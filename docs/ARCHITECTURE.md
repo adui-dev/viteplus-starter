@@ -10,8 +10,9 @@ flowchart TD
   B --> C{项目形态}
   C -->|Application| D[Vite+ vite:application]
   C -->|Monorepo| E[Vite+ vite:monorepo]
-  D --> F[官方 Vue / React 选择]
-  E --> F
+  D --> F[通过模板参数选择 vue-ts / react-ts]
+  E --> K[在 Workspace 中逐个添加应用 - 规划中]
+  K --> F
   F --> G[可选集成引擎 - 规划中]
   G --> H[UI / CSS / 大屏 / 3D]
   H --> I[模型安全适配 - 规划中]
@@ -28,7 +29,7 @@ flowchart TD
 
 ## 架构风险
 
-1. Vite+ CLI 的交互选项可能随版本变化；先确认官方非交互参数，再自动化。
+1. Vite+ 的 `vite:application` 在当前版本默认会生成普通 Vite；应用必须显式转发 `--template vue-ts|react-ts`，并在实际生成后检查框架依赖。
 2. Monorepo 中 Vue 与 React 应用隔离、配置合并需要生成后的实际验证。
 3. Cesium 资源目录、Canvas 适配、外部模型贴图需专项测试。
 4. 未安装依赖或无网络环境不能声称构建通过。

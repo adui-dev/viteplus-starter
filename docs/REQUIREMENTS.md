@@ -4,7 +4,7 @@
 
 ### FR-001 官方工程模板
 - 状态：进行中；优先级：P0。
-- 目标：Application 委托 `vp create vite:application`，Monorepo 委托 `vp create vite:monorepo`。
+- 目标：Application 委托 `vp create vite:application -- --template vue-ts|react-ts`；Monorepo 委托 `vp create vite:monorepo`。
 - 验收：实测生成 Vue 和 React 应用，且保留 Vite+ 官方结构、工具链与 Git 配置。
 
 ### FR-002 交互式创建
@@ -56,8 +56,9 @@
 
 ## V1.0 范围与依赖
 
-按顺序推进：官方基础模板 → CLI 交互和框架选择 → UI/CSS → 大屏 → 3D → 模型安全 → 跨组合验收。外部依赖版本、Vite+ 框架选项自动化及 npm scope 均需实际验证，不能推定。
+按顺序推进：官方基础模板（已完成参数映射，真实框架创建仍待复验）→ CLI 交互和框架选择 → UI/CSS → 大屏 → 3D → 模型安全 → 跨组合验收。外部依赖版本、Vite+ 框架选项自动化及 npm scope 均需实际验证，不能推定。
 
 ## 变更记录
 
+- 2026-10-26：根据 Application 冒烟测试修复框架默认生成普通 Vite 的问题，明确 Vue / React 模板参数并修复 Windows DEP0190 触发方式。
 - 2026-10-26：确定仓库 `adui-dev/viteplus-starter`；采用 Vite+ 官方基础模板；排除所有 CI/CD。

@@ -1,11 +1,12 @@
 const PROJECT_TYPES = new Set(['application', 'monorepo'])
+const FRAMEWORK_TEMPLATES = Object.freeze({ vue: 'vue-ts', react: 'react-ts' })
 
 export function validateProjectOptions(options) {
   if (!options || typeof options !== 'object') {
     throw new TypeError('项目配置必须是对象')
   }
 
-  const { name, type } = options
+  const { name, type, framework } = options
 
   if (
     typeof name !== 'string' ||
@@ -19,14 +20,18 @@ export function validateProjectOptions(options) {
     throw new Error('项目类型必须为 application 或 monorepo')
   }
 
-  return { name, type }
+  if (type === 'application' && !Object.hasOwn(FRAMEWORK_TEMPLATES, framework)) {
+    throw new Error('Application 必须通过 --framework 选择 vue 或 react')
+  }
+  if (type === 'monorepo' && framework !== undefined) {
+    throw new Error('Monorepo 根工作区不能指定 --framework，需在创建应用时独立选择')
+  }
+  return { name, type, ...(framework === undefined ? {} : { framework }) }
 }
 
 export function buildVpCommand(options) {
-  const { name, type } = validateProjectOptions(options)
-  return {
-    command: 'vp',
-    args: [
+  const { name, type, framework } = validateProjectOptions(options)
+  const args = [
       'create',
       type === 'monorepo' ? 'vite:monorepo' : 'vite:application',
       '--directory',
@@ -34,6 +39,9 @@ export function buildVpCommand(options) {
       '--package-manager',
       'pnpm',
       '--git',
-    ],
+  ]
+  if (type === 'application') {
+    args.push('--', '--template', FRAMEWORK_TEMPLATES[framework])
   }
+  return { command: 'vp', args }
 }

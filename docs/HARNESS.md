@@ -13,7 +13,8 @@
 ```powershell
 pnpm install
 node packages/create/bin/cli.mjs --help
-node packages/create/bin/cli.mjs --name demo-app --type application --dry-run
+node packages/create/bin/cli.mjs --name demo-vue --type application --framework vue --dry-run
+node packages/create/bin/cli.mjs --name demo-react --type application --framework react --dry-run
 node --test
 node scripts/validate-docs.mjs
 vp check
@@ -24,10 +25,11 @@ vp check
 ## 实际创建验收（需有 vp 环境）
 
 ```powershell
-node packages/create/bin/cli.mjs --name demo-app --type application
+node packages/create/bin/cli.mjs --name demo-vue --type application --framework vue
+node packages/create/bin/cli.mjs --name demo-react --type application --framework react
 ```
 
-在官方交互中分别验证 Vue、React。Monorepo 用 `--type monorepo` 验证。目标目录必须不存在；创建完成后在生成项目中运行官方提供的本地检查、测试与构建命令。测试结束前不要删除非本工具创建的目录。
+在两个生成目录的 package.json 分别核对 Vue/React 依赖，再运行 `vp check`、`vp build` 和 `vp dev`。Monorepo 使用 `--type monorepo` 单独验证。目标目录必须不存在；创建完成后在生成项目中运行官方提供的本地检查、测试与构建命令。测试结束前不要删除非本工具创建的目录。
 
 ## 文档校验的边界
 
@@ -35,4 +37,4 @@ node packages/create/bin/cli.mjs --name demo-app --type application
 
 ## 已知环境限制
 
-本轮执行环境有 Node.js，但无 `vp`；npm 注册表不可达，未运行真实 Vite+ 生成及构建验收。
+修复后的框架模板选择已通过 Node 单测与 Dry Run；尚未在用户 Windows Vite+ 环境中完成真实 Vue/React 创建与构建复验。
