@@ -1,12 +1,18 @@
 const VALUE_OPTIONS = new Set(['--name', '--type', '--framework', '--language', '--ui', '--css'])
 
 export function parseCliArgs(argv) {
-  const options = { name: undefined, type: undefined, framework: undefined, language: undefined, ui: undefined, css: undefined, dryRun: false, applyExisting: false, repairExisting: false }
+  const options = { name: undefined, type: undefined, framework: undefined, language: undefined, ui: undefined, css: undefined, dryRun: false, applyExisting: false, repairExisting: false, uiSmoke: false }
   const seen = new Set()
 
   for (let i = 0; i < argv.length; i += 1) {
     const token = argv[i]
     if (token === '--help' || token === '-h') return { help: true }
+    if (token === '--ui-smoke') {
+      if (seen.has(token)) throw new Error('参数不能重复: ' + token)
+      options.uiSmoke = true
+      seen.add(token)
+      continue
+    }
     if (token === '--repair-existing') {
       if (seen.has(token)) throw new Error('参数不能重复: ' + token)
       options.repairExisting = true

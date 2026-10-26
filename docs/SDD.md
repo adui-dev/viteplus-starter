@@ -67,3 +67,12 @@
 ## 待确认
 
 真实 Vue/React 生成的依赖和构建复验、Monorepo 子应用框架选择方式、最低支持 Vite+ 版本、npm 发布包名称、模型授权服务协议与大屏策略的正式参数契约。
+
+## UI Smoke 工具设计
+
+- `packages/create/src/ui-smoke.mjs`：`planUiSmoke` 负责生成独立 HTML 与 Vue SFC、React JSX/TSX；`addUiSmoke` 校验项目 `package.json`、框架语言入口、Vite+ 插件配置，写入前检查同名文件。
+- `--ui-smoke` 只用于现有独立 Application，不能与 `--dry-run`、`--apply-existing`、`--repair-existing` 同时使用；仅支持 Vue + TDesign / React + Ant Design，TS/JS 均适用。
+- 新增 `ui-smoke.html`、`src/ui-smoke/`，不改动业务入口或 Vite 配置；写入使用 `wx` 防覆盖；仅对新文件调用 `vp fmt`。
+- Vue `<t-button>` 验证组件自动导入；React 显式引用 `Button`；均含点击计数及可选 UnoCSS/Tailwind 视觉标记。
+- 由 Vite+ 开发服务器访问 `/ui-smoke.html`；需要用户在浏览器验证真实效果，不将单元测试或构建成功视为浏览器验收成功。
+

@@ -9,6 +9,7 @@ import { parseCliArgs } from '../src/cli-args.mjs'
 import { buildVpCommand, validateProjectOptions } from '../src/options.mjs'
 import { collectProjectOptions } from '../src/prompts.mjs'
 import { applyIntegrations, planIntegrations, repairExistingIntegrations } from '../src/integrations.mjs'
+import { addUiSmoke } from '../src/ui-smoke.mjs'
 
 const usage = `ADui Vite+ Starter（P2：项目初始化交互）
 
@@ -22,6 +23,7 @@ const usage = `ADui Vite+ Starter（P2：项目初始化交互）
   node packages/create/bin/cli.mjs --name my-vue-app --type application --framework vue --ui tdesign --css unocss
   node packages/create/bin/cli.mjs --name my-vue-app --type application --framework vue --ui tdesign --css unocss --apply-existing
   node packages/create/bin/cli.mjs --name my-vue-app --type application --framework vue --ui tdesign --css unocss --repair-existing
+  node packages/create/bin/cli.mjs --name my-vue-app --type application --framework vue --ui tdesign --css unocss --ui-smoke
   node packages/create/bin/cli.mjs --name my-vue-app --type application --framework vue --dry-run
 
 说明：
@@ -33,6 +35,7 @@ const usage = `ADui Vite+ Starter（P2：项目初始化交互）
   UI/CSS 集成支持 None、Element Plus、Ant Design、TDesign、UnoCSS、Tailwind CSS。
   --apply-existing 用于首次补装；--repair-existing 用于修复旧版 starter.plugins 跨文件引用。
   旧插件文件会备份成 starter.plugins.ts.bak；两种模式不重装基础模板。
+  --ui-smoke 为已有应用创建独立的 /ui-smoke.html 验证页，不修改正式首页。
   大屏及 3D 集成尚未实现。
 `
 
@@ -66,6 +69,17 @@ async function main() {
   const { command, args: vpArgs } = buildVpCommand(options)
   const integrations = planIntegrations(options)
   const target = resolve(process.cwd(), options.name)
+  if (args.uiSmoke) {
+    if (args.dryRun || args.applyExisting || args.repairExisting) {
+      throw new Error('--ui-smoke 不能与 --dry-run、--apply-existing、--repair-existing 同时使用')
+    }
+    if (!existsSync(target)) throw new Error('目标目录不存在，请先创建 Application')
+    const result = await addUiSmoke(target, options)
+    console.log('UI Smoke 验证页已生成：' + result.previewPath)
+    console.log('进入项目运行 vp dev，访问 http://localhost:5173' + result.previewPath)
+    console.log('确认组件按钮可见、点击计数增加，以及 CSS 区域显示预期颜色')
+    return
+  }
   if (args.repairExisting && args.applyExisting) {
     throw new Error('--repair-existing 不能和 --apply-existing 同时使用')
   }

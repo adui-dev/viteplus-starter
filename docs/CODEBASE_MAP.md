@@ -34,3 +34,10 @@
 | `docs/` | 需求、架构、设计、状态、Skills、Harness、ADR |
 
 计划中的 UI、CSS、3D、大屏及模型安全模块**尚无真实实现目录**。
+
+## UI Smoke 验收工具
+
+- `packages/create/src/ui-smoke.mjs`：在已有应用内生成隔离 UI 验收页，不覆盖业务文件。
+- `packages/create/test/ui-smoke.test.mjs`：涵盖 Vue/React、JS/TS、依赖预检、文件覆盖保护。
+- `docs/UI_SMOKE.md`：独立页面的运行、人工验收和清理说明。
+

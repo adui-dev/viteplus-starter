@@ -5,7 +5,7 @@ import { collectProjectOptions } from '../src/prompts.mjs'
 
 test('解析框架参数与 Dry Run', () => {
   assert.deepEqual(parseCliArgs(['--name', 'hello', '--type', 'application', '--framework', 'vue', '--dry-run']), {
-    name: 'hello', type: 'application', framework: 'vue', language: undefined, ui: undefined, css: undefined, dryRun: true, applyExisting: false, repairExisting: false,
+    name: 'hello', type: 'application', framework: 'vue', language: undefined, ui: undefined, css: undefined, dryRun: true, applyExisting: false, repairExisting: false, uiSmoke: false,
   })
 })
 
@@ -99,4 +99,13 @@ test('交互空输入默认 TypeScript', async () => {
   const answers = ['default-ts-demo', '1', '1', '', '1', '1', 'yes']
   const result = await collectProjectOptions({}, async () => answers.shift())
   assert.equal(result.language, 'ts')
+})
+
+test('独立 UI Smoke 验证页参数可解析，重复参数拒绝', () => {
+  const parsed = parseCliArgs([
+    '--name', 'starter-vue-js', '--type', 'application', '--framework', 'vue',
+    '--language', 'js', '--ui', 'tdesign', '--css', 'unocss', '--ui-smoke',
+  ])
+  assert.equal(parsed.uiSmoke, true)
+  assert.throws(() => parseCliArgs(['--ui-smoke', '--ui-smoke']))
 })

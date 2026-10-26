@@ -81,3 +81,10 @@
 
 - 2026-10-26：根据 Application 冒烟测试修复框架默认生成普通 Vite 的问题，明确 Vue / React 模板参数并修复 Windows DEP0190 触发方式。
 - 2026-10-26：确定仓库 `adui-dev/viteplus-starter`；采用 Vite+ 官方基础模板；排除所有 CI/CD。
+
+### FR-009 UI 组件实际渲染验收
+- 状态：验收页面生成工具已实现，浏览器实际渲染尚待验证；优先级：P1。
+- 目标：显式 `--ui-smoke` 在已有 Vue/TDesign、React/Ant Design TS/JS 应用中添加隔离验收页面，测试组件加载、点击计数与 CSS 原子类。
+- 验收：无需修改 App 或 main 入口，拒绝覆盖同名文件；浏览器中组件按钮可见、计数改变、CSS 样式正确且无控制台错误。
+- 范围：不支持未配置相应 UI 的应用，也不支持 Monorepo 根；不得增加 CI。
+

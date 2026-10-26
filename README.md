@@ -1,5 +1,18 @@
 # ADui Vite+ Starter
 
+## UI 组件独立验收页（新增）
+
+可以为已创建的 Vue/TDesign 或 React/Ant Design Application 添加本地 UI Smoke 页面，**不修改正式应用首页**：
+
+```powershell
+# 在 D:\Workspace\adui-studio 执行
+node .\viteplus-starter\packages\create\bin\cli.mjs --name starter-vue-js --type application --framework vue --language js --ui tdesign --css unocss --ui-smoke
+node .\viteplus-starter\packages\create\bin\cli.mjs --name starter-react-js --type application --framework react --language js --ui antd --css tailwindcss --ui-smoke
+```
+
+在各应用中运行 `vp dev`，访问 `/ui-smoke.html`，核实按钮呈现、点击计数和浅绿色原子 CSS 区域。仅新增 `ui-smoke.html` 与 `src/ui-smoke/`，不会修改 `App.*` 或正式入口。详情：[UI Smoke 验收说明](docs/UI_SMOKE.md)。**实际浏览器效果还需用户手动确认。**
+
+
 ## Vue / React：TypeScript 与 JavaScript
 
 默认使用 TypeScript，可用 `--language js` 选择 JavaScript；全部通过 Vite+ 官方 `vite:application` 生成，**不自行复制或维护框架模板**。

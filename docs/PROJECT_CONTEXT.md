@@ -36,3 +36,12 @@
 1. 继续验证真实组件渲染（TDesign/Ant Design）及其余 UI/CSS 组合；目前通过检查/构建不代表组件使用链路已验收。
 2. 在全新 Vue TypeScript + UI 组合中复验 `components.d.ts` 自动生成后的格式行为。
 3. 独立验证 Monorepo 创建，再逐步进入大屏适配及 3D 模型安全加载开发。
+
+## 2026-10-26 独立 UI Smoke 页面
+
+- 已新增 CLI `--ui-smoke`：只为已有 Vue + TDesign 或 React + Ant Design Application 生成隔离 `/ui-smoke.html`。
+- TS/JS 入口均支持；Vue 检查 `<t-button>` 自动导入，React 使用 Ant Design `Button`；点击后显示更新计数，UnoCSS/Tailwind 类显示浅绿色样式区域。
+- 不改动原始 `App.*`、`src/main.*`、`vite.config.*`；写入前检查库依赖与现有文件，防止覆盖。
+- 代码级单元测试已编写，**实际浏览器组件渲染和交互尚未验收**。
+- 下阶段：用户在已生成的 Vue/React JS 项目中运行 UI Smoke、`vp check`、`vp dev`，再推进 Monorepo 多应用创建和其余 UI/CSS 组合。
+

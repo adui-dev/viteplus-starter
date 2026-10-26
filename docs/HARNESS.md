@@ -96,3 +96,8 @@ vp build
 ## 已知环境限制
 
 用户 Windows 已通过 TypeScript、JavaScript 两种语言下的 Vue + TDesign + UnoCSS 和 React + Ant Design + Tailwind 代表组合检查与构建；历史 Vue TypeScript 曾需 `--fix`，新增 `fmt.ignorePatterns` 的 TypeScript 新建项目仍需复验。
+
+## 本地 UI Smoke 验收
+
+使用 `--ui-smoke` 在**已创建的项目**中增加隔离验收页，见 [UI Smoke 验收步骤](UI_SMOKE.md)。运行 `vp dev` 并在浏览器访问 `/ui-smoke.html`，确认真实组件按钮、点击计数、原子 CSS 的展示效果。此操作需人工检查，不会替换原首页，且 `vp build` 成功不能单独代表真实组件渲染通过。
+
