@@ -1,5 +1,19 @@
 # ADui Vite+ Starter
 
+## 2026-10-26：P3 检查修复
+
+Vue/TDesign/UnoCSS 与 React/Ant Design/Tailwind 的 `vp build` 已由用户验证通过，旧版 `vp check` 因 `./starter.plugins` 的 TS2307 失败。新版将所选插件**直接写入 `vite.config.ts`**，安装后执行 `vp fmt . --write`，不再新建 `starter.plugins.ts`。
+
+已经生成并安装好插件的旧项目，在其上级目录运行以下命令修复，不重装依赖：
+
+```powershell
+node .\viteplus-starter\packages\create\bin\cli.mjs --name starter-vue-p3 --type application --framework vue --ui tdesign --css unocss --repair-existing
+node .\viteplus-starter\packages\create\bin\cli.mjs --name starter-react-p3 --type application --framework react --ui antd --css tailwindcss --repair-existing
+```
+
+修复会将旧插件文件备份为 `starter.plugins.ts.bak`，且只格式化 `vite.config.ts`。分别在项目目录执行 `vp check` 和 `vp build`。**新方案尚待 Windows 实机复验。**
+
+
 基于 **Vite+ 官方模板**的多框架项目初始化与可选功能集成工具。
 
 > 当前状态：**初始化骨架，尚未发布**。已实现基础交互式 CLI、官方 Vue / React TypeScript 模板参数、单元测试及文档校验；UI/CSS 可选集成代码已加入（真实依赖安装与构建组合待验收）；大屏、3D 和 npm 发布仍未实现。

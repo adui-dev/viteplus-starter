@@ -1,5 +1,17 @@
 # 本地开发 Harness
 
+## P3 TS2307 修复后验证
+
+在 `D:\Workspace\adui-studio` 执行（旧项目已成功安装 UI/CSS 时）：
+
+```powershell
+node .\viteplus-starter\packages\create\bin\cli.mjs --name starter-vue-p3 --type application --framework vue --ui tdesign --css unocss --repair-existing
+node .\viteplus-starter\packages\create\bin\cli.mjs --name starter-react-p3 --type application --framework react --ui antd --css tailwindcss --repair-existing
+```
+
+上述命令不重新安装依赖，备份旧插件文件为 `starter.plugins.ts.bak`，仅对 `vite.config.ts` 执行 `vp fmt vite.config.ts --write`。再分别在两个应用执行 `vp check` 和 `vp build`。本轮修复的类型检查尚未在用户 Windows 环境中验证，不能声称通过。
+
+
 本项目**不使用 CI/CD**。所有检查由开发者本地手动执行。
 
 ## 环境

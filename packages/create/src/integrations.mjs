@@ -1,7 +1,7 @@
 import { spawnSync } from 'node:child_process'
-import { access, readFile, writeFile } from 'node:fs/promises'
+import { access, readFile, rename, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
-import { injectStarterPlugins } from './vite-config.mjs'
+import { injectStarterPlugins, repairLegacyStarterConfig } from './vite-config.mjs'
 
 const UI = {
   none: [[], []],
@@ -38,10 +38,10 @@ export function planIntegrations({ type, framework, ui = 'none', css = 'none' })
   }
 }
 
-export function generateIntegration(options, viteConfig, mainSource) {
+export function generateIntegration(options, viteConfig, mainSource, { repair = false } = {}) {
   const plan = planIntegrations({ type: 'application', ...options })
   if (plan.ui === 'none' && plan.css === 'none') return null
-  if (viteConfig.includes('starterPlugins')) throw new Error('Starter 配置已存在')
+  if (!repair && viteConfig.includes('starterPlugins')) throw new Error('Starter 配置已存在')
   const imports = []
   const plugins = []
   const mainImports = []
@@ -77,23 +77,31 @@ export function generateIntegration(options, viteConfig, mainSource) {
   const entryName = framework === 'vue' ? 'src/main.ts' : 'src/main.tsx'
   files[entryName] = mainImports.length ? mainImports.join('\n') + '\n' + mainSource : mainSource
   if (!plugins.length) return { config: viteConfig, files }
-  files['starter.plugins.ts'] = imports.join('\n') +
-    '\n\nexport function starterPlugins() {\n  return [\n    ' + plugins.join(',\n    ') + '\n  ]\n}\n'
-  const config = injectStarterPlugins(viteConfig)
+  const config = repair
+    ? repairLegacyStarterConfig(viteConfig, { imports, plugins })
+    : injectStarterPlugins(viteConfig, { imports, plugins })
   return { config, files }
+}
+
+function runCommand(cwd, command, args) {
+  const result = process.platform === 'win32'
+    ? spawnSync([command, ...args].join(' '), { cwd, stdio: 'inherit', shell: true })
+    : spawnSync(command, args, { cwd, stdio: 'inherit' })
+  if (result.error) throw result.error
+  if (result.status !== 0) throw new Error('执行失败：' + command + ' ' + args.join(' '))
+}
+
+function format(cwd, target = '.') {
+  runCommand(cwd, 'vp', ['fmt', target, '--write'])
 }
 
 function install(cwd, list, dev) {
   if (!list.length) return
   const args = ['add', ...(dev ? ['-D'] : []), ...list]
-  // Package names are selected exclusively from a hardcoded allowlist.
-  const result = process.platform === 'win32'
-    ? spawnSync(['pnpm', ...args].join(' '), { cwd, stdio: 'inherit', shell: true })
-    : spawnSync('pnpm', args, { cwd, stdio: 'inherit' })
-  if (result.error || result.status !== 0) throw new Error(`安装依赖失败：pnpm ${args.join(' ')}`)
+  runCommand(cwd, 'pnpm', args)
 }
 
-export async function applyIntegrations(directory, options, installer = install) {
+export async function applyIntegrations(directory, options, installer = install, formatter = format) {
   const plan = planIntegrations(options)
   if (!plan.dependencies.length && !plan.devDependencies.length) return false
   const configPath = join(directory, 'vite.config.ts')
@@ -117,5 +125,34 @@ export async function applyIntegrations(directory, options, installer = install)
     })
   }
   if (generated.config !== config) await writeFile(configPath, generated.config)
+  formatter(directory)
+  return true
+}
+
+export async function repairExistingIntegrations(directory, options, formatter = format) {
+  const plan = planIntegrations(options)
+  if (!plan.dependencies.length && !plan.devDependencies.length) {
+    throw new Error('未选择 UI/CSS，无需修复')
+  }
+  const configPath = join(directory, 'vite.config.ts')
+  const oldFile = join(directory, 'starter.plugins.ts')
+  const backupFile = join(directory, 'starter.plugins.ts.bak')
+  try {
+    await access(backupFile)
+    throw new Error('旧插件备份已存在，请先人工检查，拒绝覆盖')
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error
+  }
+  const [config, legacySource] = await Promise.all([
+    readFile(configPath, 'utf8'),
+    readFile(oldFile, 'utf8'),
+  ])
+  if (!/export\s+function\s+starterPlugins\s*\(/.test(legacySource)) {
+    throw new Error('旧插件文件不是已知 Starter 生成格式，拒绝自动修改')
+  }
+  const generated = generateIntegration(options, config, '', { repair: true })
+  await writeFile(configPath, generated.config)
+  await rename(oldFile, backupFile)
+  formatter(directory, 'vite.config.ts')
   return true
 }

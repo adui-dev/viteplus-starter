@@ -1,5 +1,14 @@
 # 项目上下文
 
+## 2026-10-26 P3 最新验收与修复
+
+- **用户本地已验证**：Vue + TDesign + UnoCSS、React + Ant Design + Tailwind CSS 的依赖安装及 `vp build` 成功。
+- **失败事实**：两组 `vp check` 均在 `vite.config.ts` 导入 `./starter.plugins` 处报 TS2307；`vp check --fix` 修复格式，但没有解决类型检查。
+- **本次代码修复**：插件内联写入 `vite.config.ts`，生成/补装后运行 `vp fmt . --write`；新增旧项目 `--repair-existing`，备份旧文件且不重装依赖。
+- **待验证**：用户 Windows 环境中的 `--repair-existing`、`vp check`、`vp build`，以及其他 UI/CSS 组合。
+- **不变约束**：Vue/React 使用 Vite+ 官方模板，仓库不添加任何 CI/CD。
+
+
 - 项目：ADui Vite+ Starter，仓库 `adui-dev/viteplus-starter`。
 - 当前阶段：P3 缺陷修复：解决未提供完整 UI/CSS 选项时的单元测试回归，以及官方 Vite+ `lazyPlugins` 或无插件字段配置注入失败。提供显式 `--apply-existing` 补装入口；真实构建待用户复验。
 - 目标：Vite+ 官方 Vue/React Application 与 Monorepo 项目创建，按需集成 UI、CSS、大屏、3D、安全加载。

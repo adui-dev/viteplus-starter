@@ -1,5 +1,13 @@
 # 代码索引
 
+## 2026-10-26 P3 结构更新
+
+- `packages/create/src/vite-config.mjs`：内联 Vite 插件和已知旧版 `starter.plugins` 引用迁移。
+- `packages/create/src/integrations.mjs`：执行 `vp fmt . --write`，提供不重装依赖的旧项目修复函数。
+- `packages/create/bin/cli.mjs`：新增 `--repair-existing`，保留 `--apply-existing`。
+- 新生成项目不再创建 `starter.plugins.ts`；该文件仅可能存在于旧版本，修复后保留 `.bak` 备份。
+
+
 > 本文件仅列出本次初始化实际新增的关键路径。规划模块不视为已存在。
 
 | 路径 | 作用 |

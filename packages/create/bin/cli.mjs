@@ -8,7 +8,7 @@ import { createInterface } from 'node:readline/promises'
 import { parseCliArgs } from '../src/cli-args.mjs'
 import { buildVpCommand, validateProjectOptions } from '../src/options.mjs'
 import { collectProjectOptions } from '../src/prompts.mjs'
-import { applyIntegrations, planIntegrations } from '../src/integrations.mjs'
+import { applyIntegrations, planIntegrations, repairExistingIntegrations } from '../src/integrations.mjs'
 
 const usage = `ADui Vite+ Starter（P2：项目初始化交互）
 
@@ -19,6 +19,7 @@ const usage = `ADui Vite+ Starter（P2：项目初始化交互）
   node packages/create/bin/cli.mjs --name my-workspace --type monorepo
   node packages/create/bin/cli.mjs --name my-vue-app --type application --framework vue --ui tdesign --css unocss
   node packages/create/bin/cli.mjs --name my-vue-app --type application --framework vue --ui tdesign --css unocss --apply-existing
+  node packages/create/bin/cli.mjs --name my-vue-app --type application --framework vue --ui tdesign --css unocss --repair-existing
   node packages/create/bin/cli.mjs --name my-vue-app --type application --framework vue --dry-run
 
 说明：
@@ -27,7 +28,8 @@ const usage = `ADui Vite+ Starter（P2：项目初始化交互）
   无参数时交互选择名称、形态、框架，并二次确认。
   --dry-run 只输出命令；必须提供全部必需参数，且不创建文件。
   UI/CSS 集成支持 None、Element Plus、Ant Design、TDesign、UnoCSS、Tailwind CSS。
-  --apply-existing 只用于显式补装到现有 Vite+ 项目，不会重复生成或覆盖已有 Starter 集成。
+  --apply-existing 用于首次补装；--repair-existing 用于修复旧版 starter.plugins 跨文件引用。
+  旧插件文件会备份成 starter.plugins.ts.bak；两种模式不重装基础模板。
   大屏及 3D 集成尚未实现。
 `
 
@@ -61,6 +63,22 @@ async function main() {
   const { command, args: vpArgs } = buildVpCommand(options)
   const integrations = planIntegrations(options)
   const target = resolve(process.cwd(), options.name)
+  if (args.repairExisting && args.applyExisting) {
+    throw new Error('--repair-existing 不能和 --apply-existing 同时使用')
+  }
+  if (args.repairExisting) {
+    if (args.dryRun) throw new Error('--repair-existing 与 --dry-run 不能同时使用')
+    if (options.type !== 'application') throw new Error('仅支持 Application 的旧版配置修复')
+    if (!existsSync(target)) throw new Error('目标目录不存在，无法修复')
+    const manifest = JSON.parse(await readFile(join(target, 'package.json'), 'utf8'))
+    const dependencies = { ...manifest.dependencies, ...manifest.devDependencies }
+    if (!dependencies['vite-plus'] || !dependencies[options.framework]) {
+      throw new Error('目标项目与所选 Vue/React 不匹配，拒绝修复')
+    }
+    await repairExistingIntegrations(target, options)
+    console.log('旧版插件引用修复完成，旧文件已备份，请运行 vp check 和 vp build')
+    return
+  }
   if (args.applyExisting) {
     if (args.dryRun) throw new Error('--apply-existing 与 --dry-run 不能同时使用')
     if (options.type !== 'application') throw new Error('只能向已存在的 Application 补装插件')

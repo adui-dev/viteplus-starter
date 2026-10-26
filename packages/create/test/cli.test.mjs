@@ -5,7 +5,7 @@ import { collectProjectOptions } from '../src/prompts.mjs'
 
 test('解析框架参数与 Dry Run', () => {
   assert.deepEqual(parseCliArgs(['--name', 'hello', '--type', 'application', '--framework', 'vue', '--dry-run']), {
-    name: 'hello', type: 'application', framework: 'vue', ui: undefined, css: undefined, dryRun: true, applyExisting: false,
+    name: 'hello', type: 'application', framework: 'vue', ui: undefined, css: undefined, dryRun: true, applyExisting: false, repairExisting: false,
   })
 })
 
@@ -65,4 +65,10 @@ test('显式补装参数及重复补装标记校验', () => {
   const parsed = parseCliArgs(['--name', 'demo', '--type', 'application', '--framework', 'vue', '--ui', 'tdesign', '--apply-existing'])
   assert.equal(parsed.applyExisting, true)
   assert.throws(() => parseCliArgs(['--apply-existing', '--apply-existing']))
+})
+
+test('旧版修复参数可解析，不允许重复', () => {
+  const result = parseCliArgs(['--name', 'demo', '--type', 'application', '--framework', 'vue', '--repair-existing'])
+  assert.equal(result.repairExisting, true)
+  assert.throws(() => parseCliArgs(['--repair-existing', '--repair-existing']))
 })
