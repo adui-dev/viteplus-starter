@@ -2,6 +2,7 @@ import { spawnSync } from 'node:child_process'
 import { access, readFile, rename, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { injectStarterPlugins, repairLegacyStarterConfig } from './vite-config.mjs'
+import { ignoreGeneratedVueComponentDeclarations } from './format-config.mjs'
 
 const UI = {
   none: [[], []],
@@ -77,9 +78,12 @@ export function generateIntegration(options, viteConfig, mainSource, { repair = 
   const entryName = framework === 'vue' ? 'src/main.ts' : 'src/main.tsx'
   files[entryName] = mainImports.length ? mainImports.join('\n') + '\n' + mainSource : mainSource
   if (!plugins.length) return { config: viteConfig, files }
-  const config = repair
+  const pluginConfig = repair
     ? repairLegacyStarterConfig(viteConfig, { imports, plugins })
     : injectStarterPlugins(viteConfig, { imports, plugins })
+  const config = framework === 'vue' && ui !== 'none'
+    ? ignoreGeneratedVueComponentDeclarations(pluginConfig)
+    : pluginConfig
   return { config, files }
 }
 

@@ -61,3 +61,23 @@ test('旧配置内联迁移后不再引用 starter.plugins', () => {
   assert.doesNotMatch(generated.config, /starter\.plugins|starterPlugins/)
   assert.match(generated.config, /TDesignResolver/)
 })
+
+test('Vue UI 自动导入保留组件类型声明并排除生成文件的格式检查', () => {
+  const generated = generateIntegration(
+    {framework: 'vue', ui: 'tdesign', css: 'unocss'},
+    vueConfig,
+    "import App from './App.vue'\n",
+  )
+  assert.match(generated.config, /dts: 'src\/components\.d\.ts'/)
+  assert.match(generated.config, /fmt:\s*\{\s*ignorePatterns:\s*\['src\/components\.d\.ts'\]/)
+  assert.match(generated.config, /TDesignResolver/)
+})
+
+test('React 不引入 Vue 组件类型声明格式配置', () => {
+  const generated = generateIntegration(
+    {framework: 'react', ui: 'antd', css: 'tailwindcss'},
+    reactConfig,
+    "import React from 'react'\n",
+  )
+  assert.doesNotMatch(generated.config, /src\/components\.d\.ts/)
+})

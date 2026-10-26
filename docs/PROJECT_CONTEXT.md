@@ -1,31 +1,29 @@
 # 项目上下文
 
-## 2026-10-26 P3 最新验收与修复
+更新日期：2026-10-26。
 
-- **用户本地已验证**：Vue + TDesign + UnoCSS、React + Ant Design + Tailwind CSS 的依赖安装及 `vp build` 成功。
-- **失败事实**：两组 `vp check` 均在 `vite.config.ts` 导入 `./starter.plugins` 处报 TS2307；`vp check --fix` 修复格式，但没有解决类型检查。
-- **本次代码修复**：插件内联写入 `vite.config.ts`，生成/补装后运行 `vp fmt . --write`；新增旧项目 `--repair-existing`，备份旧文件且不重装依赖。
-- **待验证**：用户 Windows 环境中的 `--repair-existing`、`vp check`、`vp build`，以及其他 UI/CSS 组合。
-- **不变约束**：Vue/React 使用 Vite+ 官方模板，仓库不添加任何 CI/CD。
+## 项目定位与约束
 
+- 仓库：`adui-dev/viteplus-starter`。Vite+ 官方 `vite:application` / `vite:monorepo` 是唯一基础工程来源，Vue/React Application 显式选 `vue-ts` / `react-ts`。
+- 已实现：基础 CLI 交互与参数模式、Application UI/CSS 集成、旧项目补装及 `--repair-existing`、基础单元测试与文档检查。
+- 规划中：Monorepo 多应用隔离与框架增强、其余 UI/CSS 兼容矩阵、大屏、Three.js/CesiumJS/Babylon.js、3D 模型安全加载。
+- 严格要求：**不得添加任何 CI/CD、自动发布或部署工作流**；仅人工本地测试。
 
-- 项目：ADui Vite+ Starter，仓库 `adui-dev/viteplus-starter`。
-- 当前阶段：P3 缺陷修复：解决未提供完整 UI/CSS 选项时的单元测试回归，以及官方 Vite+ `lazyPlugins` 或无插件字段配置注入失败。提供显式 `--apply-existing` 补装入口；真实构建待用户复验。
-- 目标：Vite+ 官方 Vue/React Application 与 Monorepo 项目创建，按需集成 UI、CSS、大屏、3D、安全加载。
-- 技术原则：Vite+、TypeScript 优先、pnpm；不使用第三方 create-vue/create-vite 作为基础创建器。
-- 已存在：原仓库 MIT LICENSE；本轮新增 CLI 原型、基础测试、核心文档、本地文档检查与一份项目 Skill。
-- 用户本地实测：Vite+ v1.4.0 的默认 Application 能通过 `vp check`、`vp build`、`vp dev`；但未指定模板时未生成 Vue/React。修复后的 Vue/React 创建已获用户确认成功。
-- 用户本地反馈：先前 20 个测试中 19 个通过、1 个失败（已针对原因修复）；Vue + TDesign + UnoCSS 项目基础模板已生成，但增强阶段在依赖安装前因 Vite 配置识别失败。修复后的完整测试与真实构建尚未复验。
-- 尚未验证：修复后 UI/CSS 依赖安装、check/build，Monorepo、3D、安全模型加载及 npm 发布。
-- 明确禁止：**任何 CI/CD 工作流**（GitHub Actions、其他流水线或自动部署）；遵循用户当前要求。
+## 用户 Windows 实机验收（已确认）
 
-## 进行中与下一阶段
+- 运行环境：Node 24.22.1、pnpm 12.15.0、Vite+ 1.4.0。
+- Vue + TDesign + UnoCSS：`--repair-existing` 成功，原 `./starter.plugins` TS2307 消失；`vp check` 首次仅提示自动生成 `src/components.d.ts` 格式差异，`vp check --fix` 后通过；`vp build` 通过。
+- React + Ant Design + Tailwind CSS：`--repair-existing` 成功；`vp check` 直接通过；`vp build` 通过。
+- 以上验证了依赖安装、配置、类型检查及生产构建。**尚未实际验证组件在页面中渲染和交互，也未覆盖所有 UI/CSS 组合。**
 
-1. 用户运行 `git pull --ff-only` 后执行 `node --test`，再用 `--apply-existing` 为已存在的 `starter-vue-p3` 补装 TDesign + UnoCSS；检查 `vp check/build`。
-2. 完善可重复的交互与非交互式选项测试。
-3. 再逐步实现 UI/CSS、大屏、3D、模型安全适配。
-4. 每阶段同步需求、SDD、代码索引与验证结果。
+## 本轮修复
 
-## 风险
+- 针对 Vue 自动导入组件的 `src/components.d.ts`：保留 `unplugin-vue-components` 的 `dts` 输出，通过 Vite+ `fmt.ignorePatterns` 排除该自动生成文件的格式检查；不关闭 TypeScript 类型检查。
+- 新生成的 Vue + UI 项目将自动加入配置，且保留已有 `fmt` 字段及忽略规则。React 不加入此 Vue 专属配置。
+- 独立 Node 测试覆盖默认配置、已有 fmt 配置、已有 ignorePatterns、幂等与异常结构。**尚未在 Windows 实际新建项目验证该修复**。
 
-用户提供的日志确认 Vue 的 P2 交互创建成功，未出现 DEP0190。P3 配置注入补丁已通过独立 Node 测试：普通 plugins、lazyPlugins、无 plugins、lint.plugins 嵌套字段及异常结构；用户 Windows 下完整依赖安装和构建待复验。
+## 下一步
+
+1. 用户运行本地 `node --test`、`node scripts/validate-docs.mjs`，并在新创建的 Vue + TDesign + UnoCSS 项目上验证 `vp check`、`vp build`；必要时复查自动生成声明的格式行为。
+2. 验证真实组件渲染，以及 Vue/React 的其余 UI/CSS 组合。
+3. 独立验证 Monorepo 创建，再逐步进入大屏适配及 3D 模型安全加载开发。

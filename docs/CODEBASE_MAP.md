@@ -2,6 +2,9 @@
 
 ## 2026-10-26 P3 结构更新
 
+- `packages/create/src/format-config.mjs`：向 Vite+ 根 `fmt.ignorePatterns` 安全合并 Vue 自动生成的 `src/components.d.ts`。
+- `packages/create/test/format-config.test.mjs`：默认 fmt、已有格式规则、幂等、异常结构测试。
+
 - `packages/create/src/vite-config.mjs`：内联 Vite 插件和已知旧版 `starter.plugins` 引用迁移。
 - `packages/create/src/integrations.mjs`：执行 `vp fmt . --write`，提供不重装依赖的旧项目修复函数。
 - `packages/create/bin/cli.mjs`：新增 `--repair-existing`，保留 `--apply-existing`。

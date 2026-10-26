@@ -9,7 +9,7 @@ node .\viteplus-starter\packages\create\bin\cli.mjs --name starter-vue-p3 --type
 node .\viteplus-starter\packages\create\bin\cli.mjs --name starter-react-p3 --type application --framework react --ui antd --css tailwindcss --repair-existing
 ```
 
-上述命令不重新安装依赖，备份旧插件文件为 `starter.plugins.ts.bak`，仅对 `vite.config.ts` 执行 `vp fmt vite.config.ts --write`。再分别在两个应用执行 `vp check` 和 `vp build`。本轮修复的类型检查尚未在用户 Windows 环境中验证，不能声称通过。
+上述命令不重新安装依赖，备份旧插件文件为 `starter.plugins.ts.bak`，仅对 `vite.config.ts` 执行 `vp fmt vite.config.ts --write`。再分别在两个应用执行 `vp check` 和 `vp build`。用户已在 Windows 完成旧项目修复：React `vp check` 直接通过、Vue `vp check --fix` 处理 `src/components.d.ts` 后通过，两组 `vp build` 均通过。
 
 
 本项目**不使用 CI/CD**。所有检查由开发者本地手动执行。
@@ -55,7 +55,7 @@ node .\viteplus-starter\packages\create\bin\cli.mjs --name p3-vue --type applica
 node .\viteplus-starter\packages\create\bin\cli.mjs --name p3-react --type application --framework react --ui antd --css tailwindcss
 ```
 
-分别进入两个目录执行 `vp check`、`vp build` 和 `vp dev`，确认组件库样式、生成的 `starter.plugins.ts`、`uno.config.ts` 或 `src/starter.tailwind.css` 可用。若安装依赖失败，项目目录可能已创建；检查后处理，禁止在生成器里自动删除现有用户文件。
+分别进入两个目录执行 `vp check`、`vp build` 和 `vp dev`，确认组件库样式、`vite.config.ts` 中的插件配置、`uno.config.ts` 或 `src/starter.tailwind.css` 可用。若安装依赖失败，项目目录可能已创建；检查后处理，禁止在生成器里自动删除现有用户文件。
 
 ## 处理官方模板生成成功但集成失败
 
@@ -74,6 +74,12 @@ vp build
 
 现有脚本检查必要文件、常规相对 Markdown 链接和需求标题编号重复。它**不等于**完整 Markdown 语义、Skills 安全审核、所有 ADR 和需求追踪一致性验证。
 
+## Vue 自动生成声明的格式验证
+
+新版 Vue UI 项目在 Vite+ `vite.config.ts` 写入 `fmt.ignorePatterns: ['src/components.d.ts']`（与现有规则合并）。这只排除自动生成类型声明的格式检查，TypeScript 仍应照常执行。
+
+对**新创建**的 Vue + UI 项目，先执行 `vp build` 触发声明生成，再运行 `vp check`；不应再次因 `src/components.d.ts` 格式失败。用户已经修好的旧项目不需要重新执行 `--repair-existing`，如以后再次出现该问题，可手动将路径加入现有 `fmt.ignorePatterns`。
+
 ## 已知环境限制
 
-用户已确认 Vue/React 显式框架创建成功；本轮新交互逻辑通过 Node 22 的 11 项单元测试，用户 Windows Vue 交互终端创建已验证；P3 组合仍待复验。
+用户 Windows 已通过 Vue + TDesign + UnoCSS 与 React + Ant Design + Tailwind 的检查（Vue 曾使用 `--fix`）和构建；新增 `fmt.ignorePatterns` 配置仍需在新项目复验。

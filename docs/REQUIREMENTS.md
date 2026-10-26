@@ -4,7 +4,7 @@
 
 - 用户本地 Vue/TDesign/UnoCSS、React/Ant Design/Tailwind CSS 的 `vp build` 均通过。
 - 旧版生成器存在插件相对导入 TS2307 与格式问题。修复要求：生成阶段内联插件、自动格式化并提供保留备份的旧项目修复入口。
-- 以上实现的 Windows 类型检查回归仍待验收；不得新增 CI/CD。
+- 用户 2026-10-26 反馈：两组旧项目修复后 `vp build` 均通过，React 的 `vp check` 直接通过，Vue 的 `vp check --fix` 修正生成声明后通过；不得新增 CI/CD。
 
 
 状态定义：**已实现 / 进行中 / 规划中 / 待确认**。当前项目仍处于初始化阶段。
@@ -20,12 +20,12 @@
 - 验收：非法名称、目录存在或未知参数时安全失败；交互与非交互创建均可用。
 
 ### FR-003 UI 集成
-- 状态：已编写初步集成逻辑，真实组合构建待验证；优先级：P1。
+- 状态：两种代表组合的安装、类型检查及构建已验证；其余组合和真实组件渲染待验收；优先级：P1。
 - 目标：None / Element Plus（Vue 专属）/ Ant Design（Vue 为 ant-design-vue，React 为 antd）/ TDesign（对应框架包），单选。
 - 验收：生成后组件正常加载、类型检查和构建成功；React 不出现 Element Plus。
 
 ### FR-004 CSS 集成
-- 状态：已编写初步集成逻辑，真实组合构建待验证；优先级：P1。
+- 状态：UnoCSS/Tailwind 的代表组合已通过构建，格式生成规则已完善；其他组合待验收；优先级：P1。
 - 目标：None / UnoCSS / Tailwind CSS，单选。
 - 验收：对应 Vite 插件及样式入口有效，未选择不引入依赖。
 
@@ -66,6 +66,8 @@
 按顺序推进：官方基础模板（已完成参数映射，真实框架创建仍待复验）→ CLI 交互和框架选择 → UI/CSS → 大屏 → 3D → 模型安全 → 跨组合验收。外部依赖版本、Vite+ 框架选项自动化及 npm scope 均需实际验证，不能推定。
 
 ## 变更记录
+
+- 2026-10-26：Vue + TDesign + UnoCSS、React + Ant Design + Tailwind CSS 的旧项目修复、检查和构建验收；新增 Vue 自动生成 `components.d.ts` 的 Vite+ 格式排除规则，不影响 TS 检查。
 
 - 2026-10-26：修复 P3 非交互选项单测回归及 Vite+ lazyPlugins/无 plugins 配置兼容；增加针对已创建项目的显式补装模式，保持无 CI 约束。
 
