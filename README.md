@@ -34,7 +34,7 @@ node .\viteplus-starter\packages\create\bin\cli.mjs --name starter-react-p3 --ty
 
 基于 **Vite+ 官方模板**的多框架项目初始化与可选功能集成工具。
 
-> 当前状态：**开发阶段、尚未发布**。基础 CLI 与 Vue/React 官方应用模板已验证；Vue + TDesign + UnoCSS、React + Ant Design + Tailwind CSS 已在 Windows 完成依赖安装和构建验收。其他 UI/CSS 组合、大屏、3D 和 npm 发布仍待完成。
+> 当前状态：**开发阶段、尚未发布**。Vue/React × TypeScript/JavaScript 四种官方应用模板已完成真实创建和构建验证；Vue + TDesign + UnoCSS 与 React + Ant Design + Tailwind CSS 的 TS/JS 代表组合均已在 Windows 通过 `vp build` 与 `vp check`（历史 Vue TS 需 `--fix`）。其他 UI/CSS 组合、组件实际渲染、Monorepo、多屏、3D 和 npm 发布仍待完成。
 
 ## 快速开始（开发者）
 

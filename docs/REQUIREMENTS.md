@@ -10,7 +10,7 @@
 状态定义：**已实现 / 进行中 / 规划中 / 待确认**。当前项目仍处于初始化阶段。
 
 ### FR-001 官方工程模板
-- 状态：进行中；优先级：P0。
+- 状态：Vue/React × TS/JS 四种 Application 官方模板已完成创建和构建验证；Monorepo 单独待验收；优先级：P0。
 - 目标：Application 委托 `vp create vite:application -- --template vue|vue-ts|react|react-ts`；语言可选 `ts` / `js`，默认 TypeScript；Monorepo 委托 `vp create vite:monorepo`。
 - 验收：实测生成 Vue 和 React 应用，且保留 Vite+ 官方结构、工具链与 Git 配置。
 
@@ -20,12 +20,12 @@
 - 验收：非法名称、目录存在或未知参数时安全失败；交互与非交互创建均可用。
 
 ### FR-003 UI 集成
-- 状态：两种代表组合的安装、类型检查及构建已验证；其余组合和真实组件渲染待验收；优先级：P1。
+- 状态：Vue TS/JS + TDesign/UnoCSS、React TS/JS + Ant Design/Tailwind 四种代表组合的安装、检查及构建已验证；其余组合和真实组件渲染待验收；优先级：P1。
 - 目标：None / Element Plus（Vue 专属）/ Ant Design（Vue 为 ant-design-vue，React 为 antd）/ TDesign（对应框架包），单选。
 - 验收：生成后组件正常加载、类型检查和构建成功；React 不出现 Element Plus。
 
 ### FR-004 CSS 集成
-- 状态：UnoCSS/Tailwind 的代表组合已通过构建，格式生成规则已完善；其他组合待验收；优先级：P1。
+- 状态：TS/JS 下 UnoCSS、Tailwind 的代表组合已通过检查和构建，格式生成规则已完善；其他组合待验收；优先级：P1。
 - 目标：None / UnoCSS / Tailwind CSS，单选。
 - 验收：对应 Vite 插件及样式入口有效，未选择不引入依赖。
 
@@ -63,9 +63,11 @@
 
 ## V1.0 范围与依赖
 
-按顺序推进：官方基础模板（已完成参数映射，真实框架创建仍待复验）→ CLI 交互和框架选择 → UI/CSS → 大屏 → 3D → 模型安全 → 跨组合验收。外部依赖版本、Vite+ 框架选项自动化及 npm scope 均需实际验证，不能推定。
+按顺序推进：官方基础模板（Vue/React × TS/JS 创建及构建已验证）→ CLI 交互和框架选择 → UI/CSS → 大屏 → 3D → 模型安全 → 跨组合验收。外部依赖版本、Vite+ 框架选项自动化及 npm scope 均需实际验证，不能推定。
 
 ## 变更记录
+
+- 2026-10-26：Windows 验收通过 `starter-vue-js`（Vue/JS/TDesign/UnoCSS）和 `starter-react-js`（React/JS/Ant Design/Tailwind），均直接通过 `vp build`、`vp check`；组件真实渲染仍未验收，不新增 CI。
 
 - 2026-10-26：Vue/React 新增 `ts`、`js` 两种官方模板选项，TypeScript 默认；JavaScript UI/CSS 集成适配 `main.js`、`main.jsx`、`uno.config.js` 和 JS 配置文件；不增加 CI。
 

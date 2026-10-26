@@ -8,7 +8,7 @@
 - `integrations.mjs` 按语言选择 `src/main.ts` / `src/main.js`（Vue）和 `src/main.tsx` / `src/main.jsx`（React），同时识别实际存在的 `vite.config.ts|mts|js|mjs`。若存在多个 Vite 配置则拒绝自动修改。
 - UnoCSS 配置采用 `uno.config.ts|js`；Vue JavaScript 组件自动导入设置 `dts: false`，Vue TypeScript 保留 `src/components.d.ts` 及对应格式忽略规则。
 - 旧版 `starter.plugins.ts` 的迁移只适用于历史 TypeScript 工程；JS 创建和 `--apply-existing` 不使用此历史格式。
-- 完成代码级参数/生成验证，但实际 JS 项目创建、依赖安装与 `vp check/build` 仍需在 Windows Vite+ 环境验收。
+- 已完成代码级参数/生成验证；Vue + JavaScript + TDesign + UnoCSS、React + JavaScript + Ant Design + Tailwind 的官方创建、依赖安装和 `vp check/build` 均已在 Windows 验收通过。组件真实渲染及剩余组合尚待测试。
 
 
 ## P3 生成器修复：插件内联与旧配置修复

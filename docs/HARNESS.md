@@ -25,7 +25,7 @@ node .\viteplus-starter\packages\create\bin\cli.mjs --name react-ts-check --type
 node .\viteplus-starter\packages\create\bin\cli.mjs --name react-js-check --type application --framework react --language js --ui antd --css tailwindcss
 ```
 
-进入每个新项目执行 `vp check` 和 `vp build`，并确认 Vue JS 项目生成 `src/main.js`、React JS 项目生成 `src/main.jsx`；JavaScript 项目不应因生成器产生 TypeScript 专属的组件声明。以上属于待完成的实机验收，不得提前标记通过。
+进入每个新项目执行 `vp check` 和 `vp build`，并确认 Vue JS 项目生成 `src/main.js`、React JS 项目生成 `src/main.jsx`；JavaScript 项目不应因生成器产生 TypeScript 专属的组件声明。其中 Vue/React JavaScript + UI/CSS 两组已由用户在 Windows 实机创建，并直接通过 `vp build`、`vp check`。其余指定新目录的完整矩阵及实际组件渲染仍待验证。
 
 ## 环境
 
@@ -95,4 +95,4 @@ vp build
 
 ## 已知环境限制
 
-用户 Windows 已通过 Vue + TDesign + UnoCSS 与 React + Ant Design + Tailwind 的检查（Vue 曾使用 `--fix`）和构建；新增 `fmt.ignorePatterns` 配置仍需在新项目复验。
+用户 Windows 已通过 TypeScript、JavaScript 两种语言下的 Vue + TDesign + UnoCSS 和 React + Ant Design + Tailwind 代表组合检查与构建；历史 Vue TypeScript 曾需 `--fix`，新增 `fmt.ignorePatterns` 的 TypeScript 新建项目仍需复验。
