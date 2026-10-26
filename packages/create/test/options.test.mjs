@@ -31,3 +31,9 @@ test('拒绝目录遍历、无效项目类型以及缺失/无效框架', () => {
   assert.throws(() => validateProjectOptions({ name: 'valid', type: 'application', framework: 'angular' }))
   assert.throws(() => validateProjectOptions({ name: 'valid', type: 'monorepo', framework: 'vue' }))
 })
+
+test('UI/CSS 配置的框架兼容性校验', () => {
+  assert.throws(() => validateProjectOptions({ name: 'demo', type: 'application', framework: 'react', ui: 'element-plus' }))
+  assert.throws(() => validateProjectOptions({ name: 'demo', type: 'monorepo', css: 'tailwindcss' }))
+  assert.throws(() => validateProjectOptions({ name: 'demo', type: 'application', framework: 'vue', css: 'unknown' }))
+})

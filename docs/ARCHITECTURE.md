@@ -21,7 +21,7 @@ flowchart TD
 
 ## 模块边界
 
-- `packages/create`：CLI、配置校验、官方命令调用；已建立最小实现。
+- `packages/create`：CLI、配置校验、官方命令调用和 UI/CSS 应用集成；已建立最小实现。
 - `packages/*` 未来可容纳共享模型加解密核心及引擎适配；尚未创建。
 - `scripts/validate-docs.mjs`：本地文档静态校验；不是 CI。
 - 官方 Vite+ 负责应用模板、基础工具链；不得偷偷替换官方模板。
@@ -29,7 +29,7 @@ flowchart TD
 
 ## 架构风险
 
-1. Vite+ 的 `vite:application` 在当前版本默认会生成普通 Vite；应用必须显式转发 `--template vue-ts|react-ts`，并在实际生成后检查框架依赖。
+1. UI/CSS 当前只适配已知的 Vite+ Vue/React 应用入口及插件数组，若官方模板结构变化需调整并复验。Vite+ 的 `vite:application` 在当前版本默认会生成普通 Vite；应用必须显式转发 `--template vue-ts|react-ts`，并在实际生成后检查框架依赖。
 2. Monorepo 中 Vue 与 React 应用隔离、配置合并需要生成后的实际验证。
 3. Cesium 资源目录、Canvas 适配、外部模型贴图需专项测试。
 4. 未安装依赖或无网络环境不能声称构建通过。

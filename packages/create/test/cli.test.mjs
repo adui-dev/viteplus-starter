@@ -5,7 +5,7 @@ import { collectProjectOptions } from '../src/prompts.mjs'
 
 test('解析框架参数与 Dry Run', () => {
   assert.deepEqual(parseCliArgs(['--name', 'hello', '--type', 'application', '--framework', 'vue', '--dry-run']), {
-    name: 'hello', type: 'application', framework: 'vue', dryRun: true,
+    name: 'hello', type: 'application', framework: 'vue', ui: undefined, css: undefined, dryRun: true,
   })
 })
 
@@ -16,9 +16,9 @@ test('拒绝未知、重复和缺少值的参数', () => {
 })
 
 test('交互选择 Vue Application 并确认', async () => {
-  const answers = ['my-app', '1', '1', 'y']
+  const answers = ['my-app', '1', '1', '1', '1', 'y']
   const result = await collectProjectOptions({}, async () => answers.shift())
-  assert.deepEqual(result, { name: 'my-app', type: 'application', framework: 'vue' })
+  assert.deepEqual(result, { name: 'my-app', type: 'application', framework: 'vue', ui: 'none', css: 'none' })
 })
 
 test('交互选择 Monorepo，不询问根框架', async () => {
@@ -29,7 +29,7 @@ test('交互选择 Monorepo，不询问根框架', async () => {
 
 test('输入非法名称后重新输入', async () => {
   const messages = []
-  const answers = ['../bad', 'valid-app', 'application', 'react', '']
+  const answers = ['../bad', 'valid-app', 'application', 'react', '1', '1', '']
   const result = await collectProjectOptions({}, async () => answers.shift(), (s) => messages.push(s))
   assert.equal(result.name, 'valid-app')
   assert.equal(result.framework, 'react')
@@ -37,7 +37,7 @@ test('输入非法名称后重新输入', async () => {
 })
 
 test('取消交互不会生成项目参数', async () => {
-  const answers = ['my-app', '1', '2', 'n']
+  const answers = ['my-app', '1', '2', '1', '1', 'n']
   const result = await collectProjectOptions({}, async () => answers.shift())
   assert.equal(result, null)
 })
@@ -45,4 +45,18 @@ test('取消交互不会生成项目参数', async () => {
 test('非交互完整配置不需要二次确认', async () => {
   const result = await collectProjectOptions({ name: 'my-app', type: 'application', framework: 'react' }, async () => { throw new Error('不应询问') })
   assert.deepEqual(result, { name: 'my-app', type: 'application', framework: 'react' })
+})
+
+test('交互选择 Vue + TDesign + UnoCSS', async () => {
+  const answers = ['my-vue', '1', '1', '4', '2', 'y']
+  const result = await collectProjectOptions({}, async () => answers.shift())
+  assert.equal(result.ui, 'tdesign')
+  assert.equal(result.css, 'unocss')
+})
+
+test('React 的 UI 菜单不提供 Element Plus', async () => {
+  const answers = ['my-react', '1', '2', '2', '3', 'y']
+  const result = await collectProjectOptions({}, async () => answers.shift())
+  assert.equal(result.ui, 'antd')
+  assert.equal(result.css, 'tailwindcss')
 })

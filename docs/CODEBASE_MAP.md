@@ -11,6 +11,8 @@
 | `packages/create/src/cli-args.mjs` | 参数白名单和重复参数校验 |
 | `packages/create/src/prompts.mjs` | 项目交互选择、确认和取消 |
 | `packages/create/test/cli.test.mjs` | 交互流程与参数解析单元测试 |
+| `packages/create/src/integrations.mjs` | UI/CSS 依赖计划、配置与样式生成、安装接入 |
+| `packages/create/test/integrations.test.mjs` | UI/CSS 兼容规则和生成文件单元测试 |
 | `packages/create/src/options.mjs` | 创建选项白名单校验及官方命令组装 |
 | `packages/create/test/options.test.mjs` | 创建选项基础单元测试 |
 | `scripts/validate-docs.mjs` | 本地文档检查 |

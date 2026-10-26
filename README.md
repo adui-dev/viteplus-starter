@@ -2,7 +2,7 @@
 
 基于 **Vite+ 官方模板**的多框架项目初始化与可选功能集成工具。
 
-> 当前状态：**初始化骨架，尚未发布**。已实现基础交互式 CLI、官方 Vue / React TypeScript 模板参数、单元测试及文档校验；UI/CSS/3D 集成和 npm 发布仍未实现。
+> 当前状态：**初始化骨架，尚未发布**。已实现基础交互式 CLI、官方 Vue / React TypeScript 模板参数、单元测试及文档校验；UI/CSS 可选集成代码已加入（真实依赖安装与构建组合待验收）；大屏、3D 和 npm 发布仍未实现。
 
 ## 快速开始（开发者）
 
@@ -18,9 +18,11 @@ node packages/create/bin/cli.mjs
 node packages/create/bin/cli.mjs --name demo-vue --type application --framework vue --dry-run
 node packages/create/bin/cli.mjs --name demo-vue --type application --framework vue
 node packages/create/bin/cli.mjs --name demo-react --type application --framework react
+# UI 与 CSS 按需选择，生成后安装依赖并追加对应配置
+node packages/create/bin/cli.mjs --name demo-ui --type application --framework vue --ui tdesign --css unocss
 ```
 
-当前 CLI 使用 Vite+ 内置 `vite:application` 或 `vite:monorepo`；Application 用 `--framework` 将框架映射到官方 `vue-ts` / `react-ts` 模板。现已提供基础交互式创建流程，但 **UI、CSS、大屏、3D 插件尚未实现**，不会出现这些未生效的选择项。
+当前 CLI 使用 Vite+ 内置 `vite:application` 或 `vite:monorepo`；Application 用 `--framework` 将框架映射到官方 `vue-ts` / `react-ts` 模板。现已支持 UI 组件库选项（None / Element Plus / Ant Design / TDesign）和 CSS 框架（None / UnoCSS / Tailwind CSS）。React 不提供 Element Plus。选中依赖后由 pnpm 安装并生成 Vite 插件/样式入口；**大屏、3D、安全模型加载尚未实现**。首次使用每种组合后仍需运行真实 check/build 验证。
 
 本地验证：
 

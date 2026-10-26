@@ -7,6 +7,7 @@ import { createInterface } from 'node:readline/promises'
 import { parseCliArgs } from '../src/cli-args.mjs'
 import { buildVpCommand, validateProjectOptions } from '../src/options.mjs'
 import { collectProjectOptions } from '../src/prompts.mjs'
+import { applyIntegrations, planIntegrations } from '../src/integrations.mjs'
 
 const usage = `ADui Vite+ Starter（P2：项目初始化交互）
 
@@ -15,6 +16,7 @@ const usage = `ADui Vite+ Starter（P2：项目初始化交互）
   node packages/create/bin/cli.mjs --name my-vue-app --type application --framework vue
   node packages/create/bin/cli.mjs --name my-react-app --type application --framework react
   node packages/create/bin/cli.mjs --name my-workspace --type monorepo
+  node packages/create/bin/cli.mjs --name my-vue-app --type application --framework vue --ui tdesign --css unocss
   node packages/create/bin/cli.mjs --name my-vue-app --type application --framework vue --dry-run
 
 说明：
@@ -22,7 +24,8 @@ const usage = `ADui Vite+ Starter（P2：项目初始化交互）
   Monorepo 使用官方 vite:monorepo；子应用的框架需分别选择。
   无参数时交互选择名称、形态、框架，并二次确认。
   --dry-run 只输出命令；必须提供全部必需参数，且不创建文件。
-  UI、CSS、大屏及 3D 集成尚未实现。
+  UI/CSS 集成支持 None、Element Plus、Ant Design、TDesign、UnoCSS、Tailwind CSS。
+  大屏及 3D 集成尚未实现。
 `
 
 async function main() {
@@ -53,12 +56,13 @@ async function main() {
   }
 
   const { command, args: vpArgs } = buildVpCommand(options)
+  const integrations = planIntegrations(options)
   if (existsSync(resolve(process.cwd(), options.name)) && !args.dryRun) {
     throw new Error(`目标目录已存在: ${options.name}，为保护文件已终止`)
   }
 
   if (args.dryRun) {
-    console.log(JSON.stringify({ command, args: vpArgs }, null, 2))
+    console.log(JSON.stringify({ command, args: vpArgs, integrations }, null, 2))
     return
   }
 
@@ -73,6 +77,11 @@ async function main() {
     : spawnSync(command, vpArgs, { stdio: 'inherit' })
 
   if (result.error) throw result.error
+  if (result.status === 0 && (integrations.dependencies.length || integrations.devDependencies.length)) {
+    console.log('正在安装和配置所选 UI/CSS 插件...')
+    await applyIntegrations(resolve(process.cwd(), options.name), options)
+    console.log('UI/CSS 插件配置已写入，请运行 vp check 和 vp build 验证')
+  }
   if (result.signal) {
     process.exitCode = 1
   } else if (result.status !== 0) {
