@@ -2,7 +2,7 @@
 
 基于 **Vite+ 官方模板**的多框架项目初始化与可选功能集成工具。
 
-> 当前状态：**初始化骨架，尚未发布**。已实现初步 CLI 命令委托、参数校验、基础测试和文档校验；已支持显式指定 Vue / React TypeScript 模板（真实框架生成尚需本地复验），UI/CSS/3D 集成和 npm 发布均未实现。
+> 当前状态：**初始化骨架，尚未发布**。已实现基础交互式 CLI、官方 Vue / React TypeScript 模板参数、单元测试及文档校验；UI/CSS/3D 集成和 npm 发布仍未实现。
 
 ## 快速开始（开发者）
 
@@ -13,12 +13,14 @@ git clone https://github.com/adui-dev/viteplus-starter.git
 cd viteplus-starter
 pnpm install
 node packages/create/bin/cli.mjs --help
+# 无参数交互创建（名称、类型、框架、确认）
+node packages/create/bin/cli.mjs
 node packages/create/bin/cli.mjs --name demo-vue --type application --framework vue --dry-run
 node packages/create/bin/cli.mjs --name demo-vue --type application --framework vue
 node packages/create/bin/cli.mjs --name demo-react --type application --framework react
 ```
 
-当前 CLI 使用 Vite+ 内置 `vite:application` 或 `vite:monorepo`；Application 用 `--framework` 将框架映射到官方 `vue-ts` / `react-ts` 模板。**请勿把初始化 CLI 误认为已完成的多选项生成器。**
+当前 CLI 使用 Vite+ 内置 `vite:application` 或 `vite:monorepo`；Application 用 `--framework` 将框架映射到官方 `vue-ts` / `react-ts` 模板。现已提供基础交互式创建流程，但 **UI、CSS、大屏、3D 插件尚未实现**，不会出现这些未生效的选择项。
 
 本地验证：
 

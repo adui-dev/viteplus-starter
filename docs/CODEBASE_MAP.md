@@ -8,6 +8,9 @@
 | `pnpm-workspace.yaml` | packages 工作区声明 |
 | `vite.config.ts` | 根部 Vite+ 最小配置，尚未做完整构建验证 |
 | `packages/create/bin/cli.mjs` | 初始化 CLI 入口 |
+| `packages/create/src/cli-args.mjs` | 参数白名单和重复参数校验 |
+| `packages/create/src/prompts.mjs` | 项目交互选择、确认和取消 |
+| `packages/create/test/cli.test.mjs` | 交互流程与参数解析单元测试 |
 | `packages/create/src/options.mjs` | 创建选项白名单校验及官方命令组装 |
 | `packages/create/test/options.test.mjs` | 创建选项基础单元测试 |
 | `scripts/validate-docs.mjs` | 本地文档检查 |

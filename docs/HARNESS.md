@@ -13,6 +13,8 @@
 ```powershell
 pnpm install
 node packages/create/bin/cli.mjs --help
+# 交互式创建（在独立测试目录执行）
+node packages/create/bin/cli.mjs
 node packages/create/bin/cli.mjs --name demo-vue --type application --framework vue --dry-run
 node packages/create/bin/cli.mjs --name demo-react --type application --framework react --dry-run
 node --test
@@ -37,4 +39,4 @@ node packages/create/bin/cli.mjs --name demo-react --type application --framewor
 
 ## 已知环境限制
 
-修复后的框架模板选择已通过 Node 单测与 Dry Run；尚未在用户 Windows Vite+ 环境中完成真实 Vue/React 创建与构建复验。
+用户已确认 Vue/React 显式框架创建成功；本轮新交互逻辑通过 Node 22 的 11 项单元测试，Windows 交互终端创建仍待复验。
