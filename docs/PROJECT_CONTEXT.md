@@ -4,7 +4,7 @@
 
 ## 项目定位与约束
 
-- 仓库：`adui-dev/viteplus-starter`。Vite+ 官方 `vite:application` / `vite:monorepo` 是唯一基础工程来源，Vue/React Application 显式选 `vue-ts` / `react-ts`。
+- 仓库：`adui-dev/viteplus-starter`。Vite+ 官方 `vite:application` / `vite:monorepo` 是唯一基础工程来源，Vue/React Application 按语言选 `vue` / `vue-ts` / `react` / `react-ts`。
 - 已实现：基础 CLI 交互与参数模式、Application UI/CSS 集成、旧项目补装及 `--repair-existing`、基础单元测试与文档检查。
 - 规划中：Monorepo 多应用隔离与框架增强、其余 UI/CSS 兼容矩阵、大屏、Three.js/CesiumJS/Babylon.js、3D 模型安全加载。
 - 严格要求：**不得添加任何 CI/CD、自动发布或部署工作流**；仅人工本地测试。
@@ -15,6 +15,13 @@
 - Vue + TDesign + UnoCSS：`--repair-existing` 成功，原 `./starter.plugins` TS2307 消失；`vp check` 首次仅提示自动生成 `src/components.d.ts` 格式差异，`vp check --fix` 后通过；`vp build` 通过。
 - React + Ant Design + Tailwind CSS：`--repair-existing` 成功；`vp check` 直接通过；`vp build` 通过。
 - 以上验证了依赖安装、配置、类型检查及生产构建。**尚未实际验证组件在页面中渲染和交互，也未覆盖所有 UI/CSS 组合。**
+
+## 2026-10-26 语言选择扩展
+
+- Vue/React Application 均可选择 `ts` 或 `js`，默认 TypeScript；官方 Vite+ 模板映射已接入 CLI 交互与 `--language`。
+- UI/CSS 生成器适配 JS/JSX 入口、JS Vite 配置与 UnoCSS 配置；Vue JS 不生成 `.d.ts`。
+- 已完成针对性代码级验证，真实 JavaScript Vite+ 项目创建、检查、构建仍待用户 Windows 复验。
+- 没有新增 CI/CD。
 
 ## 本轮修复
 

@@ -1,5 +1,8 @@
 const PROJECT_TYPES = new Set(['application', 'monorepo'])
-const FRAMEWORK_TEMPLATES = Object.freeze({ vue: 'vue-ts', react: 'react-ts' })
+const FRAMEWORK_TEMPLATES = Object.freeze({
+  vue: Object.freeze({ ts: 'vue-ts', js: 'vue' }),
+  react: Object.freeze({ ts: 'react-ts', js: 'react' }),
+})
 
 export function validateProjectName(name) {
   if (
@@ -18,6 +21,7 @@ export function validateProjectOptions(options) {
   }
 
   const { name, type, framework } = options
+  const language = options.language ?? 'ts'
   const ui = options.ui ?? 'none'
   const css = options.css ?? 'none'
 
@@ -32,6 +36,12 @@ export function validateProjectOptions(options) {
   }
   if (type === 'monorepo' && framework !== undefined) {
     throw new Error('Monorepo 根工作区不能指定 --framework，需在创建应用时独立选择')
+  }
+  if (type === 'application' && !['ts', 'js'].includes(language)) {
+    throw new Error('开发语言必须为 ts 或 js')
+  }
+  if (type === 'monorepo' && options.language !== undefined) {
+    throw new Error('Monorepo 根工作区不能指定 --language，需在各应用中独立选择')
   }
   if (!['none', 'element-plus', 'antd', 'tdesign'].includes(ui)) {
     throw new Error('不支持的 UI 组件库')
@@ -48,13 +58,14 @@ export function validateProjectOptions(options) {
   return {
     name, type,
     ...(framework === undefined ? {} : { framework }),
+    ...(options.language === undefined ? {} : { language }),
     ...(options.ui === undefined ? {} : { ui }),
     ...(options.css === undefined ? {} : { css }),
   }
 }
 
 export function buildVpCommand(options) {
-  const { name, type, framework } = validateProjectOptions(options)
+  const { name, type, framework, language = 'ts' } = validateProjectOptions(options)
   const args = [
       'create',
       type === 'monorepo' ? 'vite:monorepo' : 'vite:application',
@@ -65,7 +76,7 @@ export function buildVpCommand(options) {
       '--git',
   ]
   if (type === 'application') {
-    args.push('--', '--template', FRAMEWORK_TEMPLATES[framework])
+    args.push('--', '--template', FRAMEWORK_TEMPLATES[framework][language])
   }
   return { command: 'vp', args }
 }

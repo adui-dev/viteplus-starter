@@ -47,7 +47,7 @@ export function generateIntegration(options, viteConfig, mainSource, { repair = 
   const plugins = []
   const mainImports = []
   const files = {}
-  const { framework, ui = 'none', css = 'none' } = options
+  const { framework, language = 'ts', ui = 'none', css = 'none' } = options
 
   if (framework === 'vue' && ui !== 'none') {
     imports.push("import Components from 'unplugin-vue-components/vite'")
@@ -58,7 +58,7 @@ export function generateIntegration(options, viteConfig, mainSource, { repair = 
     }
     const [importLine, resolver] = resolvers[ui]
     imports.push(importLine)
-    plugins.push(`Components({ resolvers: [${resolver}], dts: 'src/components.d.ts' })`)
+    plugins.push(`Components({ resolvers: [${resolver}], dts: ${language === 'ts' ? "'src/components.d.ts'" : 'false'} })`)
     if (ui === 'tdesign') mainImports.push("import 'tdesign-vue-next/es/style/index.css'")
   }
   if (framework === 'react' && ui === 'antd') mainImports.push("import 'antd/dist/reset.css'")
@@ -67,7 +67,7 @@ export function generateIntegration(options, viteConfig, mainSource, { repair = 
     imports.push("import UnoCSS from 'unocss/vite'")
     plugins.push('UnoCSS()')
     mainImports.push("import 'virtual:uno.css'")
-    files['uno.config.ts'] = "import { defineConfig, presetWind3 } from 'unocss'\n\nexport default defineConfig({ presets: [presetWind3()] })\n"
+    files[`uno.config.${language === 'js' ? 'js' : 'ts'}`] = "import { defineConfig, presetWind3 } from 'unocss'\n\nexport default defineConfig({ presets: [presetWind3()] })\n"
   }
   if (css === 'tailwindcss') {
     imports.push("import tailwindcss from '@tailwindcss/vite'")
@@ -75,13 +75,13 @@ export function generateIntegration(options, viteConfig, mainSource, { repair = 
     mainImports.push("import './starter.tailwind.css'")
     files['src/starter.tailwind.css'] = '@import "tailwindcss";\n'
   }
-  const entryName = framework === 'vue' ? 'src/main.ts' : 'src/main.tsx'
+  const entryName = `src/main.${framework === 'vue' ? (language === 'js' ? 'js' : 'ts') : (language === 'js' ? 'jsx' : 'tsx')}`
   files[entryName] = mainImports.length ? mainImports.join('\n') + '\n' + mainSource : mainSource
   if (!plugins.length) return { config: viteConfig, files }
   const pluginConfig = repair
     ? repairLegacyStarterConfig(viteConfig, { imports, plugins })
     : injectStarterPlugins(viteConfig, { imports, plugins })
-  const config = framework === 'vue' && ui !== 'none'
+  const config = framework === 'vue' && ui !== 'none' && language === 'ts'
     ? ignoreGeneratedVueComponentDeclarations(pluginConfig)
     : pluginConfig
   return { config, files }
@@ -105,15 +105,38 @@ function install(cwd, list, dev) {
   runCommand(cwd, 'pnpm', args)
 }
 
+async function resolveApplicationPaths(directory, options) {
+  const language = options.language ?? 'ts'
+  if (!['ts', 'js'].includes(language)) throw new Error('开发语言必须为 ts 或 js')
+  const entry = options.framework === 'vue'
+    ? (language === 'js' ? 'main.js' : 'main.ts')
+    : (language === 'js' ? 'main.jsx' : 'main.tsx')
+  const mainPath = join(directory, 'src', entry)
+  await access(mainPath)
+  const candidates = ['vite.config.ts', 'vite.config.mts', 'vite.config.js', 'vite.config.mjs']
+  const existing = []
+  for (const filename of candidates) {
+    try {
+      await access(join(directory, filename))
+      existing.push(join(directory, filename))
+    } catch (error) {
+      if (error.code !== 'ENOENT') throw error
+    }
+  }
+  if (existing.length !== 1) {
+    throw new Error('无法唯一识别 Vite+ 官方配置文件（vite.config.ts/js/mts/mjs）')
+  }
+  return { configPath: existing[0], mainPath }
+}
+
 export async function applyIntegrations(directory, options, installer = install, formatter = format) {
   const plan = planIntegrations(options)
   if (!plan.dependencies.length && !plan.devDependencies.length) return false
-  const configPath = join(directory, 'vite.config.ts')
-  const mainPath = join(directory, 'src', options.framework === 'vue' ? 'main.ts' : 'main.tsx')
+  const { configPath, mainPath } = await resolveApplicationPaths(directory, options)
   const [config, entry] = await Promise.all([readFile(configPath, 'utf8'), readFile(mainPath, 'utf8')])
   const generated = generateIntegration(options, config, entry)
   for (const path of Object.keys(generated.files)) {
-    if (path === `src/main.${options.framework === 'vue' ? 'ts' : 'tsx'}`) continue
+    if (join(directory, path) === mainPath) continue
     try {
       await access(join(directory, path))
       throw new Error(`文件已存在，拒绝覆盖：${path}`)
@@ -125,7 +148,7 @@ export async function applyIntegrations(directory, options, installer = install,
   installer(directory, plan.devDependencies, true)
   for (const [path, source] of Object.entries(generated.files)) {
     await writeFile(join(directory, path), source, {
-      flag: path.startsWith('src/main.') ? 'w' : 'wx',
+      flag: join(directory, path) === mainPath ? 'w' : 'wx',
     })
   }
   if (generated.config !== config) await writeFile(configPath, generated.config)
@@ -134,6 +157,9 @@ export async function applyIntegrations(directory, options, installer = install,
 }
 
 export async function repairExistingIntegrations(directory, options, formatter = format) {
+  if (options.language === 'js') {
+    throw new Error('旧版 starter.plugins.ts 迁移仅支持 TypeScript 项目')
+  }
   const plan = planIntegrations(options)
   if (!plan.dependencies.length && !plan.devDependencies.length) {
     throw new Error('未选择 UI/CSS，无需修复')

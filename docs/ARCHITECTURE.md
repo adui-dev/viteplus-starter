@@ -10,7 +10,7 @@ flowchart TD
   B --> C{项目形态}
   C -->|Application| D[Vite+ vite:application]
   C -->|Monorepo| E[Vite+ vite:monorepo]
-  D --> F[通过模板参数选择 vue-ts / react-ts]
+  D --> F[通过模板参数选择 vue / vue-ts / react / react-ts]
   E --> K[在 Workspace 中逐个添加应用 - 规划中]
   K --> F
   F --> G[可选集成引擎 - 规划中]

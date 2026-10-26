@@ -1,5 +1,23 @@
 # ADui Vite+ Starter
 
+## Vue / React：TypeScript 与 JavaScript
+
+默认使用 TypeScript，可用 `--language js` 选择 JavaScript；全部通过 Vite+ 官方 `vite:application` 生成，**不自行复制或维护框架模板**。
+
+| 框架 | `--language ts`（默认） | `--language js` |
+| --- | --- | --- |
+| Vue 3 | `vue-ts` | `vue` |
+| React | `react-ts` | `react` |
+
+```powershell
+node packages/create/bin/cli.mjs --name vue-js-demo --type application --framework vue --language js
+node packages/create/bin/cli.mjs --name react-js-demo --type application --framework react --language js --ui antd --css tailwindcss
+node packages/create/bin/cli.mjs --name vue-ts-demo --type application --framework vue --language ts --ui tdesign --css unocss
+```
+
+交互式创建会在框架选择后询问开发语言，默认 TypeScript。JS 生成器将按照官方工程实际配置处理 `vite.config.js` / `.ts` 等格式，并写入 `src/main.js` 或 `src/main.jsx`；UnoCSS 对应 `uno.config.js`。JavaScript 的 Vue 项目不会生成 TypeScript 专用的组件类型声明。Monorepo 根目录不接受 `--language`，各子应用独立选择。
+
+
 ## 2026-10-26：P3 检查修复
 
 Vue/TDesign/UnoCSS 与 React/Ant Design/Tailwind 的 `vp build` 已由用户验证通过，旧版 `vp check` 因 `./starter.plugins` 的 TS2307 失败。新版将所选插件**直接写入 `vite.config.ts`**，安装后执行 `vp fmt . --write`，不再新建 `starter.plugins.ts`。
@@ -38,7 +56,7 @@ node packages/create/bin/cli.mjs --name demo-ui --type application --framework v
 node packages/create/bin/cli.mjs --name demo-ui --type application --framework vue --ui tdesign --css unocss --apply-existing
 ```
 
-当前 CLI 使用 Vite+ 内置 `vite:application` 或 `vite:monorepo`；Application 用 `--framework` 将框架映射到官方 `vue-ts` / `react-ts` 模板。现已支持 UI 组件库选项（None / Element Plus / Ant Design / TDesign）和 CSS 框架（None / UnoCSS / Tailwind CSS）。React 不提供 Element Plus。选中依赖后由 pnpm 安装并生成 Vite 插件/样式入口；**大屏、3D、安全模型加载尚未实现**。现在支持针对官方 `plugins: [...]`、`plugins: lazyPlugins(() => [...])` 和不包含 `plugins` 属性的 `defineConfig` 进行兼容配置注入。Vue 自动导入的 `src/components.d.ts` 保留类型声明，但会自动加入 Vite+ `fmt.ignorePatterns`，避免其重新生成造成格式漂移。其他组合仍需运行真实 check/build 验证；未知配置结构会明确报错而不强行修改。
+当前 CLI 使用 Vite+ 内置 `vite:application` 或 `vite:monorepo`；Application 用 `--framework` 和 `--language` 映射到官方 `vue` / `vue-ts` / `react` / `react-ts` 模板。现已支持 UI 组件库选项（None / Element Plus / Ant Design / TDesign）和 CSS 框架（None / UnoCSS / Tailwind CSS）。React 不提供 Element Plus。选中依赖后由 pnpm 安装并生成 Vite 插件/样式入口；**大屏、3D、安全模型加载尚未实现**。现在支持针对官方 `plugins: [...]`、`plugins: lazyPlugins(() => [...])` 和不包含 `plugins` 属性的 `defineConfig` 进行兼容配置注入。Vue 自动导入的 `src/components.d.ts` 保留类型声明，但会自动加入 Vite+ `fmt.ignorePatterns`，避免其重新生成造成格式漂移。其他组合仍需运行真实 check/build 验证；未知配置结构会明确报错而不强行修改。
 
 本地验证：
 

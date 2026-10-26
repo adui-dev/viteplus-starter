@@ -51,13 +51,22 @@ export async function collectProjectOptions(partial, ask, report = console.error
     prompted = true
     options.framework = await askUntilValid(
       ask,
-      '前端框架 [1] Vue 3 + TypeScript  [2] React + TypeScript (默认 1): ',
+      '前端框架 [1] Vue 3  [2] React (默认 1): ',
       choiceValidator({ ...FRAMEWORKS, vue: 'vue', react: 'react' }, '1'),
       report,
     )
   }
 
   if (options.type === 'application') {
+    if (!options.language) {
+      prompted = true
+      options.language = await askUntilValid(
+        ask,
+        '开发语言 [1] TypeScript  [2] JavaScript (默认 1): ',
+        choiceValidator({ '1': 'ts', '2': 'js', ts: 'ts', js: 'js' }, '1'),
+        report,
+      )
+    }
     if (!options.ui) {
       prompted = true
       const values = options.framework === 'vue'
@@ -82,7 +91,7 @@ export async function collectProjectOptions(partial, ask, report = console.error
   if (!prompted) return selected
 
   const description = selected.type === 'application'
-    ? `Application / ${selected.framework === 'vue' ? 'Vue 3' : 'React'} / TypeScript / UI: ${selected.ui ?? 'none'} / CSS: ${selected.css ?? 'none'}`
+    ? `Application / ${selected.framework === 'vue' ? 'Vue 3' : 'React'} / ${selected.language === 'js' ? 'JavaScript' : 'TypeScript'} / UI: ${selected.ui ?? 'none'} / CSS: ${selected.css ?? 'none'}`
     : 'Monorepo (各子应用后续独立选择框架)'
   const answer = (await ask(`\n将创建 ${selected.name} (${description})，确认吗？[Y/n]: `)).trim().toLowerCase()
   if (answer === 'n' || answer === 'no') return null

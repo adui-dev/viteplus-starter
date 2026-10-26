@@ -16,7 +16,7 @@
 
 ## 决策
 
-采用方案 3。Vue 与 React 都从 Vite+ 的 `vite:application` 入口生成，传入官方 create-vite 的 `vue-ts` / `react-ts` 模板选项；本项目仅增加校验与可选集成。不得通过 `vp migrate` 替代此路径。
+采用方案 3。Vue 与 React 都从 Vite+ 的 `vite:application` 入口生成，按语言传入官方 create-vite 的 `vue` / `vue-ts` / `react` / `react-ts` 模板选项（TypeScript 默认）；本项目仅增加校验与可选集成。不得通过 `vp migrate` 替代此路径。
 
 ## 理由与权衡
 

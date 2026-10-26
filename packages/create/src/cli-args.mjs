@@ -1,7 +1,7 @@
-const VALUE_OPTIONS = new Set(['--name', '--type', '--framework', '--ui', '--css'])
+const VALUE_OPTIONS = new Set(['--name', '--type', '--framework', '--language', '--ui', '--css'])
 
 export function parseCliArgs(argv) {
-  const options = { name: undefined, type: undefined, framework: undefined, ui: undefined, css: undefined, dryRun: false, applyExisting: false, repairExisting: false }
+  const options = { name: undefined, type: undefined, framework: undefined, language: undefined, ui: undefined, css: undefined, dryRun: false, applyExisting: false, repairExisting: false }
   const seen = new Set()
 
   for (let i = 0; i < argv.length; i += 1) {

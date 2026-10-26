@@ -16,6 +16,8 @@ const usage = `ADui Vite+ Starter（P2：项目初始化交互）
   node packages/create/bin/cli.mjs
   node packages/create/bin/cli.mjs --name my-vue-app --type application --framework vue
   node packages/create/bin/cli.mjs --name my-react-app --type application --framework react
+  node packages/create/bin/cli.mjs --name my-vue-js-app --type application --framework vue --language js
+  node packages/create/bin/cli.mjs --name my-react-js-app --type application --framework react --language js
   node packages/create/bin/cli.mjs --name my-workspace --type monorepo
   node packages/create/bin/cli.mjs --name my-vue-app --type application --framework vue --ui tdesign --css unocss
   node packages/create/bin/cli.mjs --name my-vue-app --type application --framework vue --ui tdesign --css unocss --apply-existing
@@ -23,9 +25,10 @@ const usage = `ADui Vite+ Starter（P2：项目初始化交互）
   node packages/create/bin/cli.mjs --name my-vue-app --type application --framework vue --dry-run
 
 说明：
-  Application 委托 Vite+ 官方 vite:application，使用 vue-ts / react-ts 模板。
+  Application 委托 Vite+ 官方 vite:application，按框架和语言选择 vue/vue-ts/react/react-ts。
+  --language ts|js（默认 ts）；Monorepo 根不指定语言。
   Monorepo 使用官方 vite:monorepo；子应用的框架需分别选择。
-  无参数时交互选择名称、形态、框架，并二次确认。
+  无参数时交互选择名称、形态、框架、语言（默认 TypeScript）、UI/CSS，并二次确认。
   --dry-run 只输出命令；必须提供全部必需参数，且不创建文件。
   UI/CSS 集成支持 None、Element Plus、Ant Design、TDesign、UnoCSS、Tailwind CSS。
   --apply-existing 用于首次补装；--repair-existing 用于修复旧版 starter.plugins 跨文件引用。
@@ -105,7 +108,7 @@ async function main() {
   }
 
   console.log(options.type === 'application'
-    ? `调用 Vite+ 官方 Application 模板，框架：${options.framework}`
+    ? `调用 Vite+ 官方 Application 模板，框架：${options.framework}，语言：${options.language ?? 'ts'}`
     : '调用 Vite+ 官方 Monorepo 模板')
 
   // Windows 的 vp 通常是 .cmd shim；所有值在构造命令前均被白名单校验。

@@ -37,3 +37,26 @@ test('UI/CSS 配置的框架兼容性校验', () => {
   assert.throws(() => validateProjectOptions({ name: 'demo', type: 'monorepo', css: 'tailwindcss' }))
   assert.throws(() => validateProjectOptions({ name: 'demo', type: 'application', framework: 'vue', css: 'unknown' }))
 })
+
+test('Vue / React 两种语言全部使用 Vite+ 官方模板', () => {
+  const variants = [
+    ['vue', 'ts', 'vue-ts'],
+    ['vue', 'js', 'vue'],
+    ['react', 'ts', 'react-ts'],
+    ['react', 'js', 'react'],
+  ]
+  for (const [framework, language, expected] of variants) {
+    const result = buildVpCommand({name: 'language-demo', type: 'application', framework, language})
+    assert.equal(result.args[1], 'vite:application')
+    assert.deepEqual(result.args.slice(-3), ['--', '--template', expected])
+  }
+})
+
+test('默认语言 TypeScript，拒绝非法语言和 Monorepo 全局语言', () => {
+  const defaults = validateProjectOptions({name: 'default-ts', type: 'application', framework: 'vue'})
+  assert.equal(defaults.language, undefined)
+  assert.equal(buildVpCommand(defaults).args.at(-1), 'vue-ts')
+  assert.throws(() => validateProjectOptions({name: 'bad-lang', type: 'application', framework: 'vue', language: 'javascript'}))
+  assert.throws(() => validateProjectOptions({name: 'bad-lang', type: 'application', framework: 'react', language: 'TS'}))
+  assert.throws(() => validateProjectOptions({name: 'workspace', type: 'monorepo', language: 'js'}))
+})

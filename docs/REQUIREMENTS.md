@@ -11,12 +11,12 @@
 
 ### FR-001 官方工程模板
 - 状态：进行中；优先级：P0。
-- 目标：Application 委托 `vp create vite:application -- --template vue-ts|react-ts`；Monorepo 委托 `vp create vite:monorepo`。
+- 目标：Application 委托 `vp create vite:application -- --template vue|vue-ts|react|react-ts`；语言可选 `ts` / `js`，默认 TypeScript；Monorepo 委托 `vp create vite:monorepo`。
 - 验收：实测生成 Vue 和 React 应用，且保留 Vite+ 官方结构、工具链与 Git 配置。
 
 ### FR-002 交互式创建
 - 状态：已实现基础交互（Windows 实机待复验），扩展插件选项规划中；优先级：P0。
-- 目标：交互选择名称、项目形态、框架与确认/取消；非交互调用支持参数化。
+- 目标：交互选择名称、项目形态、框架、语言（默认 TypeScript）及确认/取消；非交互调用支持 `--language ts|js`。
 - 验收：非法名称、目录存在或未知参数时安全失败；交互与非交互创建均可用。
 
 ### FR-003 UI 集成
@@ -46,7 +46,7 @@
 
 ### FR-008 Monorepo 应用隔离
 - 状态：规划中；优先级：P1。
-- 目标：同一工作区可包含不同框架和插件选择的应用。
+- 目标：同一工作区可包含不同框架、语言和插件选择的应用；根工作区不指定统一语言。
 - 验收：配置互不污染，依赖与生成目录正确。
 
 ### NFR-001 安全与可靠性
@@ -66,6 +66,8 @@
 按顺序推进：官方基础模板（已完成参数映射，真实框架创建仍待复验）→ CLI 交互和框架选择 → UI/CSS → 大屏 → 3D → 模型安全 → 跨组合验收。外部依赖版本、Vite+ 框架选项自动化及 npm scope 均需实际验证，不能推定。
 
 ## 变更记录
+
+- 2026-10-26：Vue/React 新增 `ts`、`js` 两种官方模板选项，TypeScript 默认；JavaScript UI/CSS 集成适配 `main.js`、`main.jsx`、`uno.config.js` 和 JS 配置文件；不增加 CI。
 
 - 2026-10-26：Vue + TDesign + UnoCSS、React + Ant Design + Tailwind CSS 的旧项目修复、检查和构建验收；新增 Vue 自动生成 `components.d.ts` 的 Vite+ 格式排除规则，不影响 TS 检查。
 

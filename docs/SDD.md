@@ -1,5 +1,16 @@
 # 详细设计
 
+## 官方模板语言选择（新增）
+
+- Application 的 `--language ts|js` 默认 `ts`。Vue 选 `vue-ts` 或 `vue`；React 选 `react-ts` 或 `react`，全部使用 Vite+ 官方 `vite:application`，不再自行运行其他生成器。
+- `options.mjs` 负责框架 × 语言的模板映射及校验；`cli-args.mjs` 解析 `--language`；`prompts.mjs` 在框架后询问语言，默认 TypeScript。
+- Monorepo 根目录禁止传 `--language`；后续需为各子应用独立设置。
+- `integrations.mjs` 按语言选择 `src/main.ts` / `src/main.js`（Vue）和 `src/main.tsx` / `src/main.jsx`（React），同时识别实际存在的 `vite.config.ts|mts|js|mjs`。若存在多个 Vite 配置则拒绝自动修改。
+- UnoCSS 配置采用 `uno.config.ts|js`；Vue JavaScript 组件自动导入设置 `dts: false`，Vue TypeScript 保留 `src/components.d.ts` 及对应格式忽略规则。
+- 旧版 `starter.plugins.ts` 的迁移只适用于历史 TypeScript 工程；JS 创建和 `--apply-existing` 不使用此历史格式。
+- 完成代码级参数/生成验证，但实际 JS 项目创建、依赖安装与 `vp check/build` 仍需在 Windows Vite+ 环境验收。
+
+
 ## P3 生成器修复：插件内联与旧配置修复
 
 - `packages/create/src/format-config.mjs`：仅针对 Vue UI 自动导入，向 Vite+ `fmt.ignorePatterns` 添加 `src/components.d.ts`，避免自动生成的类型声明在重新生成后造成不稳定格式检查。保留原有 `fmt`、`ignorePatterns`，重复调用不新增重复条目；不支持的配置格式拒绝修改。该规则仅影响格式检查，不关闭 Lint 或 TypeScript。

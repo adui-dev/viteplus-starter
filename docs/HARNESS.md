@@ -14,6 +14,19 @@ node .\viteplus-starter\packages\create\bin\cli.mjs --name starter-react-p3 --ty
 
 本项目**不使用 CI/CD**。所有检查由开发者本地手动执行。
 
+## TypeScript / JavaScript 四种官方模板验证
+
+在仓库外的工作目录执行：
+
+```powershell
+node .\viteplus-starter\packages\create\bin\cli.mjs --name vue-ts-check --type application --framework vue --language ts
+node .\viteplus-starter\packages\create\bin\cli.mjs --name vue-js-check --type application --framework vue --language js --ui tdesign --css unocss
+node .\viteplus-starter\packages\create\bin\cli.mjs --name react-ts-check --type application --framework react --language ts
+node .\viteplus-starter\packages\create\bin\cli.mjs --name react-js-check --type application --framework react --language js --ui antd --css tailwindcss
+```
+
+进入每个新项目执行 `vp check` 和 `vp build`，并确认 Vue JS 项目生成 `src/main.js`、React JS 项目生成 `src/main.jsx`；JavaScript 项目不应因生成器产生 TypeScript 专属的组件声明。以上属于待完成的实机验收，不得提前标记通过。
+
 ## 环境
 
 - Node.js 22+（计划最低版本，尚待官方工具链版本验证）

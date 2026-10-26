@@ -1,6 +1,9 @@
 import { test } from 'node:test'
+import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import assert from 'node:assert/strict'
-import { planIntegrations, generateIntegration } from '../src/integrations.mjs'
+import { planIntegrations, generateIntegration, applyIntegrations } from '../src/integrations.mjs'
 
 const vueConfig = "import vue from '@vitejs/plugin-vue'\nexport default defineConfig({\n  plugins: [vue()],\n})\n"
 const reactConfig = "import react from '@vitejs/plugin-react'\nexport default defineConfig({\n  plugins: [react()],\n})\n"
@@ -80,4 +83,69 @@ test('React 不引入 Vue 组件类型声明格式配置', () => {
     "import React from 'react'\n",
   )
   assert.doesNotMatch(generated.config, /src\/components\.d\.ts/)
+})
+
+test('Vue JS + TDesign + UnoCSS 使用 main.js、uno.config.js 且不生成类型声明', () => {
+  const generated = generateIntegration(
+    {framework: 'vue', language: 'js', ui: 'tdesign', css: 'unocss'},
+    vueConfig,
+    "import App from './App.vue'\n",
+  )
+  assert.match(generated.files['src/main.js'], /virtual:uno.css/)
+  assert.ok(generated.files['uno.config.js'])
+  assert.equal(generated.files['src/main.ts'], undefined)
+  assert.equal(generated.files['uno.config.ts'], undefined)
+  assert.match(generated.config, /dts: false/)
+  assert.doesNotMatch(generated.config, /fmt:|components\.d\.ts/)
+})
+
+test('React JS + Ant Design + Tailwind 使用 main.jsx', () => {
+  const generated = generateIntegration(
+    {framework: 'react', language: 'js', ui: 'antd', css: 'tailwindcss'},
+    reactConfig,
+    "import React from 'react'\n",
+  )
+  assert.match(generated.files['src/main.jsx'], /antd\/dist\/reset.css/)
+  assert.match(generated.files['src/main.jsx'], /starter.tailwind.css/)
+  assert.ok(generated.files['src/starter.tailwind.css'])
+  assert.equal(generated.files['src/main.tsx'], undefined)
+})
+
+test('JavaScript 官方配置和应用入口可被正确识别并写入', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'vp-starter-js-'))
+  try {
+    await mkdir(join(directory, 'src'))
+    await writeFile(join(directory, 'vite.config.js'),
+      "import { defineConfig } from 'vite-plus'\nexport default defineConfig({plugins: []})\n")
+    await writeFile(join(directory, 'src/main.js'), "import App from './App.vue'\n")
+    const installs = []
+    const formats = []
+    await applyIntegrations(directory, {
+      type: 'application', framework: 'vue', language: 'js', ui: 'tdesign', css: 'unocss',
+    }, (_cwd, deps, dev) => installs.push({deps, dev}), (_cwd, target) => formats.push(target))
+    assert.match(await readFile(join(directory, 'vite.config.js'), 'utf8'), /TDesignResolver/)
+    assert.match(await readFile(join(directory, 'src/main.js'), 'utf8'), /virtual:uno.css/)
+    assert.ok((await readFile(join(directory, 'uno.config.js'), 'utf8')).includes('presetWind3'))
+    assert.equal(installs.length, 2)
+    assert.equal(formats.length, 1)
+  } finally {
+    await rm(directory, {recursive: true, force: true})
+  }
+})
+
+test('React JavaScript 入口 main.jsx 与 vite.config.js 可生成', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'vp-starter-react-js-'))
+  try {
+    await mkdir(join(directory, 'src'))
+    await writeFile(join(directory, 'vite.config.js'),
+      "import { defineConfig } from 'vite-plus'\nexport default defineConfig({ plugins: [] })\n")
+    await writeFile(join(directory, 'src/main.jsx'), "import React from 'react'\n")
+    await applyIntegrations(directory, {
+      type: 'application', framework: 'react', language: 'js', ui: 'antd', css: 'tailwindcss',
+    }, () => {}, () => {})
+    assert.match(await readFile(join(directory, 'vite.config.js'), 'utf8'), /tailwindcss\(\)/)
+    assert.match(await readFile(join(directory, 'src/main.jsx'), 'utf8'), /starter.tailwind.css/)
+  } finally {
+    await rm(directory, {recursive: true, force: true})
+  }
 })
