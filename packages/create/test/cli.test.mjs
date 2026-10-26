@@ -5,7 +5,7 @@ import { collectProjectOptions } from '../src/prompts.mjs'
 
 test('解析框架参数与 Dry Run', () => {
   assert.deepEqual(parseCliArgs(['--name', 'hello', '--type', 'application', '--framework', 'vue', '--dry-run']), {
-    name: 'hello', type: 'application', framework: 'vue', ui: undefined, css: undefined, dryRun: true,
+    name: 'hello', type: 'application', framework: 'vue', ui: undefined, css: undefined, dryRun: true, applyExisting: false,
   })
 })
 
@@ -59,4 +59,10 @@ test('React 的 UI 菜单不提供 Element Plus', async () => {
   const result = await collectProjectOptions({}, async () => answers.shift())
   assert.equal(result.ui, 'antd')
   assert.equal(result.css, 'tailwindcss')
+})
+
+test('显式补装参数及重复补装标记校验', () => {
+  const parsed = parseCliArgs(['--name', 'demo', '--type', 'application', '--framework', 'vue', '--ui', 'tdesign', '--apply-existing'])
+  assert.equal(parsed.applyExisting, true)
+  assert.throws(() => parseCliArgs(['--apply-existing', '--apply-existing']))
 })

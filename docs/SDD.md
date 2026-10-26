@@ -20,10 +20,12 @@
 
 `packages/create/src/integrations.mjs`：
 - `planIntegrations(options)`：按 Vue/React 生成白名单依赖清单，拒绝 React + Element Plus、Monorepo 根统一配置。
-- `generateIntegration(options, viteConfig, mainSource)`：保留官方 Vite 配置，识别插件数组后仅添加引用 `starter.plugins.ts`；若结构无法识别则停止。
-- `applyIntegrations(directory, options)`：先检查目标文件，再通过 pnpm 安装依赖，最后写入选中的样式和配置。安装失败时不写入配置，但生成项目可能已存在。
+- `generateIntegration(options, viteConfig, mainSource)`：保留 Vite+ 官方配置，不再仅识别直接数组；调用 `vite-config.mjs` 兼容顶层普通 plugins、lazyPlugins 或无 plugins 情况，未知结构停止。
+- `applyIntegrations(directory, options)`：在安装依赖前先生成并校验修改后的配置、检查目标文件是否存在；校验失败不安装依赖。安装失败时不写入插件配置，但官方基础项目可能已存在。
+- 新增 `--apply-existing` 显式补装：校验原目录、package.json 中的 `vite-plus` 及 Vue/React 依赖，再对已有的官方基础应用安装所选集成；不重新执行 `vp create`。
 - Vue 使用 `unplugin-vue-components` 和对应 Resolver 按需引入组件；React 依赖自身组件导入机制；UnoCSS / Tailwind 均写入官方建议的插件与样式入口。
 - 当前只支持独立 Application。Monorepo 各应用独立 UI/CSS 配置仍待实现和验证。
+- `collectProjectOptions` 基础参数已全部提供时直接返回校验结果，未指定 UI/CSS 默认视为 None；修复 P3 新增交互字段导致的非交互单元测试回归。
 - 自动修改仅支持官方 Vue/React 的 `plugins: [...]` 格式以及标准 `src/main.ts[x]` 入口，不对未知结构强行变更。
 
 ## 规划模块（未实现）

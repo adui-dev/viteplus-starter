@@ -32,3 +32,14 @@ test('React + Ant Design 仅需入口样式', () => {
 test('未知模板布局应拒绝修改', () => {
   assert.throws(() => generateIntegration({framework:'vue',ui:'antd',css:'none'}, 'export default {}', ''))
 })
+
+test('Vite+ lazyPlugins 配置可以安全追加 UI/CSS 插件', () => {
+  const config = "import { defineConfig, lazyPlugins } from 'vite-plus'\nexport default defineConfig({plugins:lazyPlugins(() => [vue()])})"
+  const result = generateIntegration({framework:'vue',ui:'tdesign',css:'unocss'}, config, "import App from './App.vue'")
+  assert.match(result.config, /\.\.\.starterPlugins\(\)/)
+})
+test('Vite+ 无插件数组时可以增加 plugins', () => {
+  const config = "import { defineConfig } from 'vite-plus'\nexport default defineConfig({staged:{}})"
+  const result = generateIntegration({framework:'vue',ui:'element-plus',css:'none'}, config, "import App from './App.vue'")
+  assert.match(result.config, /plugins: lazyPlugins/)
+})

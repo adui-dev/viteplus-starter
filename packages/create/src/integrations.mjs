@@ -1,6 +1,7 @@
 import { spawnSync } from 'node:child_process'
 import { access, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
+import { injectStarterPlugins } from './vite-config.mjs'
 
 const UI = {
   none: [[], []],
@@ -40,9 +41,6 @@ export function planIntegrations({ type, framework, ui = 'none', css = 'none' })
 export function generateIntegration(options, viteConfig, mainSource) {
   const plan = planIntegrations({ type: 'application', ...options })
   if (plan.ui === 'none' && plan.css === 'none') return null
-  if (!/plugins\s*:\s*\[/.test(viteConfig)) {
-    throw new Error('无法识别 Vite+ 官方配置中的 plugins 数组，拒绝修改')
-  }
   if (viteConfig.includes('starterPlugins')) throw new Error('Starter 配置已存在')
   const imports = []
   const plugins = []
@@ -81,8 +79,7 @@ export function generateIntegration(options, viteConfig, mainSource) {
   if (!plugins.length) return { config: viteConfig, files }
   files['starter.plugins.ts'] = imports.join('\n') +
     '\n\nexport function starterPlugins() {\n  return [\n    ' + plugins.join(',\n    ') + '\n  ]\n}\n'
-  const config = "import { starterPlugins } from './starter.plugins'\n" +
-    viteConfig.replace(/plugins\s*:\s*\[/, (match) => match + '\n    ...starterPlugins(),')
+  const config = injectStarterPlugins(viteConfig)
   return { config, files }
 }
 
@@ -112,8 +109,8 @@ export async function applyIntegrations(directory, options, installer = install)
       if (error.code !== 'ENOENT') throw error
     }
   }
-  install === installer ? install(directory, plan.dependencies, false) : installer(directory, plan.dependencies, false)
-  install === installer ? install(directory, plan.devDependencies, true) : installer(directory, plan.devDependencies, true)
+  installer(directory, plan.dependencies, false)
+  installer(directory, plan.devDependencies, true)
   for (const [path, source] of Object.entries(generated.files)) {
     await writeFile(join(directory, path), source, {
       flag: path.startsWith('src/main.') ? 'w' : 'wx',

@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 import { spawnSync } from 'node:child_process'
 import { existsSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { readFile } from 'node:fs/promises'
+import { join, resolve } from 'node:path'
 import { stdin, stdout } from 'node:process'
 import { createInterface } from 'node:readline/promises'
 import { parseCliArgs } from '../src/cli-args.mjs'
@@ -17,6 +18,7 @@ const usage = `ADui Vite+ Starter（P2：项目初始化交互）
   node packages/create/bin/cli.mjs --name my-react-app --type application --framework react
   node packages/create/bin/cli.mjs --name my-workspace --type monorepo
   node packages/create/bin/cli.mjs --name my-vue-app --type application --framework vue --ui tdesign --css unocss
+  node packages/create/bin/cli.mjs --name my-vue-app --type application --framework vue --ui tdesign --css unocss --apply-existing
   node packages/create/bin/cli.mjs --name my-vue-app --type application --framework vue --dry-run
 
 说明：
@@ -25,6 +27,7 @@ const usage = `ADui Vite+ Starter（P2：项目初始化交互）
   无参数时交互选择名称、形态、框架，并二次确认。
   --dry-run 只输出命令；必须提供全部必需参数，且不创建文件。
   UI/CSS 集成支持 None、Element Plus、Ant Design、TDesign、UnoCSS、Tailwind CSS。
+  --apply-existing 只用于显式补装到现有 Vite+ 项目，不会重复生成或覆盖已有 Starter 集成。
   大屏及 3D 集成尚未实现。
 `
 
@@ -57,7 +60,24 @@ async function main() {
 
   const { command, args: vpArgs } = buildVpCommand(options)
   const integrations = planIntegrations(options)
-  if (existsSync(resolve(process.cwd(), options.name)) && !args.dryRun) {
+  const target = resolve(process.cwd(), options.name)
+  if (args.applyExisting) {
+    if (args.dryRun) throw new Error('--apply-existing 与 --dry-run 不能同时使用')
+    if (options.type !== 'application') throw new Error('只能向已存在的 Application 补装插件')
+    if (!existsSync(target)) throw new Error('目标目录不存在，无法补装')
+    const manifest = JSON.parse(await readFile(join(target, 'package.json'), 'utf8'))
+    const dependencies = { ...manifest.dependencies, ...manifest.devDependencies }
+    if (!dependencies['vite-plus'] || !dependencies[options.framework]) {
+      throw new Error('现有目录不是所选 Vite+ Vue/React 应用，拒绝修改')
+    }
+    if (!integrations.dependencies.length && !integrations.devDependencies.length) {
+      throw new Error('未选择需要安装的 UI/CSS 集成')
+    }
+    await applyIntegrations(target, options)
+    console.log('补装完成，请在项目中执行 vp check 和 vp build')
+    return
+  }
+  if (existsSync(target) && !args.dryRun) {
     throw new Error(`目标目录已存在: ${options.name}，为保护文件已终止`)
   }
 
@@ -79,7 +99,7 @@ async function main() {
   if (result.error) throw result.error
   if (result.status === 0 && (integrations.dependencies.length || integrations.devDependencies.length)) {
     console.log('正在安装和配置所选 UI/CSS 插件...')
-    await applyIntegrations(resolve(process.cwd(), options.name), options)
+    await applyIntegrations(target, options)
     console.log('UI/CSS 插件配置已写入，请运行 vp check 和 vp build 验证')
   }
   if (result.signal) {

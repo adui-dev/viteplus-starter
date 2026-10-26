@@ -25,6 +25,11 @@ function choiceValidator(choices, defaultValue) {
 
 export async function collectProjectOptions(partial, ask, report = console.error) {
   const options = { ...partial }
+  // 基础参数齐全时按非交互调用处理；UI/CSS 缺省为 None。
+  if (options.name && options.type &&
+      (options.type === 'monorepo' || options.framework)) {
+    return validateProjectOptions(options)
+  }
   let prompted = false
 
   if (!options.name) {

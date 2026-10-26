@@ -20,9 +20,11 @@ node packages/create/bin/cli.mjs --name demo-vue --type application --framework 
 node packages/create/bin/cli.mjs --name demo-react --type application --framework react
 # UI 与 CSS 按需选择，生成后安装依赖并追加对应配置
 node packages/create/bin/cli.mjs --name demo-ui --type application --framework vue --ui tdesign --css unocss
+# 已创建但此前 UI/CSS 增强失败的项目：显式补装，不重新创建
+node packages/create/bin/cli.mjs --name demo-ui --type application --framework vue --ui tdesign --css unocss --apply-existing
 ```
 
-当前 CLI 使用 Vite+ 内置 `vite:application` 或 `vite:monorepo`；Application 用 `--framework` 将框架映射到官方 `vue-ts` / `react-ts` 模板。现已支持 UI 组件库选项（None / Element Plus / Ant Design / TDesign）和 CSS 框架（None / UnoCSS / Tailwind CSS）。React 不提供 Element Plus。选中依赖后由 pnpm 安装并生成 Vite 插件/样式入口；**大屏、3D、安全模型加载尚未实现**。首次使用每种组合后仍需运行真实 check/build 验证。
+当前 CLI 使用 Vite+ 内置 `vite:application` 或 `vite:monorepo`；Application 用 `--framework` 将框架映射到官方 `vue-ts` / `react-ts` 模板。现已支持 UI 组件库选项（None / Element Plus / Ant Design / TDesign）和 CSS 框架（None / UnoCSS / Tailwind CSS）。React 不提供 Element Plus。选中依赖后由 pnpm 安装并生成 Vite 插件/样式入口；**大屏、3D、安全模型加载尚未实现**。现在支持针对官方 `plugins: [...]`、`plugins: lazyPlugins(() => [...])` 和不包含 `plugins` 属性的 `defineConfig` 进行兼容配置注入。首次使用每种组合后仍需运行真实 check/build 验证；未知的配置结构会明确报错而不强行修改。
 
 本地验证：
 

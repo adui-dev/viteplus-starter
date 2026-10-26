@@ -45,6 +45,19 @@ node .\viteplus-starter\packages\create\bin\cli.mjs --name p3-react --type appli
 
 分别进入两个目录执行 `vp check`、`vp build` 和 `vp dev`，确认组件库样式、生成的 `starter.plugins.ts`、`uno.config.ts` 或 `src/starter.tailwind.css` 可用。若安装依赖失败，项目目录可能已创建；检查后处理，禁止在生成器里自动删除现有用户文件。
 
+## 处理官方模板生成成功但集成失败
+
+如果之前执行已经产生 Application 目录，禁止自动删除或覆盖原项目。在上级目录执行：
+
+```powershell
+node .\viteplus-starter\packages\create\bin\cli.mjs --name starter-vue-p3 --type application --framework vue --ui tdesign --css unocss --apply-existing
+cd starter-vue-p3
+vp check
+vp build
+```
+
+补装会先检查目录、Vite+ 和 Vue/React 类型，以及已有 Starter 配置。失败时保留现有文件；并不提供可保证回滚所有已安装依赖的事务能力。
+
 ## 文档校验的边界
 
 现有脚本检查必要文件、常规相对 Markdown 链接和需求标题编号重复。它**不等于**完整 Markdown 语义、Skills 安全审核、所有 ADR 和需求追踪一致性验证。
