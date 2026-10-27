@@ -100,7 +100,7 @@
 
 ## P4 第二期：JSON 批量生成
 
-- `--config` 在单项目交互前分流，仅允许同时指定 `--dry-run`，不沿用模糊的单项目默认值。顶层仅接受 version/name/apps，应用仅接受 name/framework/language/ui/css/uiSmoke；必填版本为 1，框架显式选择，语言默认 ts、UI/CSS 默认 none。
+- `--config` 在单项目交互前分流，仅允许同时指定 `--dry-run`，不沿用模糊的单项目默认值。顶层仅接受 version/name/apps，应用仅接受 name/framework/language/ui/css/uiSmoke/screen；必填版本为 1，框架显式选择，语言默认 ts、UI/CSS 默认 none。
 - `validateBatchConfig` 先校验全部应用，再接触输出目录：最多 32 个，拒绝未知字段与错误类型、遍历、重名、Windows 设备名称、与工作区名或默认 website/utils 冲突；uiSmoke 预先调用既有组合校验。
 - `createBatchPlan` 使用真实 cwd 为父目录，输出固定为 cwd/name；已有目标含悬空链接拒绝，逐级检查祖先 workspace 标记，禁止嵌套。配置读取限制为 1 MiB，接受 UTF-8 BOM；只解析 JSON，不执行配置代码。
 - dry-run 展示规范化选项、根官方命令、每应用的 CLI argv 与官方模板命令、依赖计划、可选验收页路径/文件；不写目录。执行前重新从规范化配置构建计划，避免使用过期或被修改的阶段命令。

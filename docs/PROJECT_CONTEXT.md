@@ -109,3 +109,14 @@
 - Chrome 两验收页按钮显示、点击计数 0→1、CSS 颜色/8px 圆角/16px 内边距正常，控制台均无 warn/error；验收后开发服务已停止。
 - 重复执行相同 batch 退出 1，明确拒绝已有根，根 package.json 哈希保持不变。失败阶段停止及保留部分文件由受控测试覆盖，不破坏真实工作区制造失败。
 - 生成器最终 81 项测试、文档校验和全仓 `vp check` 均通过；功能与实机验收记录分步提交并按用户授权推送。下一步：P5 大屏适配首期。
+
+## 2026-10-27 P5 首期：分层大屏插件
+
+- 参考 smart-geology-web 的 AdScreen.vue，重做 packages/screen：框架无关布局/DOM 控制器、Vue 插件与 React 组件、CSS 和 TS 声明。仅阅读原业务文件，没有修改业务工程；业务 top/right 常量改为 engineInsets，核心默认零内缩。
+- 支持 contain/cover/stretch/none、禁放大、双轴比例、原生引擎层、HUD、两种浮层、坐标反算、原生全屏 Promise 接口和卸载清理。Vue 使用命名 Symbol 注入及按值监听，实测修复内联对象/layout 回调导致的递归；React 使用 DOM 回调 ref 状态，解决官方 TS 模板严格 refs 警告，不关闭 lint。
+- CLI --screen 与严格尺寸/模式参数、apply-existing、已有 Monorepo 成员及批量应用 screen 字段已接入。只新增 src/adui-screen 源码快照、独立演示目录/HTML，无需额外应用依赖，保留正式 App/main/Vite 配置，预检拒绝已有文件和链接。包 private，未发布 npm。
+- 四种官方已有应用均实际补装：adui-batch-demo/apps/admin（Vue TS）、apps/portal（React JS）、starter-vue-js、starter-react-p3（React TS）。最终独立应用检查/构建通过；混合工作区根 ready 8/8 成功（4 项命中既有缓存），71 文件格式正确、38 文件无 lint/type 警告错误，utils 1 项测试通过。默认构建保留原首页，不把独立演示页作为生产入口。
+- Chrome 两框架均验证容器 ResizeObserver、四模式、HUD 点击 0→1、网格中心坐标约 960/577.5、引擎 transform=none、卸载重挂。最终新标签复验控制台 warn/error 均为空；早期 Vue 递归错误已修复，不把旧标签历史日志当作最终结果。
+- 全屏请求在当前 Chrome 自动化环境返回 TypeError: not granted，页面已正常显示拒绝；控制器的进入/退出调用和事件合帧由单测覆盖，但浏览器全屏成功/退出恢复仍待人工验收。未绕过浏览器权限。真实 Three/Cesium/Babylon canvas、DPR 与拾取尚未实现，不宣称 3D 验收完成。
+- 91/91 Node 测试、文档检查、全仓 vp check 均通过。新增 screen.batch.json 在仓库上级目录 dry-run 成功；本轮未完整执行这个新批量样例，不混同先前批量工作区的创建验收。锁文件仅增加新可选框架 peer 图，未升级已有声明；联网补齐缺失缓存后 frozen-lockfile 离线安装退出 0。
+- 沿用 git-commit/gitmoji Skills 和历史中文 emoji 格式分步提交推送；无 CI/CD、npm/Release 发布。下一步先人工确认原生全屏成功路径，再接入 Three.js 最小真实场景，验证 drawing buffer/DPR、拾取与资源回收。

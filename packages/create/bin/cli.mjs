@@ -57,7 +57,7 @@ const usage = `ADui Vite+ Starter（Application / Monorepo）
   --apply-existing 用于首次补装；--repair-existing 用于修复旧版 starter.plugins 跨文件引用。
   旧插件文件会备份成 starter.plugins.ts.bak；两种模式不重装基础模板。
   --ui-smoke 为已有应用创建独立的 /ui-smoke.html 验证页，不修改正式首页。
-  大屏及 3D 集成尚未实现。
+  大屏首期已支持；3D 引擎集成尚未实现。
 `;
 
 async function main() {
