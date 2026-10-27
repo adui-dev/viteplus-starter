@@ -26,6 +26,7 @@ flowchart TD
 - `scripts/validate-docs.mjs`：本地文档静态校验；不是 CI。
 - 官方 Vite+ 负责应用模板、基础工具链；不得偷偷替换官方模板。
 - `workspace.mjs` 预检已有官方 pnpm 根、成员路径与同名包；子应用仍交给 `vite:application`，以工作区根为 cwd，不传 Git 初始化参数。UI/CSS 安装在子应用中，官方管理共享锁文件和 catalog；Vue TS 声明格式忽略规则仅在根增量合并。
+- `batch.mjs` 将严格 JSON 转成顺序阶段计划；根直接调用官方 `vite:monorepo`，应用和验收页通过 argv 子进程复用单应用 CLI，沿用路径保护与 UI/CSS 兼容处理；配置不提供自定义命令或脚本。
 - 混合工作区的插件 peer 兼容修复在根 packageExtensions 增量记录，避免缺失 Vite peer 时从提升目录解析到另一应用的类型实例；拒绝覆盖冲突的用户配置。
 - 模型安全：加密 CLI / 浏览器解密 / Loader 分离；生产密钥由后端提供，浏览器端保护不等于 DRM。
 

@@ -14,6 +14,7 @@ import {
   repairExistingIntegrations,
 } from "../src/integrations.mjs";
 import { addUiSmoke } from "../src/ui-smoke.mjs";
+import { loadBatchPlan, executeBatch, validateBatchCliArgs } from "../src/batch.mjs";
 import {
   normalizeNewWorkspaceApplication,
   prepareWorkspacePeerExtensions,
@@ -22,7 +23,7 @@ import {
   updateWorkspaceDeclarationIgnore,
 } from "../src/workspace.mjs";
 
-const usage = `ADui Vite+ Starter（P2：项目初始化交互）
+const usage = `ADui Vite+ Starter（Application / Monorepo）
 
 用法：
   node packages/create/bin/cli.mjs
@@ -31,6 +32,8 @@ const usage = `ADui Vite+ Starter（P2：项目初始化交互）
   node packages/create/bin/cli.mjs --name my-vue-js-app --type application --framework vue --language js
   node packages/create/bin/cli.mjs --name my-react-js-app --type application --framework react --language js
   node packages/create/bin/cli.mjs --name my-workspace --type monorepo
+  node packages/create/bin/cli.mjs --config ./monorepo.json --dry-run
+  node packages/create/bin/cli.mjs --config ./monorepo.json
   node packages/create/bin/cli.mjs --name my-vue-app --type application --framework vue --ui tdesign --css unocss
   node packages/create/bin/cli.mjs --name my-vue-app --type application --framework vue --ui tdesign --css unocss --apply-existing
   node packages/create/bin/cli.mjs --name my-vue-app --type application --framework vue --ui tdesign --css unocss --repair-existing
@@ -40,6 +43,7 @@ const usage = `ADui Vite+ Starter（P2：项目初始化交互）
 说明：
   Application 委托 Vite+ 官方 vite:application，按框架和语言选择 vue/vue-ts/react/react-ts。
   --language ts|js（默认 ts）；Monorepo 根不指定语言。
+  --config <JSON 文件>：批量新建官方 Monorepo 和应用，仅可与 --dry-run 同用。
   --workspace <已有工作区路径>：在官方 pnpm Monorepo 的 apps/<name> 中添加 Application。
   例：--workspace ../my-workspace --name admin --type application --framework vue --ui tdesign --css unocss
   Monorepo 使用官方 vite:monorepo；子应用的框架需分别选择。
@@ -56,6 +60,19 @@ async function main() {
   const args = parseCliArgs(process.argv.slice(2));
   if (args.help) {
     console.log(usage);
+    return;
+  }
+  if (args.config !== undefined) {
+    validateBatchCliArgs(args);
+    const plan = await loadBatchPlan(args.config);
+    if (args.dryRun) {
+      console.log(JSON.stringify(plan, null, 2));
+    } else {
+      const result = await executeBatch(plan);
+      console.log("批量生成完成：" + result.workspaceRoot);
+      console.log("已完成：" + result.completed.join("、"));
+      console.log("进入工作区运行 vp run ready；组件效果仍需浏览器验收");
+    }
     return;
   }
 

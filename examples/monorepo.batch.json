@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "name": "adui-batch-demo",
+  "apps": [
+    { "name": "admin", "framework": "vue", "ui": "tdesign", "css": "unocss", "uiSmoke": true },
+    {
+      "name": "portal",
+      "framework": "react",
+      "language": "js",
+      "ui": "antd",
+      "css": "tailwindcss",
+      "uiSmoke": true
+    }
+  ]
+}

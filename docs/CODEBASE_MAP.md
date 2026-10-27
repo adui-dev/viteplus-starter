@@ -39,6 +39,9 @@ UI/CSS 已在 `integrations.mjs` 实现；3D、大屏及模型安全模块**尚�
 - `packages/create/src/workspace.mjs`：工作区预检、安全成员路径、同名包检查和根声明忽略规则增量合并。
 - `packages/create/test/workspace.test.mjs`：官方命令参数、配置隔离、目录与 junction 保护、真实 CLI dry-run/覆盖拒绝。
 - `docs/MONOREPO.md`：逐应用创建、检查及边界说明。
+- `packages/create/src/batch.mjs`：JSON 严格校验、无写入批量计划、官方顺序执行与失败摘要。
+- `packages/create/test/batch.test.mjs`：真实 CLI dry-run、冲突与路径保护、顺序执行及失败保留现场测试。
+- `examples/monorepo.batch.json`、`docs/BATCH_CONFIG.md`：可执行配置样例与字段/运行说明。
 
 ## UI Smoke 验收工具
 

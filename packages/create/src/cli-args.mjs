@@ -6,6 +6,7 @@ const VALUE_OPTIONS = new Set([
   "--ui",
   "--css",
   "--workspace",
+  "--config",
 ]);
 
 export function parseCliArgs(argv) {

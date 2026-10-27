@@ -1,5 +1,17 @@
 # ADui Vite+ Starter
 
+## JSON 批量新建 Monorepo
+
+一份配置可以按顺序创建官方工作区、不同框架的应用和可选 UI 验收页：
+
+```powershell
+# 在生成器仓库上级目录执行，目标 adui-batch-demo 必须不存在
+node ./viteplus-starter/packages/create/bin/cli.mjs --config ./viteplus-starter/examples/monorepo.batch.json --dry-run
+node ./viteplus-starter/packages/create/bin/cli.mjs --config ./viteplus-starter/examples/monorepo.batch.json
+```
+
+示例生成 Vue TS/TDesign/UnoCSS 的 `apps/admin` 和 React JS/Ant Design/Tailwind 的 `apps/portal`，保留官方 website/utils。执行前统一检查全部选项与名称；失败立即停止，报告已完成/未执行的阶段并保留现场。配置路径相对于当前目录，输出为当前目录下的配置 `name`。详见 [批量配置说明](docs/BATCH_CONFIG.md)。
+
 ## Monorepo 多应用（P4）
 
 先由官方模板创建工作区，再用 `--workspace` 逐个添加应用。每个应用独立选择 Vue/React、TS/JS、UI 与 CSS；默认 TypeScript。

@@ -2,6 +2,8 @@
 
 根工作区使用 Vite+ 官方 `vite:monorepo`；每个新增应用仍使用官方 `vite:application`。保留默认 `apps/website` 和 `packages/utils`，没有 CI/CD 配置。
 
+需要一次新建多个应用时，使用 [JSON 批量配置](BATCH_CONFIG.md)；下面的 `--workspace` 继续用于向已有工作区逐个添加应用。
+
 ## 创建
 
 在生成器仓库的上级目录执行，目标工作区名称必须尚不存在：
@@ -37,7 +39,7 @@ vp dev
 ## 保护与限制
 
 - 仅支持已有 private Vite+ pnpm 工作区，packages 使用官方块列表，包含 `apps/*`；列表仅允许 `apps/*`、`packages/*`、`tools/*`。自定义 glob、排除规则、YAML 合并键和其他包管理器明确拒绝，不自动改写。
-- 根不指定 framework/language/UI/CSS；每个应用独立指定。当前为逐应用命令，尚无批量配置文件。
+- 根不指定 framework/language/UI/CSS；每个应用独立指定。`--workspace` 为逐应用命令，批量新建使用独立的 `--config` 入口。
 - 应用名只允许安全的小写 kebab-case；已有目标或同名包拒绝创建，拒绝 apps/目标/关键根文件的符号链接或 junction。
 - `--workspace` 与 `--repair-existing` 不兼容；首次增强失败可检查现场后显式 `--apply-existing`，同名增强文件仍会拒绝覆盖。
 - 失败保留现场，不自动删除或回滚安装；不要并发操作同一个工作区。

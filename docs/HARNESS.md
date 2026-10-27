@@ -17,6 +17,8 @@ node .\viteplus-starter\packages\create\bin\cli.mjs --name starter-react-p3 --ty
 
 ## P4 Monorepo 混合应用
 
+批量模式见 [JSON 批量配置](BATCH_CONFIG.md)：在仓库外用示例 JSON 先 dry-run，再实际生成全新根。运行根 `vp run ready`、构建后 `vp check`，分别打开两应用的 UI Smoke 验证渲染与点击；检查官方 website/utils 和根无 UI/CSS 直接依赖。错误与部分失败由 `batch.test.mjs` 的受控执行器验证，不破坏真实项目来制造失败。
+
 见 [Monorepo 操作说明](MONOREPO.md)。使用独立的仓库外目录，依次创建官方根、Vue TS/TDesign/UnoCSS 和 React JS/Ant Design/Tailwind；不要并发执行生成。分别运行应用 `vp check`、`vp run build`，根运行 `vp check`；确认根没有新增 Vue/React UI/CSS 依赖、每个应用插件互不污染，Vue TS 声明生成后格式检查仍有效。默认 website/utils 保留。
 
 ## TypeScript / JavaScript 四种官方模板验证
