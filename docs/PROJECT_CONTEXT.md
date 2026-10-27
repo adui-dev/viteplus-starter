@@ -71,3 +71,9 @@
 - 保留第三方 Skill 原文及来源哈希，`skills-lock.json` 只保留当前安装项；清理明细见 `docs/SKILLS.md`。
 - 清理后 71 项测试、文档检查通过；根 `vp check` 报告 35 个文件格式问题，包含既有文件与保留的第三方 Skill 原文，未改动检查配置或跳过 Git hooks。
 
+## 2026-10-27 依赖复现
+
+- 将现有根 pnpm 锁文件纳入版本控制，固定已验证的 Vite+ 1.4.0 及传递依赖，不修改依赖声明或升级版本。
+- pnpm 11.24.0 的 `pnpm install --frozen-lockfile --offline` 退出 0，依赖已是最新锁定状态；P4 样例仍使用 Vite+ 管理的 pnpm 12.15.0。
+- 按历史的 emoji + Conventional Commits + 中文说明拆分 P4 功能、Skills 精简、依赖锁定三个提交；用户已授权推送 main。没有新增 CI/CD，也未执行 npm 发布或 Release。
+

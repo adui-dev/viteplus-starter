@@ -54,6 +54,12 @@ vp check
 
 `vp check` 需完整工具链可用。没有网络或依赖时明确记录失败原因，不绕过检查或伪造通过结果。
 
+## 仓库依赖锁定
+
+根 `pnpm-lock.yaml` 纳入版本控制，固定本次已验证的 Vite+ 1.4.0 及传递依赖；不改变 package.json 中的版本声明，不执行依赖升级。常规复现使用 `pnpm install --frozen-lockfile`；已缓存依赖时可追加 `--offline`。
+
+2026-10-27 在本地使用 pnpm 11.24.0 执行 `pnpm install --frozen-lockfile --offline`，退出 0，未更新依赖。该记录与生成样例通过 Vite+ 管理的 pnpm 12.15.0 安装是两个不同环境。
+
 ## 实际创建验收（需有 vp 环境）
 
 ```powershell
