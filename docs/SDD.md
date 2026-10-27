@@ -116,3 +116,11 @@
 生成器 --screen 仅增强官方应用，复制 core/controller/CSS、所选框架与声明至 src/adui-screen，生成独立 screen-smoke.html。预检所有待写文件与父路径，已有文件/链接拒绝，写入使用 wx；不覆盖正式入口，不增加应用依赖。--apply-existing 允许仅补装大屏；批量应用字段增加 screen，uiSmoke 阶段去除 screen 参数防止重复补装。CLI 不提供自动覆盖升级，交互菜单暂未新增大屏问题，使用显式参数或 JSON。
 
 核心支持 allowUpscale 与 engineInsets，CLI/JSON 首期仅选择尺寸和模式，复杂设置由应用源码配置。开发验收页默认不参与正式首页构建；真实引擎 canvas 尺寸、DPR、资源生命周期与全屏成功路径仍需专项验收。操作与契约见 [SCREEN](SCREEN.md)。
+
+## Three.js 首期设计
+
+--three-smoke 在创建流程前分流，只对已有 --screen 应用生效，不与其他维护或 UI/CSS 选项混用。planThreeSmoke 为 Vue/React TS/JS 生成独立 ThreeView、演示、入口和源码快照；addThreeSmoke 在安装前预检全部目录/文件、框架与语言，拒绝已有输出、链接、冲突版本，应用内用 vp add 安装固定 three/@types 版本，安装后复查父路径及文件再写入。工作区根元数据由包管理器更新并定向格式化；批量 JSON 还未接入 Three 字段。
+
+运行时独占场景、相机、几何、材质、射线与 renderer。ResizeObserver 与循环内 DPR 检查只在尺寸键变化时设置缓冲；DPR 上限 2、单边上限 8192/硬件 maxTextureSize，隐藏不绘制。拾取以 canvas rect 生成 NDC，HUD 设计坐标另行处理。使用 setAnimationLoop，销毁释放监听、观察器、几何、材质、renderer 和 context；初始化失败及意外 contextlost 也清理。本期不含纹理、模型、共享资源或自动 context 恢复。
+
+默认正式首页构建不包含验收 HTML；专项构建通过临时 mergeConfig 指定 Three HTML 输入完成，不能将默认构建当成 Three 构建。包体提醒保留，正式按需分块待设计。更多接口见 [THREE_SMOKE](THREE_SMOKE.md)。

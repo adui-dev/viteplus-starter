@@ -54,3 +54,7 @@ React 导入 `{ AdScreen, useAdScreen }`；engine、hud/children、overlayScaled
 4. 手动点击进入全屏，确认 shell 是 fullscreenElement，浮层仍显示，退出后恢复容器尺寸；自动化环境拒绝请求时记录错误，不能算全屏成功。
 
 本轮真实验证范围与限制见 [PROJECT_CONTEXT](PROJECT_CONTEXT.md)。不添加 CI/CD。
+
+## Three.js 补充验收
+
+已有大屏应用可按 [THREE_SMOKE](THREE_SMOKE.md) 增加真实 WebGL 场景。本轮 Vue/React 代表组合已经验证前台原生全屏进入/退出、实际 canvas DPR、拾取与卸载重挂；此结果补充前述 P5 首期的待验收项。其他引擎仍待实现。

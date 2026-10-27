@@ -34,16 +34,17 @@
 
 ### FR-005 大屏可视化
 
-- 状态：P5 首期已实现分层插件、Vue/React TS/JS 适配及 CLI/批量接入；布局与交互已实机验收，原生全屏成功路径及真实 3D Canvas 尚待验收；优先级：P1。
+- 状态：P5 首期已实现分层插件、Vue/React TS/JS 适配及 CLI/批量接入；布局、原生全屏进入/退出及 Three.js Canvas 的代表组合已实机验收；其他引擎仍待验证；优先级：P1。
 - 目标：按应用选择是否启用自定义大屏适配，支持设计稿尺寸及 contain / cover / stretch。
 - 验收：窗口变化、全屏、清理监听器和 3D Canvas 交互正确。
 - 首期范围：contain/cover/stretch/none、可配置引擎内缩、双轴坐标反算、缩放/非缩放浮层、监听器清理与独立页面；无额外应用依赖、无覆盖写入，详见 [SCREEN](SCREEN.md)。
 
 ### FR-006 3D 引擎
 
-- 状态：规划中；优先级：P1。
+- 状态：首期 Three.js 共享运行时和 --three-smoke 工具已实现，Vue/React TS/JS 检查构建及两框架真实渲染、DPR、拾取、卸载和全屏通过；正式引擎选项、批量编排、Cesium/Babylon 尚未实现；优先级：P1。
 - 目标：可多选 Three.js、CesiumJS、Babylon.js，按应用集成。
 - 验收：最小场景渲染、资源回收及相应构建成功。
+- 首期边界：已有 --screen 应用单独安装固定版本依赖、添加独立页面，详见 [THREE_SMOKE](THREE_SMOKE.md)。不把此工具视为完整的多引擎生成或模型安全能力。
 
 ### FR-007 模型安全加载
 

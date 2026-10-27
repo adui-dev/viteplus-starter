@@ -32,7 +32,7 @@
 | `AGENTS.md`                                          | Agent 规则及导航入口                                                  |
 | `docs/`                                              | 需求、架构、设计、状态、Skills、Harness、ADR                          |
 
-UI/CSS 已在 `integrations.mjs` 实现；大屏核心见 `packages/screen`；3D 与模型安全模块尚未实现。
+UI/CSS 已在 `integrations.mjs` 实现；大屏核心见 `packages/screen`；Three.js 核心见 packages/three；其他引擎与模型安全尚未实现。
 
 ## P4 Monorepo 多应用
 
@@ -56,3 +56,10 @@ UI/CSS 已在 `integrations.mjs` 实现；大屏核心见 `packages/screen`；3D
 - `packages/create/src/screen-options.mjs`：CLI/批量严格输入归一化；screen.mjs：源码快照和独立页面预检/写入；screen-demo.mjs：Vue/React 演示。
 - `packages/screen/test/screen.test.mjs`、`packages/create/test/screen.test.mjs`：布局边界、坐标、控制器清理、四种生成组合、路径/覆盖与批量参数保护。
 - [SCREEN](SCREEN.md)、[配置示例](../examples/screen.batch.json)：API、迁移和验收边界。
+
+## Three.js 真实场景
+
+- packages/three/src/index.mjs、index.d.mts：createThreeScene 引擎绑定与声明。
+- packages/three/src/runtime.mjs、test/runtime.test.mjs：缓冲尺寸、DPR、相机、拾取、动画、异常与资源回收。
+- packages/create/src/three-smoke.mjs、test/three-smoke.test.mjs：四种应用计划、固定版本安装、独立页面及覆盖/版本/链接保护。
+- [THREE_SMOKE](THREE_SMOKE.md)：命令、API 与专项构建/浏览器验收。

@@ -36,6 +36,12 @@ export function parseCliArgs(argv) {
       seen.add(token);
       continue;
     }
+    if (token === "--three-smoke") {
+      if (seen.has(token)) throw new Error("参数不能重复: " + token);
+      options.threeSmoke = true;
+      seen.add(token);
+      continue;
+    }
     if (token === "--ui-smoke") {
       if (seen.has(token)) throw new Error("参数不能重复: " + token);
       options.uiSmoke = true;

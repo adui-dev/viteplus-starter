@@ -117,3 +117,7 @@ vp build
 ## 大屏验收
 
 按 [SCREEN](SCREEN.md) 运行 --screen；Vue/React 的 TS/JS 都应检查与构建，独立页面通过开发服务器验证四模式、容器变化、坐标、交互、卸载重挂与控制台。全屏必须实测 fullscreenElement 和退出恢复，遇到浏览器 not granted 只能记录拒绝路径，不能标记成功。真实 3D 视口与 DPR 待引擎接入后验收。
+
+## Three.js 专项检查
+
+先有 --screen，再运行 --three-smoke；按 [THREE_SMOKE](THREE_SMOKE.md) 检查 canvas 缓冲、DPR、中心拾取、卸载与重挂。全屏需先激活目标标签，在前台通过用户手势进入，并检查 :fullscreen 与退出尺寸恢复。Three 页面需单独作为 build 输入验证，不用正式首页构建代替；记录包体提醒，不调高阈值掩盖。

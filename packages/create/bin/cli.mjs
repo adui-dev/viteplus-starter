@@ -14,6 +14,7 @@ import {
   repairExistingIntegrations,
 } from "../src/integrations.mjs";
 import { addUiSmoke } from "../src/ui-smoke.mjs";
+import { addThreeSmoke } from "../src/three-smoke.mjs";
 import { addScreenPreset, planScreenPreset, preflightScreenPreset } from "../src/screen.mjs";
 import { loadBatchPlan, executeBatch, validateBatchCliArgs } from "../src/batch.mjs";
 import {
@@ -47,6 +48,7 @@ const usage = `ADui Vite+ Starter（Application / Monorepo）
   --screen：生成 AdScreen 大屏插件及 /screen-smoke.html，保留正式首页。
   --screen-width / --screen-height：设计尺寸，默认 1920 / 1080。
   --screen-mode contain|cover|stretch|none：默认 contain；已有项目配合 --apply-existing。
+  --three-smoke：向已有 --screen 应用安装 Three.js 并生成 /three-smoke.html。
   --config <JSON 文件>：批量新建官方 Monorepo 和应用，仅可与 --dry-run 同用。
   --workspace <已有工作区路径>：在官方 pnpm Monorepo 的 apps/<name> 中添加 Application。
   例：--workspace ../my-workspace --name admin --type application --framework vue --ui tdesign --css unocss
@@ -57,7 +59,7 @@ const usage = `ADui Vite+ Starter（Application / Monorepo）
   --apply-existing 用于首次补装；--repair-existing 用于修复旧版 starter.plugins 跨文件引用。
   旧插件文件会备份成 starter.plugins.ts.bak；两种模式不重装基础模板。
   --ui-smoke 为已有应用创建独立的 /ui-smoke.html 验证页，不修改正式首页。
-  大屏首期已支持；3D 引擎集成尚未实现。
+  大屏与 Three.js 独立验收页已支持；其他引擎尚未实现。
 `;
 
 async function main() {
@@ -117,6 +119,23 @@ async function main() {
       runWorkspaceVp(commandCwd, ["fmt", basename(workspace.configPath), "--write"]);
     }
     runWorkspaceVp(commandCwd, ["fmt", "pnpm-workspace.yaml", "--write"]);
+  }
+  if (args.threeSmoke) {
+    if (
+      args.dryRun ||
+      args.uiSmoke ||
+      args.applyExisting ||
+      args.repairExisting ||
+      options.screen ||
+      (options.ui ?? "none") !== "none" ||
+      (options.css ?? "none") !== "none"
+    )
+      throw new Error("--three-smoke 需单独调用，不混用创建/补装/其他验收选项");
+    const result = await addThreeSmoke(target, options);
+    await finishWorkspaceIntegration();
+    console.log("Three.js 验收页已生成：" + result.previewPath);
+    console.log("运行 vp check、vp dev；验证真实 WebGL、DPR、拾取与卸载清理");
+    return;
   }
   if (args.uiSmoke) {
     if (args.dryRun || args.applyExisting || args.repairExisting) {

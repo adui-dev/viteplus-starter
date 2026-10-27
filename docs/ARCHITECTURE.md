@@ -45,3 +45,7 @@ flowchart TD
 ## P5：共享大屏核心
 
 新增 packages/screen 作为框架无关核心与 Vue/React 适配器来源；生成器只向官方应用增量添加源码快照和独立验收页，不维护新的框架工程模板，也不修改正式页面。框架为可选 peer，不给应用引入另一框架。布局与引擎渲染生命周期分离，具体接口见 [SCREEN](SCREEN.md)。
+
+## Three.js 首期
+
+新增 packages/three：框架无关的独占场景运行时，依赖可选 Three peer；index 提供固定引擎绑定，runtime 注入引擎依赖以便受控验证初始化异常与清理。--three-smoke 只补充已有大屏应用，不另建框架模板，不修改官方正式入口。Three Smoke 的组件封装负责 Vue/React 生命周期；后续正式引擎选择与模型 Loader 另行扩展，详见 [THREE_SMOKE](THREE_SMOKE.md)。
