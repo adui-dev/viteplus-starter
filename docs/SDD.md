@@ -1,5 +1,9 @@
 # 详细设计
 
+## 本地质量基线
+
+根 Vite+ fmt 统一自有源码、测试与文档格式；仅排除原样保存的第三方 `.agents/skills/git-commit/**`、`.agents/skills/gitmoji/**`，保留其上游指令与安装哈希。没有关闭源码检查、lint 规则或 Git hooks。
+
 ## 官方模板语言选择（新增）
 
 - Application 的 `--language ts|js` 默认 `ts`。Vue 选 `vue-ts` 或 `vue`；React 选 `react-ts` 或 `react`，全部使用 Vite+ 官方 `vite:application`，不再自行运行其他生成器。
@@ -10,7 +14,6 @@
 - 旧版 `starter.plugins.ts` 的迁移只适用于历史 TypeScript 工程；JS 创建和 `--apply-existing` 不使用此历史格式。
 - 已完成代码级参数/生成验证；Vue + JavaScript + TDesign + UnoCSS、React + JavaScript + Ant Design + Tailwind 的官方创建、依赖安装和 `vp check/build` 均已在 Windows 验收通过。组件真实渲染及剩余组合尚待测试。
 
-
 ## P3 生成器修复：插件内联与旧配置修复
 
 - `packages/create/src/format-config.mjs`：仅针对 Vue UI 自动导入，向 Vite+ `fmt.ignorePatterns` 添加 `src/components.d.ts`，避免自动生成的类型声明在重新生成后造成不稳定格式检查。保留原有 `fmt`、`ignorePatterns`，重复调用不新增重复条目；不支持的配置格式拒绝修改。该规则仅影响格式检查，不关闭 Lint 或 TypeScript。
@@ -20,10 +23,10 @@
 - `--repair-existing` 仅用于符合已知 Starter 旧格式的现有 Vue/React Application：先验证项目类型、旧插件文件及配置形态，再替换旧导入并将 `starter.plugins.ts` 备份为 `starter.plugins.ts.bak`，随后格式化；**不安装依赖，也不重建项目**。
 - 此功能不是通用任意 TypeScript 配置的转换器，无法识别的结构必须拒绝修改；真实 Windows `vp check` 待用户复验。
 
-
 ## 当前可用模块
 
 `packages/create/src/options.mjs`:
+
 - `validateProjectOptions({name,type,framework})`：名称限制为安全的小写 kebab-case；Application 强制 vue/react，Monorepo 不接受根框架参数。
 - `buildVpCommand(options)`：组装 Vite+ 官方模板创建命令，不执行命令。
 
@@ -32,6 +35,7 @@
 `packages/create/src/prompts.mjs`：交互式名称、类型、框架选择，非法名称重试，创建确认/取消。
 
 `packages/create/bin/cli.mjs`:
+
 - 支持 `--name`、`--type`、`--framework`、`--dry-run`、`--help`。
 - 交互缺失选项可从终端读取，支持默认值与二次确认；取消时不调用 Vite+；非 TTY 必须显式传参。
 - 已存在目标目录立即拒绝；仅执行白名单参数，不使用用户输入拼接 shell 命令字符串。
@@ -40,6 +44,7 @@
 ## UI/CSS 可选集成（已编写，待组合验收）
 
 `packages/create/src/integrations.mjs`：
+
 - `planIntegrations(options)`：按 Vue/React 生成白名单依赖清单，拒绝 React + Element Plus、Monorepo 根统一配置。
 - `generateIntegration(options, viteConfig, mainSource)`：保留 Vite+ 官方配置，不再仅识别直接数组；调用 `vite-config.mjs` 兼容顶层普通 plugins、lazyPlugins 或无 plugins 情况，未知结构停止。
 - `applyIntegrations(directory, options)`：在安装依赖前先生成并校验修改后的配置、检查目标文件是否存在；校验失败不安装依赖。安装失败时不写入插件配置，但官方基础项目可能已存在。
@@ -89,4 +94,3 @@
 - `--workspace` 可与 dry-run、apply-existing、ui-smoke 使用；不支持历史 repair-existing。dry-run 显示实际 cwd/target，已有目标创建失败；补装和 Smoke 仍需显式参数。
 - 失败保留官方已生成目录和已完成的安装，不承诺事务回滚，不自动重试覆盖；不得并发向同一工作区运行多个生成命令。
 - 本期以逐应用命令提供多应用能力；交互式批量收集、配置文件批量生成、自定义 glob 及其他包管理器仍待后续实现。
-

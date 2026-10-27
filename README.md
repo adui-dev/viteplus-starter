@@ -26,15 +26,14 @@ node .\viteplus-starter\packages\create\bin\cli.mjs --name starter-react-js --ty
 
 在各应用中运行 `vp dev`，访问 `/ui-smoke.html`，核实按钮呈现、点击计数和浅绿色原子 CSS 区域。仅新增 `ui-smoke.html` 与 `src/ui-smoke/`，不会修改 `App.*` 或正式入口。详情：[UI Smoke 验收说明](docs/UI_SMOKE.md)。2026-10-27 已验证两个独立 JavaScript 代表组合的真实浏览器效果。
 
-
 ## Vue / React：TypeScript 与 JavaScript
 
 默认使用 TypeScript，可用 `--language js` 选择 JavaScript；全部通过 Vite+ 官方 `vite:application` 生成，**不自行复制或维护框架模板**。
 
-| 框架 | `--language ts`（默认） | `--language js` |
-| --- | --- | --- |
-| Vue 3 | `vue-ts` | `vue` |
-| React | `react-ts` | `react` |
+| 框架  | `--language ts`（默认） | `--language js` |
+| ----- | ----------------------- | --------------- |
+| Vue 3 | `vue-ts`                | `vue`           |
+| React | `react-ts`              | `react`         |
 
 ```powershell
 node packages/create/bin/cli.mjs --name vue-js-demo --type application --framework vue --language js
@@ -43,7 +42,6 @@ node packages/create/bin/cli.mjs --name vue-ts-demo --type application --framewo
 ```
 
 交互式创建会在框架选择后询问开发语言，默认 TypeScript。JS 生成器将按照官方工程实际配置处理 `vite.config.js` / `.ts` 等格式，并写入 `src/main.js` 或 `src/main.jsx`；UnoCSS 对应 `uno.config.js`。JavaScript 的 Vue 项目不会生成 TypeScript 专用的组件类型声明。Monorepo 根目录不接受 `--language`，各子应用独立选择。
-
 
 ## 2026-10-26：P3 检查修复
 
@@ -57,7 +55,6 @@ node .\viteplus-starter\packages\create\bin\cli.mjs --name starter-react-p3 --ty
 ```
 
 修复会将旧插件文件备份为 `starter.plugins.ts.bak`，且只格式化 `vite.config.ts`。分别在项目目录执行 `vp check` 和 `vp build`。**两组旧项目已在 Windows 实机修复并通过构建及类型检查；Vue 首次需格式化自动生成的 `src/components.d.ts`。**
-
 
 基于 **Vite+ 官方模板**的多框架项目初始化与可选功能集成工具。
 

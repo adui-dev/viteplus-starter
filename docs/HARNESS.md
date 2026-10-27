@@ -11,8 +11,9 @@ node .\viteplus-starter\packages\create\bin\cli.mjs --name starter-react-p3 --ty
 
 上述命令不重新安装依赖，备份旧插件文件为 `starter.plugins.ts.bak`，仅对 `vite.config.ts` 执行 `vp fmt vite.config.ts --write`。再分别在两个应用执行 `vp check` 和 `vp build`。用户已在 Windows 完成旧项目修复：React `vp check` 直接通过、Vue `vp check --fix` 处理 `src/components.d.ts` 后通过，两组 `vp build` 均通过。
 
-
 本项目**不使用 CI/CD**。所有检查由开发者本地手动执行。
+
+自有文件统一使用根 `vite.config.ts` 中的 Vite+ 格式配置。第三方 `git-commit`、`gitmoji` Skill 原文仅从格式化范围排除以保持安装哈希；自有 Skill、源码、测试和文档继续参与全仓检查。2026-10-27 已建立通过 `vp check` 的格式基线。
 
 ## P4 Monorepo 混合应用
 
@@ -110,4 +111,3 @@ vp build
 ## 本地 UI Smoke 验收
 
 使用 `--ui-smoke` 在**已创建的项目**中增加隔离验收页，见 [UI Smoke 验收步骤](UI_SMOKE.md)。运行 `vp dev` 并在浏览器访问 `/ui-smoke.html`，确认真实组件按钮、点击计数、原子 CSS 的展示效果。此操作需人工检查，不会替换原首页，且 `vp build` 成功不能单独代表真实组件渲染通过。
-

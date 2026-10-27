@@ -6,59 +6,69 @@
 - 旧版生成器存在插件相对导入 TS2307 与格式问题。修复要求：生成阶段内联插件、自动格式化并提供保留备份的旧项目修复入口。
 - 用户 2026-10-26 反馈：两组旧项目修复后 `vp build` 均通过，React 的 `vp check` 直接通过，Vue 的 `vp check --fix` 修正生成声明后通过；不得新增 CI/CD。
 
-
 状态定义：**已实现 / 进行中 / 规划中 / 待确认**。当前项目仍处于初始化阶段。
 
 ### FR-001 官方工程模板
+
 - 状态：Vue/React × TS/JS 四种 Application 官方模板已完成创建和构建验证；2026-10-27 官方 Monorepo 根及混合子应用通过创建、检查和构建验收；优先级：P0。
 - 目标：Application 委托 `vp create vite:application -- --template vue|vue-ts|react|react-ts`；语言可选 `ts` / `js`，默认 TypeScript；Monorepo 委托 `vp create vite:monorepo`。
 - 验收：实测生成 Vue 和 React 应用，且保留 Vite+ 官方结构、工具链与 Git 配置。
 
 ### FR-002 交互式创建
+
 - 状态：已实现基础交互（Windows 实机待复验），扩展插件选项规划中；优先级：P0。
 - 目标：交互选择名称、项目形态、框架、语言（默认 TypeScript）及确认/取消；非交互调用支持 `--language ts|js`。
 - 验收：非法名称、目录存在或未知参数时安全失败；交互与非交互创建均可用。
 
 ### FR-003 UI 集成
+
 - 状态：Vue TS/JS + TDesign/UnoCSS、React TS/JS + Ant Design/Tailwind 四种代表组合的安装、检查及构建已验证；其余组合和真实组件渲染待验收；优先级：P1。
 - 目标：None / Element Plus（Vue 专属）/ Ant Design（Vue 为 ant-design-vue，React 为 antd）/ TDesign（对应框架包），单选。
 - 验收：生成后组件正常加载、类型检查和构建成功；React 不出现 Element Plus。
 
 ### FR-004 CSS 集成
+
 - 状态：TS/JS 下 UnoCSS、Tailwind 的代表组合已通过检查和构建，格式生成规则已完善；其他组合待验收；优先级：P1。
 - 目标：None / UnoCSS / Tailwind CSS，单选。
 - 验收：对应 Vite 插件及样式入口有效，未选择不引入依赖。
 
 ### FR-005 大屏可视化
+
 - 状态：规划中；优先级：P1。
 - 目标：按应用选择是否启用自定义大屏适配，支持设计稿尺寸及 contain / cover / stretch。
 - 验收：窗口变化、全屏、清理监听器和 3D Canvas 交互正确。
 
 ### FR-006 3D 引擎
+
 - 状态：规划中；优先级：P1。
 - 目标：可多选 Three.js、CesiumJS、Babylon.js，按应用集成。
 - 验收：最小场景渲染、资源回收及相应构建成功。
 
 ### FR-007 模型安全加载
+
 - 状态：规划中；优先级：P1。
 - 目标：选择 3D 引擎时默认提供可关闭的模型加解密能力；优先 GLB，FBX / OBJ 按引擎格式兼容。
 - 验收：AES-256-GCM 正确解密，拒绝错误密钥及篡改文件；服务端授权接口契约明确，前端无硬编码密钥。
 
 ### FR-008 Monorepo 应用隔离
+
 - 状态：首期已实现；2026-10-27 官方根 + Vue TS/TDesign/UnoCSS + React JS/Ant Design/Tailwind 通过创建、检查、完整构建与浏览器验收；其他组合、自定义布局和批量配置仍待扩展；优先级：P1。
 - 目标：同一工作区可包含不同框架、语言和插件选择的应用；根工作区不指定统一语言。
 - 验收：配置互不污染，依赖与生成目录正确。
 - 首期边界：保留官方默认应用和库；已有官方 pnpm 工作区内逐个创建 `apps/<name>`，默认 TS；根不接受框架、语言、UI/CSS 统一配置。自定义 glob、批量配置文件及其他包管理器暂不支持。
 
 ### NFR-001 安全与可靠性
+
 - 状态：进行中；优先级：P0。
 - 验收：拒绝路径遍历、拒绝覆盖已有目标目录、退出码准确、不嵌入生产密钥。
 
 ### NFR-002 本地验证（无 CI）
+
 - 状态：进行中；优先级：P0。
 - 验收：提供本地单元测试、文档检查与构建说明；**不得新增 CI/CD 工作流**。
 
 ### NFR-003 可维护性
+
 - 状态：进行中；优先级：P1。
 - 验收：核心需求编号稳定、代码索引准确，记录架构决策与实施状态。
 
@@ -84,8 +94,8 @@
 - 2026-10-26：确定仓库 `adui-dev/viteplus-starter`；采用 Vite+ 官方基础模板；排除所有 CI/CD。
 
 ### FR-009 UI 组件实际渲染验收
+
 - 状态：验收页面生成工具已实现；2026-10-27 Vue/JS/TDesign/UnoCSS、React/JS/Ant Design/Tailwind 的浏览器渲染、点击及 CSS 验收通过；TS 和其余组合待验收。React 验收入口仍有一条 Fast Refresh lint 警告；优先级：P1。
 - 目标：显式 `--ui-smoke` 在已有 Vue/TDesign、React/Ant Design TS/JS 应用中添加隔离验收页面，测试组件加载、点击计数与 CSS 原子类。
 - 验收：无需修改 App 或 main 入口，拒绝覆盖同名文件；浏览器中组件按钮可见、计数改变、CSS 样式正确且无控制台错误。
 - 范围：不支持未配置相应 UI 的应用，也不支持 Monorepo 根；不得增加 CI。
-

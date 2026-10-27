@@ -77,3 +77,8 @@
 - pnpm 11.24.0 的 `pnpm install --frozen-lockfile --offline` 退出 0，依赖已是最新锁定状态；P4 样例仍使用 Vite+ 管理的 pnpm 12.15.0。
 - 按历史的 emoji + Conventional Commits + 中文说明拆分 P4 功能、Skills 精简、依赖锁定三个提交；用户已授权推送 main。没有新增 CI/CD，也未执行 npm 发布或 Release。
 
+## 2026-10-27 本地格式基线
+
+- 统一项目自有源码、测试、配置和文档格式，清除此前的全仓格式失败，不改变运行逻辑和依赖版本。
+- 第三方 `git-commit`、`gitmoji` Skills 按安装原文保留，根 fmt 仅排除这两个目录以保持来源哈希；项目源码、测试和文档仍完整参与检查。
+- `node --test` 71/71、文档静态检查、根 `vp check` 均通过；根检查 35 文件格式正确，18 文件无警告或 lint 错误。无 CI/CD。

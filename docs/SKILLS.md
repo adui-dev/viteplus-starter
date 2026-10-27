@@ -1,10 +1,10 @@
 # Skills 索引
 
-| Skill | 位置 | 状态 |
-| --- | --- | --- |
-| starter-preset-development | [SKILL.md](../.agents/skills/starter-preset-development/SKILL.md) | 项目自有；已用于 P3/P4 集成与实机验收 |
-| git-commit | [SKILL.md](../.agents/skills/git-commit/SKILL.md) | 按逻辑分步暂存、检查和提交；遵循项目历史提交格式 |
-| gitmoji | [SKILL.md](../.agents/skills/gitmoji/SKILL.md) | 为中文 Conventional Commits 选择意图一致的 emoji；不单独执行提交 |
+| Skill                      | 位置                                                              | 状态                                                             |
+| -------------------------- | ----------------------------------------------------------------- | ---------------------------------------------------------------- |
+| starter-preset-development | [SKILL.md](../.agents/skills/starter-preset-development/SKILL.md) | 项目自有；已用于 P3/P4 集成与实机验收                            |
+| git-commit                 | [SKILL.md](../.agents/skills/git-commit/SKILL.md)                 | 按逻辑分步暂存、检查和提交；遵循项目历史提交格式                 |
+| gitmoji                    | [SKILL.md](../.agents/skills/gitmoji/SKILL.md)                    | 为中文 Conventional Commits 选择意图一致的 emoji；不单独执行提交 |
 
 ## 使用约定
 
