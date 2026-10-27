@@ -132,3 +132,15 @@
 - 已补齐 P5 原生全屏成功路径：后台请求仍可 not granted，激活 Chrome 标签后普通用户手势成功进入，两框架 :fullscreen 分别为 ad-screen/ad-screen（含空白类名差异）；HUD/原生浮层保留，canvas 缓冲随全屏扩展，退出恢复原容器。只切到前台并使用正常浏览器输入，未修改安全设置或绕过权限。
 - 98/98 Node 测试、文档检查、根 vp check 通过；冻结锁文件离线安装成功，仅新增 three 锁定条目。pnpm peers check 仍报告已有 vite npm alias（版本显示 1.4.0）与 Vitest 5 的 vite semver 提示；相关原有版本/锁条目未改，不将其称为无 peer 警告。
 - 本轮继续采用 git-commit/gitmoji，按用户新要求提交标题不再附加无 CI 后缀；仍不添加流水线，不发布 npm/Release。下一步：将已验证 Three 能力接入正式按应用引擎选项与批量配置，设计按需加载/分块，再逐步扩展其他引擎。
+
+## 2026-10-27 Three.js 第二期：正式应用选项与按需分块
+
+- 新增 --engine none|three；默认不引入引擎，新建 Three 应用要求显式 --screen，已有大屏应用可用 --engine three --apply-existing；根不接受统一引擎。严格拒绝未知值、错误类型（含 null）及独立 smoke/repair 混用，不替换官方首页、App/main 或 Vite 配置。
+- 批量 JSON 每应用增加 engine，Three 须同时 screen，应用阶段复用 CLI 完成集成，UI Smoke 独立阶段不重复传引擎/大屏。dry-run 列出引擎文件与固定依赖，不写文件。组合补装在 UI 安装和大屏写入前校验 Three 目标与已有依赖版本；已有输出及旧快照拒绝覆盖，不做隐式迁移。
+- 新增 createLazyScene，只有 start 才 import 引擎/创建 WebGL；并发 start 复用请求，失败可重试，加载期间 DPR 更新有效。卸载阻止晚到模块创建资源/通知失效组件，构造回调同步卸载也清理刚创建对象。不能取消 import 下载本身；受控测试覆盖这些生命周期边界。
+- 完整执行 examples/three.batch.json，生成 D:/Workspace/adui-studio/adui-three-options-demo（官方根 + Vue TS vue-dashboard + React JS react-dashboard），3 阶段完成。根仅有官方工具链直接依赖，无 Three/UI/CSS 直接依赖，官方 website/utils 保留，无 .github/workflows。
+- 新工作区根 ready 8/8 成功（本轮首次无缓存），83 文件格式正确、48 文件无 lint/type 警告错误，utils 1 项测试通过；官方 TypeScript 7 API 实验性提醒仍在。后续对最终源码再次根 check 成功。另从官方入口实际创建 three-option-react-ts 与 three-option-vue-js，均检查与原首页构建通过，覆盖完整四种框架/语言。
+- 两框架专项双入口构建：临时 mergeConfig 同时指定 index.html/three-smoke.html，保留原配置，完成后移除临时配置，产物位于各应用忽略的 dist/three-options。最终验收入口约 10.26/10.74 kB，共享框架约 64.40/219.44 kB，引擎独立分块均为 adui-three-CLYS0v9R.js，525.76 kB、gzip 131.15 kB，manifest 标记 isDynamicEntry。入口大小不含共享框架，不当作完整首屏大小；引擎仍有默认 500 kB 提醒，未隐藏。
+- Chrome 生产预览网络捕获：两页面初始均无引擎请求、canvas=0；点击加载后分别请求独立引擎分块并出现真实 canvas，中心拾取变色。卸载 canvas=0/disposed=true；重挂后仍无 canvas，需再次点击创建新实例，两框架控制台 warn/error 均为空。最终 React 重载复验新构建及拾取通过；加载前截图已保存。加载失败/晚到导入由受控测试覆盖，未通过破坏真实网络制造失败。
+- 最终 106/106 Node 测试、文档静态校验、仓库 vp check 及冻结锁文件离线安装均通过；未修改依赖版本或锁文件。旧样例未自动覆盖升级。
+- 按中文 emoji 格式分步提交并推送，不附加额外后缀，不创建流水线或发布。下一步：接入 GLB 模型加载与错误/资源回收验证，再逐步扩展模型授权及加解密边界；其他引擎与多选仍未实现。
