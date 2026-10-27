@@ -120,3 +120,15 @@
 - 全屏请求在当前 Chrome 自动化环境返回 TypeError: not granted，页面已正常显示拒绝；控制器的进入/退出调用和事件合帧由单测覆盖，但浏览器全屏成功/退出恢复仍待人工验收。未绕过浏览器权限。真实 Three/Cesium/Babylon canvas、DPR 与拾取尚未实现，不宣称 3D 验收完成。
 - 91/91 Node 测试、文档检查、全仓 vp check 均通过。新增 screen.batch.json 在仓库上级目录 dry-run 成功；本轮未完整执行这个新批量样例，不混同先前批量工作区的创建验收。锁文件仅增加新可选框架 peer 图，未升级已有声明；联网补齐缺失缓存后 frozen-lockfile 离线安装退出 0。
 - 沿用 git-commit/gitmoji Skills 和历史中文 emoji 格式分步提交推送；无 CI/CD、npm/Release 发布。下一步先人工确认原生全屏成功路径，再接入 Three.js 最小真实场景，验证 drawing buffer/DPR、拾取与资源回收。
+
+## 2026-10-27 Three.js 首期与全屏补验
+
+- 新增 private packages/three：真实 WebGLRenderer 最小旋转线框立方体，原生容器测量、相机比例、DPR（最高 2/单边上限）、Raycaster 拾取、初始化异常/contextlost 处理及幂等资源清理。未实现模型加载、加解密、其他引擎或正式批量引擎选择。
+- 新增 --three-smoke，向已有 --screen 的官方 Vue/React TS/JS 应用安装 three 0.186.1、@types/three 0.186.0 并生成独立页面。保留正式入口/Vite 配置及已有大屏源码；安装前后校验输出与父目录，拒绝链接、覆盖、已有其他依赖版本。包管理器可更新应用 package.json 和工作区 catalog/锁文件；失败保留现场。
+- 四种应用实际补装：adui-batch-demo/apps/admin（Vue TS）、apps/portal（React JS）、starter-vue-js、starter-react-p3（React TS）。全部检查与原首页构建通过。实测修复 React TS 的按钮 PointerEvent 目标类型，不用类型断言或禁用规则绕过。
+- 混合工作区根 ready 8/8 成功（1 项已有缓存）：87 文件格式正确、50 文件无 lint/type 警告错误，utils 1 项测试通过；官方 utils 仍提示 TypeScript 7 API 实验性，未升级其依赖。专项构建产物最初被全仓格式扫描发现，已移出工作区后重跑成功，不新增忽略规则掩盖。
+- Vue/React 另用临时 mergeConfig 将 three-smoke.html 设为真实生产构建入口，两项成功，输出约 598/755 kB，保留默认 500 kB 分块提醒。显式导入所需 Three 类型，避免传递整个引擎命名空间造成额外包体。临时配置已移除，初次构建产物保存至 D:/Workspace/adui-studio/three-build-verification-20261027/vue 与 react，最终构建产物位于样例应用忽略的 dist/three-verification；未修改正式 Vite 配置。默认首页构建不视为 Three 页面专项构建。
+- Chrome 两框架真实旋转渲染、DPR 2、中心拾取变色、四模式/容器切换均实测；contain 半尺寸示例逻辑视口 956×501，实际 canvas 缓冲 1912×1002。卸载后 disposed=true、canvas 数量 0；重挂后一个新 canvas，中心点击 picks=1/selected=true，最终控制台 warn/error 为空。GPU 清理调用由受控测试验证，未进行驱动堆内存分析；OS 实体跨屏 DPR 变化未实测。
+- 已补齐 P5 原生全屏成功路径：后台请求仍可 not granted，激活 Chrome 标签后普通用户手势成功进入，两框架 :fullscreen 分别为 ad-screen/ad-screen（含空白类名差异）；HUD/原生浮层保留，canvas 缓冲随全屏扩展，退出恢复原容器。只切到前台并使用正常浏览器输入，未修改安全设置或绕过权限。
+- 98/98 Node 测试、文档检查、根 vp check 通过；冻结锁文件离线安装成功，仅新增 three 锁定条目。pnpm peers check 仍报告已有 vite npm alias（版本显示 1.4.0）与 Vitest 5 的 vite semver 提示；相关原有版本/锁条目未改，不将其称为无 peer 警告。
+- 本轮继续采用 git-commit/gitmoji，按用户新要求提交标题不再附加无 CI 后缀；仍不添加流水线，不发布 npm/Release。下一步：将已验证 Three 能力接入正式按应用引擎选项与批量配置，设计按需加载/分块，再逐步扩展其他引擎。
