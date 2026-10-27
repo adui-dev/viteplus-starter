@@ -11,7 +11,7 @@ flowchart TD
   C -->|Application| D[Vite+ vite:application]
   C -->|Monorepo| E[Vite+ vite:monorepo]
   D --> F[通过模板参数选择 vue / vue-ts / react / react-ts]
-  E --> K[在 Workspace 中逐个添加应用 - 规划中]
+  E --> K[通过 --workspace 在 apps 下逐个添加应用]
   K --> F
   F --> G[可选集成引擎 - 规划中]
   G --> H[UI / CSS / 大屏 / 3D]
@@ -25,6 +25,8 @@ flowchart TD
 - `packages/*` 未来可容纳共享模型加解密核心及引擎适配；尚未创建。
 - `scripts/validate-docs.mjs`：本地文档静态校验；不是 CI。
 - 官方 Vite+ 负责应用模板、基础工具链；不得偷偷替换官方模板。
+- `workspace.mjs` 预检已有官方 pnpm 根、成员路径与同名包；子应用仍交给 `vite:application`，以工作区根为 cwd，不传 Git 初始化参数。UI/CSS 安装在子应用中，官方管理共享锁文件和 catalog；Vue TS 声明格式忽略规则仅在根增量合并。
+- 混合工作区的插件 peer 兼容修复在根 packageExtensions 增量记录，避免缺失 Vite peer 时从提升目录解析到另一应用的类型实例；拒绝覆盖冲突的用户配置。
 - 模型安全：加密 CLI / 浏览器解密 / Loader 分离；生产密钥由后端提供，浏览器端保护不等于 DRM。
 
 ## 架构风险

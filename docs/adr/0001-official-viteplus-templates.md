@@ -25,3 +25,9 @@
 ## 额外约束
 
 用户明确要求不增加任何 CI/CD。架构中只提供手动本地检查和测试。
+
+## 2026-10-27：Monorepo 子应用
+
+继续采用官方入口：根用 `vite:monorepo`，成员以根为 cwd 调用 `vite:application --directory apps/<name>`，不再传入只适用于独立工程的 Git 初始化选项。保留官方默认应用和库，不复制独立工程到工作区，也不走迁移流程。选择逐应用 `--workspace` 命令，先保证混合框架与语言的隔离；批量配置另行设计。
+
+实测发现插件包遗漏 Vite peer 会在 pnpm 混合工作区解析到另一类型实例，造成 Vue TS 的 TS2321。采用 pnpm packageExtensions 增量补充已知包的 peer 元数据，保留各应用原有 TypeScript/Node 类型版本；不通过强制统一依赖版本、类型断言或关闭检查绕过。已有扩展冲突时在生成前拒绝修改。

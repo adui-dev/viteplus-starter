@@ -81,7 +81,7 @@ export function generateIntegration(options, viteConfig, mainSource, { repair = 
   const pluginConfig = repair
     ? repairLegacyStarterConfig(viteConfig, { imports, plugins })
     : injectStarterPlugins(viteConfig, { imports, plugins })
-  const config = framework === 'vue' && ui !== 'none' && language === 'ts'
+  const config = framework === 'vue' && ui !== 'none' && language === 'ts' && !options.workspace
     ? ignoreGeneratedVueComponentDeclarations(pluginConfig)
     : pluginConfig
   return { config, files }

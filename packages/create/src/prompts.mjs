@@ -93,7 +93,8 @@ export async function collectProjectOptions(partial, ask, report = console.error
   const description = selected.type === 'application'
     ? `Application / ${selected.framework === 'vue' ? 'Vue 3' : 'React'} / ${selected.language === 'js' ? 'JavaScript' : 'TypeScript'} / UI: ${selected.ui ?? 'none'} / CSS: ${selected.css ?? 'none'}`
     : 'Monorepo (各子应用后续独立选择框架)'
-  const answer = (await ask(`\n将创建 ${selected.name} (${description})，确认吗？[Y/n]: `)).trim().toLowerCase()
+  const destination = selected.workspace ? `${selected.workspace}/apps/${selected.name}` : selected.name
+  const answer = (await ask(`\n将创建 ${destination} (${description})，确认吗？[Y/n]: `)).trim().toLowerCase()
   if (answer === 'n' || answer === 'no') return null
   if (answer !== '' && answer !== 'y' && answer !== 'yes') {
     throw new Error('确认选项只能是 Y 或 N，已取消创建')

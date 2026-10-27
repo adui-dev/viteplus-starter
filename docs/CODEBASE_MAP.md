@@ -33,7 +33,13 @@
 | `AGENTS.md` | Agent 规则及导航入口 |
 | `docs/` | 需求、架构、设计、状态、Skills、Harness、ADR |
 
-计划中的 UI、CSS、3D、大屏及模型安全模块**尚无真实实现目录**。
+UI/CSS 已在 `integrations.mjs` 实现；3D、大屏及模型安全模块**尚无真实实现目录**。
+
+## P4 Monorepo 多应用
+
+- `packages/create/src/workspace.mjs`：工作区预检、安全成员路径、同名包检查和根声明忽略规则增量合并。
+- `packages/create/test/workspace.test.mjs`：官方命令参数、配置隔离、目录与 junction 保护、真实 CLI dry-run/覆盖拒绝。
+- `docs/MONOREPO.md`：逐应用创建、检查及边界说明。
 
 ## UI Smoke 验收工具
 

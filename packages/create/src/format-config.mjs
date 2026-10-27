@@ -49,12 +49,15 @@ function findTopLevelField(source, start, field) {
   throw new Error('Vite+ 配置未正确闭合，拒绝修改')
 }
 
-export function ignoreGeneratedVueComponentDeclarations(viteConfig) {
+export function ignoreGeneratedVueComponentDeclarations(viteConfig, generatedPath = 'src/components.d.ts') {
+  if (!/^(?:apps\/[a-z][a-z0-9]*(?:-[a-z0-9]+)*\/)?src\/components\.d\.ts$/.test(generatedPath)) {
+    throw new Error('无效的自动生成声明路径')
+  }
   const root = /export\s+default\s+defineConfig\s*\(\s*\{/.exec(viteConfig)
   if (!root) throw new Error('仅支持 Vite+ 官方 defineConfig({ ... })')
   const rootStart = root.index + root[0].length
   const fmtPosition = findTopLevelField(viteConfig, rootStart, 'fmt')
-  const ignoreEntry = "'src/components.d.ts'"
+  const ignoreEntry = "'" + generatedPath + "'"
 
   if (fmtPosition === null) {
     return viteConfig.slice(0, rootStart) +
@@ -79,6 +82,6 @@ export function ignoreGeneratedVueComponentDeclarations(viteConfig) {
   const arrayEnd = viteConfig.indexOf(']', arrayContentStart)
   if (arrayEnd < 0) throw new Error('fmt.ignorePatterns 数组未闭合')
   const already = viteConfig.slice(arrayContentStart, arrayEnd)
-  if (/(?:['"])src\/components\.d\.ts(?:['"])/.test(already)) return viteConfig
+  if (already.includes("'" + generatedPath + "'") || already.includes('"' + generatedPath + '"')) return viteConfig
   return viteConfig.slice(0, arrayContentStart) + ignoreEntry + ', ' + viteConfig.slice(arrayContentStart)
 }

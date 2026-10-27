@@ -14,6 +14,10 @@ node .\viteplus-starter\packages\create\bin\cli.mjs --name starter-react-p3 --ty
 
 本项目**不使用 CI/CD**。所有检查由开发者本地手动执行。
 
+## P4 Monorepo 混合应用
+
+见 [Monorepo 操作说明](MONOREPO.md)。使用独立的仓库外目录，依次创建官方根、Vue TS/TDesign/UnoCSS 和 React JS/Ant Design/Tailwind；不要并发执行生成。分别运行应用 `vp check`、`vp run build`，根运行 `vp check`；确认根没有新增 Vue/React UI/CSS 依赖、每个应用插件互不污染，Vue TS 声明生成后格式检查仍有效。默认 website/utils 保留。
+
 ## TypeScript / JavaScript 四种官方模板验证
 
 在仓库外的工作目录执行：

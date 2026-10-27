@@ -1,12 +1,12 @@
 # 项目上下文
 
-更新日期：2026-10-26。
+更新日期：2026-10-27。
 
 ## 项目定位与约束
 
 - 仓库：`adui-dev/viteplus-starter`。Vite+ 官方 `vite:application` / `vite:monorepo` 是唯一基础工程来源，Vue/React Application 按语言选 `vue` / `vue-ts` / `react` / `react-ts`。
-- 已实现：基础 CLI 交互与参数模式、Application UI/CSS 集成、旧项目补装及 `--repair-existing`、基础单元测试与文档检查。
-- 规划中：Monorepo 多应用隔离与框架增强、其余 UI/CSS 兼容矩阵、大屏、Three.js/CesiumJS/Babylon.js、3D 模型安全加载。
+- 已实现：基础 CLI 交互与参数模式、Application UI/CSS 集成、旧项目补装及 `--repair-existing`、UI Smoke、通过 `--workspace` 逐个添加 Monorepo 应用、本地单元测试与文档检查。
+- 规划中：Monorepo 批量配置与自定义布局、其余 UI/CSS 兼容矩阵、大屏、Three.js/CesiumJS/Babylon.js、3D 模型安全加载。
 - 严格要求：**不得添加任何 CI/CD、自动发布或部署工作流**；仅人工本地测试。
 
 ## 用户 Windows 实机验收（已确认）
@@ -35,7 +35,7 @@
 
 1. 继续验证真实组件渲染（TDesign/Ant Design）及其余 UI/CSS 组合；目前通过检查/构建不代表组件使用链路已验收。
 2. 在全新 Vue TypeScript + UI 组合中复验 `components.d.ts` 自动生成后的格式行为。
-3. 独立验证 Monorepo 创建，再逐步进入大屏适配及 3D 模型安全加载开发。
+3. Monorepo 首期已于 2026-10-27 验收（见文末）；后续扩展批量配置，再逐步进入大屏适配及 3D 模型安全加载开发。
 
 ## 2026-10-26 独立 UI Smoke 页面
 
@@ -44,4 +44,24 @@
 - 不改动原始 `App.*`、`src/main.*`、`vite.config.*`；写入前检查库依赖与现有文件，防止覆盖。
 - 代码级单元测试已编写，**实际浏览器组件渲染和交互尚未验收**。
 - 下阶段：用户在已生成的 Vue/React JS 项目中运行 UI Smoke、`vp check`、`vp dev`，再推进 Monorepo 多应用创建和其余 UI/CSS 组合。
+
+## 2026-10-27 UI Smoke 实机验收
+
+- 验证基线：`511c8c5`，本地与 fetch 后的 `origin/main` 一致；未添加 CI/CD。
+- 在已有 `starter-vue-js`、`starter-react-js` 中通过 CLI 成功生成验收页，未重新安装依赖；App、main、Vite 配置的前后 SHA-256 一致。
+- Chrome 实测 Vue/JS/TDesign/UnoCSS 和 React/JS/Ant Design/Tailwind：主按钮可见，点击计数从 0 变为 1，浅绿色背景、深绿色文字、8px 圆角和 16px 内边距均生效；所验收页面控制台无 warn/error。
+- 两项目的 `vp check`、`vp build` 均退出 0；Vue 无警告，React 新增的 `src/ui-smoke/main.jsx:7` 有一条 `react/only-export-components` Fast Refresh 警告，尚未修复。
+- 仓库本地 `node --test` 59/59 通过，文档静态检查通过；根仓库 `vp check` 因 31 个文件格式问题退出 1，未进行全仓格式化。
+- 本轮只验收上述两个已有 JavaScript 项目；TypeScript 验收页、其余组合及 Monorepo 仍待独立验证。
+
+## 2026-10-27 P4 Monorepo 多应用首期
+
+- 新增 `--workspace <path>`：以已有官方 pnpm Monorepo 为根，委托 `vite:application` 创建 `apps/<name>`，逐应用选择 Vue/React、TS/JS、UI/CSS；根仍委托 `vite:monorepo`，保留默认 website/utils，无 CI/CD。
+- 新增工作区预检、同名包/已有目录/junction 保护、Vue TS 声明根格式忽略规则增量合并。支持 dry-run、apply-existing、ui-smoke；暂不支持自定义 glob、批量配置文件和旧版 repair-existing。
+- 实测修复：官方新成员配置的 vite 导入与根 lint 规则不一致，使用官方 lint 定向修复；为 unplugin-vue-components/unocss 补充根 packageExtensions 的 Vite peer 元数据，修复混合工作区因类型解析到不同 Vite 实例引起的 TS2321；不关闭检查、不使用类型断言。
+- 全新验证目录：`D:\Workspace\adui-studio\adui-p4-final-20261027`。由当前 CLI 完整创建官方根、`apps/vue-admin`（Vue TS/TDesign/UnoCSS）、`apps/react-portal`（React JS/Ant Design/Tailwind）。根无 UI/CSS 直接依赖，两个应用配置隔离。
+- 根 `vp run ready` 退出 0：根检查无 lint/type 警告或错误，utils 1 项测试通过，网站、库与两应用完整构建共 8 项任务全部成功。官方 utils 构建提示 TypeScript 7 API 实验性警告，未修改官方版本。
+- 构建后再次根 `vp check` 通过，46 文件格式正确、19 文件无警告或 lint/type 错误，Vue 自动生成声明不造成格式失败。
+- 两应用均通过 `--workspace --ui-smoke` 生成独立验收页；Chrome 实测按钮渲染、点击 0→1、浅绿色 CSS、8px 圆角和 16px 内边距正确，控制台无 warn/error。
+- 生成器 `node --test` 71/71 通过、文档检查及改动代码的定向 lint 通过；本阶段根 `vp check` 报告 68 个文件格式问题（初始 31 个，期间出现新增未跟踪 Skills 文件），未修改这些 Skills 或做无关全仓格式化。后续按用户授权分步提交并推送，Skills 清理结果另行记录。
 

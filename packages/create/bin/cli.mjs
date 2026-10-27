@@ -2,7 +2,7 @@
 import { spawnSync } from 'node:child_process'
 import { existsSync } from 'node:fs'
 import { readFile } from 'node:fs/promises'
-import { join, resolve } from 'node:path'
+import { basename, join, resolve } from 'node:path'
 import { stdin, stdout } from 'node:process'
 import { createInterface } from 'node:readline/promises'
 import { parseCliArgs } from '../src/cli-args.mjs'
@@ -10,6 +10,7 @@ import { buildVpCommand, validateProjectOptions } from '../src/options.mjs'
 import { collectProjectOptions } from '../src/prompts.mjs'
 import { applyIntegrations, planIntegrations, repairExistingIntegrations } from '../src/integrations.mjs'
 import { addUiSmoke } from '../src/ui-smoke.mjs'
+import { normalizeNewWorkspaceApplication, prepareWorkspacePeerExtensions, resolveWorkspaceApplication, runWorkspaceVp, updateWorkspaceDeclarationIgnore } from '../src/workspace.mjs'
 
 const usage = `ADui Vite+ Starter（P2：项目初始化交互）
 
@@ -29,6 +30,8 @@ const usage = `ADui Vite+ Starter（P2：项目初始化交互）
 说明：
   Application 委托 Vite+ 官方 vite:application，按框架和语言选择 vue/vue-ts/react/react-ts。
   --language ts|js（默认 ts）；Monorepo 根不指定语言。
+  --workspace <已有工作区路径>：在官方 pnpm Monorepo 的 apps/<name> 中添加 Application。
+  例：--workspace ../my-workspace --name admin --type application --framework vue --ui tdesign --css unocss
   Monorepo 使用官方 vite:monorepo；子应用的框架需分别选择。
   无参数时交互选择名称、形态、框架、语言（默认 TypeScript）、UI/CSS，并二次确认。
   --dry-run 只输出命令；必须提供全部必需参数，且不创建文件。
@@ -68,7 +71,17 @@ async function main() {
 
   const { command, args: vpArgs } = buildVpCommand(options)
   const integrations = planIntegrations(options)
-  const target = resolve(process.cwd(), options.name)
+  if (options.workspace && args.repairExisting) throw new Error('--workspace 不支持旧版 --repair-existing')
+  const workspace = options.workspace ? await resolveWorkspaceApplication(options) : null
+  const commandCwd = workspace?.root ?? process.cwd()
+  const target = workspace?.target ?? resolve(process.cwd(), options.name)
+  async function finishWorkspaceIntegration() {
+    if (!workspace) return
+    if (await updateWorkspaceDeclarationIgnore(workspace)) {
+      runWorkspaceVp(commandCwd, ['fmt', basename(workspace.configPath), '--write'])
+    }
+    runWorkspaceVp(commandCwd, ['fmt', 'pnpm-workspace.yaml', '--write'])
+  }
   if (args.uiSmoke) {
     if (args.dryRun || args.applyExisting || args.repairExisting) {
       throw new Error('--ui-smoke 不能与 --dry-run、--apply-existing、--repair-existing 同时使用')
@@ -108,7 +121,9 @@ async function main() {
     if (!integrations.dependencies.length && !integrations.devDependencies.length) {
       throw new Error('未选择需要安装的 UI/CSS 集成')
     }
+    if (workspace) await prepareWorkspacePeerExtensions(workspace)
     await applyIntegrations(target, options)
+    await finishWorkspaceIntegration()
     console.log('补装完成，请在项目中执行 vp check 和 vp build')
     return
   }
@@ -117,7 +132,7 @@ async function main() {
   }
 
   if (args.dryRun) {
-    console.log(JSON.stringify({ command, args: vpArgs, integrations }, null, 2))
+    console.log(JSON.stringify({ command, args: vpArgs, ...(workspace ? { cwd: commandCwd, target } : {}), integrations }, null, 2))
     return
   }
 
@@ -125,18 +140,22 @@ async function main() {
     ? `调用 Vite+ 官方 Application 模板，框架：${options.framework}，语言：${options.language ?? 'ts'}`
     : '调用 Vite+ 官方 Monorepo 模板')
 
+  if (workspace) await prepareWorkspacePeerExtensions(workspace)
+
   // Windows 的 vp 通常是 .cmd shim；所有值在构造命令前均被白名单校验。
   // 以单个 shell 命令执行，避免 Node.js 24 在 shell:true + args[] 时的 DEP0190。
   const result = process.platform === 'win32'
-    ? spawnSync([command, ...vpArgs].join(' '), { stdio: 'inherit', shell: true })
-    : spawnSync(command, vpArgs, { stdio: 'inherit' })
+    ? spawnSync([command, ...vpArgs].join(' '), { cwd: commandCwd, stdio: 'inherit', shell: true })
+    : spawnSync(command, vpArgs, { cwd: commandCwd, stdio: 'inherit' })
 
   if (result.error) throw result.error
+  if (result.status === 0 && workspace) await normalizeNewWorkspaceApplication(workspace)
   if (result.status === 0 && (integrations.dependencies.length || integrations.devDependencies.length)) {
     console.log('正在安装和配置所选 UI/CSS 插件...')
     await applyIntegrations(target, options)
     console.log('UI/CSS 插件配置已写入，请运行 vp check 和 vp build 验证')
   }
+  if (result.status === 0) await finishWorkspaceIntegration()
   if (result.signal) {
     process.exitCode = 1
   } else if (result.status !== 0) {

@@ -21,6 +21,7 @@ export function validateProjectOptions(options) {
   }
 
   const { name, type, framework } = options
+  const { workspace } = options
   const language = options.language ?? 'ts'
   const ui = options.ui ?? 'none'
   const css = options.css ?? 'none'
@@ -29,6 +30,10 @@ export function validateProjectOptions(options) {
 
   if (!PROJECT_TYPES.has(type)) {
     throw new Error('项目类型必须为 application 或 monorepo')
+  }
+  if (workspace !== undefined &&
+      (type !== 'application' || typeof workspace !== 'string' || !workspace.trim() || workspace.includes('\0'))) {
+    throw new Error('--workspace 只能为 Application 指定已有工作区路径')
   }
 
   if (type === 'application' && !Object.hasOwn(FRAMEWORK_TEMPLATES, framework)) {
@@ -57,6 +62,7 @@ export function validateProjectOptions(options) {
   }
   return {
     name, type,
+    ...(workspace === undefined ? {} : { workspace }),
     ...(framework === undefined ? {} : { framework }),
     ...(options.language === undefined ? {} : { language }),
     ...(options.ui === undefined ? {} : { ui }),
@@ -65,15 +71,15 @@ export function validateProjectOptions(options) {
 }
 
 export function buildVpCommand(options) {
-  const { name, type, framework, language = 'ts' } = validateProjectOptions(options)
+  const { name, type, framework, language = 'ts', workspace } = validateProjectOptions(options)
   const args = [
       'create',
       type === 'monorepo' ? 'vite:monorepo' : 'vite:application',
       '--directory',
-      name,
+      workspace === undefined ? name : 'apps/' + name,
       '--package-manager',
       'pnpm',
-      '--git',
+      ...(workspace === undefined ? ['--git'] : ['--no-interactive']),
   ]
   if (type === 'application') {
     args.push('--', '--template', FRAMEWORK_TEMPLATES[framework][language])

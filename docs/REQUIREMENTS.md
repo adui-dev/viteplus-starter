@@ -10,7 +10,7 @@
 状态定义：**已实现 / 进行中 / 规划中 / 待确认**。当前项目仍处于初始化阶段。
 
 ### FR-001 官方工程模板
-- 状态：Vue/React × TS/JS 四种 Application 官方模板已完成创建和构建验证；Monorepo 单独待验收；优先级：P0。
+- 状态：Vue/React × TS/JS 四种 Application 官方模板已完成创建和构建验证；2026-10-27 官方 Monorepo 根及混合子应用通过创建、检查和构建验收；优先级：P0。
 - 目标：Application 委托 `vp create vite:application -- --template vue|vue-ts|react|react-ts`；语言可选 `ts` / `js`，默认 TypeScript；Monorepo 委托 `vp create vite:monorepo`。
 - 验收：实测生成 Vue 和 React 应用，且保留 Vite+ 官方结构、工具链与 Git 配置。
 
@@ -45,9 +45,10 @@
 - 验收：AES-256-GCM 正确解密，拒绝错误密钥及篡改文件；服务端授权接口契约明确，前端无硬编码密钥。
 
 ### FR-008 Monorepo 应用隔离
-- 状态：规划中；优先级：P1。
+- 状态：首期已实现；2026-10-27 官方根 + Vue TS/TDesign/UnoCSS + React JS/Ant Design/Tailwind 通过创建、检查、完整构建与浏览器验收；其他组合、自定义布局和批量配置仍待扩展；优先级：P1。
 - 目标：同一工作区可包含不同框架、语言和插件选择的应用；根工作区不指定统一语言。
 - 验收：配置互不污染，依赖与生成目录正确。
+- 首期边界：保留官方默认应用和库；已有官方 pnpm 工作区内逐个创建 `apps/<name>`，默认 TS；根不接受框架、语言、UI/CSS 统一配置。自定义 glob、批量配置文件及其他包管理器暂不支持。
 
 ### NFR-001 安全与可靠性
 - 状态：进行中；优先级：P0。
@@ -83,7 +84,7 @@
 - 2026-10-26：确定仓库 `adui-dev/viteplus-starter`；采用 Vite+ 官方基础模板；排除所有 CI/CD。
 
 ### FR-009 UI 组件实际渲染验收
-- 状态：验收页面生成工具已实现，浏览器实际渲染尚待验证；优先级：P1。
+- 状态：验收页面生成工具已实现；2026-10-27 Vue/JS/TDesign/UnoCSS、React/JS/Ant Design/Tailwind 的浏览器渲染、点击及 CSS 验收通过；TS 和其余组合待验收。React 验收入口仍有一条 Fast Refresh lint 警告；优先级：P1。
 - 目标：显式 `--ui-smoke` 在已有 Vue/TDesign、React/Ant Design TS/JS 应用中添加隔离验收页面，测试组件加载、点击计数与 CSS 原子类。
 - 验收：无需修改 App 或 main 入口，拒绝覆盖同名文件；浏览器中组件按钮可见、计数改变、CSS 样式正确且无控制台错误。
 - 范围：不支持未配置相应 UI 的应用，也不支持 Monorepo 根；不得增加 CI。

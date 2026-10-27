@@ -1,0 +1,54 @@
+# Monorepo 多应用（P4）
+
+根工作区使用 Vite+ 官方 `vite:monorepo`；每个新增应用仍使用官方 `vite:application`。保留默认 `apps/website` 和 `packages/utils`，没有 CI/CD 配置。
+
+## 创建
+
+在生成器仓库的上级目录执行，目标工作区名称必须尚不存在：
+
+```powershell
+node ./viteplus-starter/packages/create/bin/cli.mjs --name my-workspace --type monorepo
+node ./viteplus-starter/packages/create/bin/cli.mjs --workspace ./my-workspace --name admin --type application --framework vue --ui tdesign --css unocss
+node ./viteplus-starter/packages/create/bin/cli.mjs --workspace ./my-workspace --name portal --type application --framework react --language js --ui antd --css tailwindcss
+```
+
+得到 Vue TS 的 `apps/admin` 和 React JS 的 `apps/portal`；可分别指定 `--language ts|js`，默认 TS。UI/CSS 依赖和插件写入各自应用，根共享锁文件和 catalog 由官方流程及 pnpm 管理。Vue TS 自动生成声明的格式排除规则按应用路径合并到根配置。
+
+生成器会对新应用 Vite 配置运行官方 lint 的定向修复。选用 Vue 自动导入或 UnoCSS 时，还会在根 `packageExtensions` 中补充相应包缺失的 Vite peer 声明，使插件类型解析到所在应用的 Vite 实例；这不会给根添加 UI/CSS 依赖，也不会更改各应用选择的语言版本。已有冲突的扩展配置会明确报错。
+
+## 预览与检查
+
+相同命令追加 `--dry-run` 可查看官方命令、执行 cwd、目标路径及依赖计划，不写文件。
+
+```powershell
+cd my-workspace
+vp check
+cd apps/admin
+vp check
+vp run build
+vp dev
+# 结束服务后，进入 ../portal 执行同样的检查和构建
+```
+
+使用 `vp run build` 执行官方应用的完整 build 脚本，包含模板提供的 vue-tsc/tsc 等前置检查；`vp build` 单独运行 Vite 构建。根默认 dev 脚本继续指向官方 website；请在需要的应用目录执行 `vp dev`。
+
+支持的 TDesign/Ant Design 应用还可在原生成命令追加 `--ui-smoke`（不要同时添加 dry-run 或 apply-existing），然后访问开发服务器的 `/ui-smoke.html`。见 [UI Smoke](UI_SMOKE.md)。
+
+## 保护与限制
+
+- 仅支持已有 private Vite+ pnpm 工作区，packages 使用官方块列表，包含 `apps/*`；列表仅允许 `apps/*`、`packages/*`、`tools/*`。自定义 glob、排除规则、YAML 合并键和其他包管理器明确拒绝，不自动改写。
+- 根不指定 framework/language/UI/CSS；每个应用独立指定。当前为逐应用命令，尚无批量配置文件。
+- 应用名只允许安全的小写 kebab-case；已有目标或同名包拒绝创建，拒绝 apps/目标/关键根文件的符号链接或 junction。
+- `--workspace` 与 `--repair-existing` 不兼容；首次增强失败可检查现场后显式 `--apply-existing`，同名增强文件仍会拒绝覆盖。
+- 失败保留现场，不自动删除或回滚安装；不要并发操作同一个工作区。
+
+## 本轮验证
+
+2026-10-27，当前 CLI 完整生成 `D:\Workspace\adui-studio\adui-p4-final-20261027`：官方默认 website/utils 保留，新增 Vue TS/TDesign/UnoCSS 的 `apps/vue-admin`、React JS/Ant Design/Tailwind 的 `apps/react-portal`。
+
+- 根 `vp run ready` 通过：根检查、utils 1 项测试、四个包完整构建，共 8 项任务全部成功；官方 utils 构建提示 TypeScript 7 API 实验性警告，未修改模板依赖版本。
+- 构建后再运行根 `vp check` 通过：46 文件格式正确、19 文件无警告或 lint/type 错误，自动生成声明的格式排除生效。
+- Chrome 两页面按钮显示正确、点击计数 0→1、CSS 颜色/圆角/内边距生效，控制台无 warn/error。
+- 根无 UI/CSS 直接依赖，应用配置隔离；71 项生成器单元测试、文档校验和定向 lint 通过。生成器仓库本身的根 `vp check` 仍受全仓格式问题阻塞，详见项目状态记录。
+
+尚未穷举 Vue/React × TS/JS × 全部 UI/CSS；通过上述代表组合不等于所有组合均已验收。

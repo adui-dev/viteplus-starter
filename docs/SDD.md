@@ -45,7 +45,7 @@
 - `applyIntegrations(directory, options)`：在安装依赖前先生成并校验修改后的配置、检查目标文件是否存在；校验失败不安装依赖。安装失败时不写入插件配置，但官方基础项目可能已存在。
 - 新增 `--apply-existing` 显式补装：校验原目录、package.json 中的 `vite-plus` 及 Vue/React 依赖，再对已有的官方基础应用安装所选集成；不重新执行 `vp create`。
 - Vue 使用 `unplugin-vue-components` 和对应 Resolver 按需引入组件；React 依赖自身组件导入机制；UnoCSS / Tailwind 均写入官方建议的插件与样式入口。
-- 当前只支持独立 Application。Monorepo 各应用独立 UI/CSS 配置仍待实现和验证。
+- 支持独立 Application 及通过 `--workspace` 添加的 Monorepo Application；不在 Monorepo 根安装 UI/CSS。
 - `collectProjectOptions` 基础参数已全部提供时直接返回校验结果，未指定 UI/CSS 默认视为 None；修复 P3 新增交互字段导致的非交互单元测试回归。
 - 自动修改仅支持官方 Vue/React 的 `plugins: [...]` 格式以及标准 `src/main.ts[x]` 入口，不对未知结构强行变更。
 
@@ -62,7 +62,8 @@
 - FR-001/002、NFR-001 → `packages/create/src/options.mjs`、`packages/create/src/cli-args.mjs`、`packages/create/src/prompts.mjs`、`packages/create/bin/cli.mjs`、`packages/create/test/*.test.mjs`。
 - NFR-002/003 → `scripts/validate-docs.mjs`、`docs/HARNESS.md`。
 - FR-003/004 → `packages/create/src/integrations.mjs`、`packages/create/test/integrations.test.mjs`（组合构建待验收）。
-- FR-005 至 FR-008 → 规划，暂无实现文件或测试。
+- FR-005 至 FR-007 → 规划，暂无实现文件或测试。
+- FR-008 → `packages/create/src/workspace.mjs`、`packages/create/test/workspace.test.mjs`。
 
 ## 待确认
 
@@ -75,4 +76,17 @@
 - 新增 `ui-smoke.html`、`src/ui-smoke/`，不改动业务入口或 Vite 配置；写入使用 `wx` 防覆盖；仅对新文件调用 `vp fmt`。
 - Vue `<t-button>` 验证组件自动导入；React 显式引用 `Button`；均含点击计数及可选 UnoCSS/Tailwind 视觉标记。
 - 由 Vite+ 开发服务器访问 `/ui-smoke.html`；需要用户在浏览器验证真实效果，不将单元测试或构建成功视为浏览器验收成功。
+
+## P4：已有 Monorepo 逐应用生成
+
+- `--workspace <path>` 仅适用于 Application；路径仅用于 Node 文件 API 和子进程 cwd，不拼入 shell 命令。`buildVpCommand` 仍委托 `vite:application`，目录固定为安全的 `apps/<name>`，不传 `--git/--no-git`。
+- `workspace.mjs` 预检 private Vite+ 根、官方 pnpm packages 块列表、apps 目录、唯一根 Vite 配置及其他成员同名包；拒绝 apps/目标/根配置的符号链接与 junction、路径遍历和未知 glob。预检不写文件。
+- 保留默认 `apps/website`、`packages/utils`。依赖安装与 Vite 插件/样式增强仅作用于新应用；根锁文件和 catalog 的更新由官方生成器与 pnpm 管理。
+- Vue TS + UI 的 `src/components.d.ts` 仍在应用内生成；子配置不添加根专属 fmt。根增量合并 `apps/<name>/src/components.d.ts` 忽略规则，保留其他 fmt 和 run 配置。JS/React 不新增该规则。
+- 兼容官方成员模板仍从 vite 导入 defineConfig 的情况：新应用生成后仅对其 Vite 配置执行官方 `vp lint --fix` 与 `vp fmt`，不处理已有同级应用。
+- 混合工作区可能存在多个 Vite peer 实例。针对已知未声明 Vite peer 的 `unplugin-vue-components`、`unocss`，按选项增量加入根 pnpm `packageExtensions`，补充 `peerDependencies.vite: '*'`；在安装前预检，保留其他扩展与 catalog，冲突或不支持的结构拒绝修改。不使用类型断言或关闭检查绕过 TS2321。
+- 安装后仅格式化根 pnpm-workspace.yaml 及确实修改的根 Vite 配置；避免 pnpm 新增 catalog 条目的引号格式导致根检查失败。
+- `--workspace` 可与 dry-run、apply-existing、ui-smoke 使用；不支持历史 repair-existing。dry-run 显示实际 cwd/target，已有目标创建失败；补装和 Smoke 仍需显式参数。
+- 失败保留官方已生成目录和已完成的安装，不承诺事务回滚，不自动重试覆盖；不得并发向同一工作区运行多个生成命令。
+- 本期以逐应用命令提供多应用能力；交互式批量收集、配置文件批量生成、自定义 glob 及其他包管理器仍待后续实现。
 

@@ -1,5 +1,19 @@
 # ADui Vite+ Starter
 
+## Monorepo 多应用（P4）
+
+先由官方模板创建工作区，再用 `--workspace` 逐个添加应用。每个应用独立选择 Vue/React、TS/JS、UI 与 CSS；默认 TypeScript。
+
+```powershell
+# 在生成器仓库执行；示例工作区位于仓库外
+cd ..
+node ./viteplus-starter/packages/create/bin/cli.mjs --name my-workspace --type monorepo
+node ./viteplus-starter/packages/create/bin/cli.mjs --workspace ./my-workspace --name admin --type application --framework vue --ui tdesign --css unocss
+node ./viteplus-starter/packages/create/bin/cli.mjs --workspace ./my-workspace --name portal --type application --framework react --language js --ui antd --css tailwindcss
+```
+
+保留官方默认的 `apps/website` 和 `packages/utils`；新应用位于 `apps/admin`、`apps/portal`。不接受已有同名目标、跨目录名称或 junction。当前支持官方 pnpm 工作区列表，不自动改写自定义 workspace glob。详细步骤、限制和验证结果见 [Monorepo 说明](docs/MONOREPO.md)。
+
 ## UI 组件独立验收页（新增）
 
 可以为已创建的 Vue/TDesign 或 React/Ant Design Application 添加本地 UI Smoke 页面，**不修改正式应用首页**：
@@ -10,7 +24,7 @@ node .\viteplus-starter\packages\create\bin\cli.mjs --name starter-vue-js --type
 node .\viteplus-starter\packages\create\bin\cli.mjs --name starter-react-js --type application --framework react --language js --ui antd --css tailwindcss --ui-smoke
 ```
 
-在各应用中运行 `vp dev`，访问 `/ui-smoke.html`，核实按钮呈现、点击计数和浅绿色原子 CSS 区域。仅新增 `ui-smoke.html` 与 `src/ui-smoke/`，不会修改 `App.*` 或正式入口。详情：[UI Smoke 验收说明](docs/UI_SMOKE.md)。**实际浏览器效果还需用户手动确认。**
+在各应用中运行 `vp dev`，访问 `/ui-smoke.html`，核实按钮呈现、点击计数和浅绿色原子 CSS 区域。仅新增 `ui-smoke.html` 与 `src/ui-smoke/`，不会修改 `App.*` 或正式入口。详情：[UI Smoke 验收说明](docs/UI_SMOKE.md)。2026-10-27 已验证两个独立 JavaScript 代表组合的真实浏览器效果。
 
 
 ## Vue / React：TypeScript 与 JavaScript
@@ -47,7 +61,7 @@ node .\viteplus-starter\packages\create\bin\cli.mjs --name starter-react-p3 --ty
 
 基于 **Vite+ 官方模板**的多框架项目初始化与可选功能集成工具。
 
-> 当前状态：**开发阶段、尚未发布**。Vue/React × TypeScript/JavaScript 四种官方应用模板已完成真实创建和构建验证；Vue + TDesign + UnoCSS 与 React + Ant Design + Tailwind CSS 的 TS/JS 代表组合均已在 Windows 通过 `vp build` 与 `vp check`（历史 Vue TS 需 `--fix`）。其他 UI/CSS 组合、组件实际渲染、Monorepo、多屏、3D 和 npm 发布仍待完成。
+> 当前状态：**开发阶段、尚未发布**。Vue/React × TypeScript/JavaScript 四种官方应用模板已完成真实创建和构建验证。P4 首期逐应用 Monorepo 已实现并通过 Vue TS/TDesign/UnoCSS + React JS/Ant Design/Tailwind 混合工作区的检查、完整构建和浏览器验收。其余 UI/CSS 组合、批量配置、多屏、3D 和 npm 发布仍待完成。
 
 ## 快速开始（开发者）
 

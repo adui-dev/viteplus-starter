@@ -44,4 +44,12 @@ vp dev
 - 验收页由开发服务器独立提供；Vite 默认单入口生产构建不一定包含该页面。**不要只依据 `vp build` 判断按钮是否正常渲染。**
 - 不改变 `App.vue`、`App.jsx`、`src/main.*`、`vite.config.*`。
 - 测试完成后，若确认无需保留，可手动删除新增的 `ui-smoke.html` 和 `src/ui-smoke/`；生成器不会删除现有文件。
-- 本流程不创建 CI/CD。真实浏览器测试仍需人工执行。
+- 本流程不创建 CI/CD。
+
+## 2026-10-27 本地验收记录
+
+基于 `511c8c5`，两个已有 JavaScript 项目均已完成 Chrome 实际验收：Vue/TDesign 自动导入及 React/Ant Design 按钮渲染正常，点击次数从 0 变为 1；UnoCSS/Tailwind 浅绿色区域、文字颜色、8px 圆角、16px 内边距正确；浏览器控制台未发现警告或错误。原 App、main 和 Vite 配置文件的前后 SHA-256 一致。
+
+两项目 `vp check` 与 `vp build` 均退出 0，但 React 的新增 `src/ui-smoke/main.jsx:7` 有 `react/only-export-components` 警告（当前组件与挂载在同一无导出文件中）；不能称为无警告通过。Vue 首次启动进行了 TDesign 依赖预构建，完成后页面正常。
+
+仓库 `node --test` 59 项通过，文档校验通过；仓库根 `vp check` 因 31 个文件格式问题退出 1。以上不代表 TypeScript 验收页或其他 UI/CSS 组合已经通过。
