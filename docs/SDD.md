@@ -124,3 +124,11 @@
 运行时独占场景、相机、几何、材质、射线与 renderer。ResizeObserver 与循环内 DPR 检查只在尺寸键变化时设置缓冲；DPR 上限 2、单边上限 8192/硬件 maxTextureSize，隐藏不绘制。拾取以 canvas rect 生成 NDC，HUD 设计坐标另行处理。使用 setAnimationLoop，销毁释放监听、观察器、几何、材质、renderer 和 context；初始化失败及意外 contextlost 也清理。本期不含纹理、模型、共享资源或自动 context 恢复。
 
 默认正式首页构建不包含验收 HTML；专项构建通过临时 mergeConfig 指定 Three HTML 输入完成，不能将默认构建当成 Three 构建。包体提醒保留，正式按需分块待设计。更多接口见 [THREE_SMOKE](THREE_SMOKE.md)。
+
+## Three.js 第二期：应用选项与延迟初始化
+
+options.mjs 严格归一化 engine=none/three，默认不保留 none 字段、不改变未选应用。CLI 新建要求同时显式 screen，已有应用可用 --engine three --apply-existing 重用大屏；不与独立 smoke/repair 标记混用。组合补装先预检 Three 输出、入口语言及已有依赖，再安装 UI/写入大屏；已存在目录或冲突版本拒绝覆盖与升级。
+
+batch.mjs 接受逐应用 engine 字段，Three 要求 screen，同时规划依赖、文件及独立页面；应用阶段直接传 --engine three，保留 root/app 失败摘要与串行保护，uiSmoke 独立阶段不重复传 engine/screen。--engine three 生成可复用源码与示例页面，不替换正式业务首页，不等同实现多引擎多选或模型安全。
+
+lazy.mjs 在 start 时动态 import，复用未完成请求，失败可重试；destroy 使晚到模块失效并避免回调已卸载组件，构造期间的同步卸载也回收已创建对象。Vue/React ThreeView 仅静态导入轻量 lazy API；DPR 与组件 ready/loading 状态随生命周期更新。模块下载本身不取消。分块由 Vite 自然生成，专项构建和生产网络验证见 THREE_SMOKE；旧快照不自动覆盖迁移。

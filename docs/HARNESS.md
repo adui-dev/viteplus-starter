@@ -121,3 +121,7 @@ vp build
 ## Three.js 专项检查
 
 先有 --screen，再运行 --three-smoke；按 [THREE_SMOKE](THREE_SMOKE.md) 检查 canvas 缓冲、DPR、中心拾取、卸载与重挂。全屏需先激活目标标签，在前台通过用户手势进入，并检查 :fullscreen 与退出尺寸恢复。Three 页面需单独作为 build 输入验证，不用正式首页构建代替；记录包体提醒，不调高阈值掩盖。
+
+## 延迟引擎请求
+
+对 examples/three.batch.json 执行完整生成与根 ready；专项多页构建开启 manifest。检查引擎 isDynamicEntry，首页与验收入口均无静态引擎 import；生产预览用网络事件确认点击前无引擎分块请求、无 canvas，点击后出现一个引擎请求与 canvas，并验证卸载/重挂需要再次加载。晚到异步结果及重试使用受控单测验证；不以缓存命中代替首访请求证据。

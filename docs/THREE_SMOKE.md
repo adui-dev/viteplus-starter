@@ -10,7 +10,7 @@ node ./viteplus-starter/packages/create/bin/cli.mjs --workspace ./adui-batch-dem
 node ./viteplus-starter/packages/create/bin/cli.mjs --name starter-react-js --type application --framework react --language js --three-smoke
 ```
 
-进入应用运行 `vp check`、`vp run build`、`vp dev`，打开实际端口的 `/three-smoke.html`。本命令只处理已有 Application，不能与 dry-run、screen、UI/CSS 补装、其他验收或修复标记混用；Monorepo 根不支持。批量 JSON 暂未加入 Three 字段，先生成工作区/大屏，再逐应用运行本命令。
+进入应用运行 `vp check`、`vp run build`、`vp dev`，打开实际端口的 `/three-smoke.html`。本命令只处理已有 Application，不能与 dry-run、screen、engine、UI/CSS 补装、其他验收或修复标记混用；Monorepo 根不支持。新建/批量应用也可通过 engine 选项直接接入，见下节；--three-smoke 保留为已有应用的独立工具。
 
 ## 文件与依赖
 
@@ -39,3 +39,33 @@ destroy 幂等：取消 setAnimationLoop、断开观察器、移除窗口/canvas
 默认正式构建只打包原首页，不能据此声称 Three 页面构建成功。本轮另用临时 mergeConfig 的 build.rolldownOptions.input=three-smoke.html 完成 Vue/React 专项构建，随后移走产物并移除临时配置，未改正式 Vite 配置。输出约 598/755 kB（压缩前），出现默认 500 kB 分块提醒；未通过调高阈值隐藏。正式集成阶段需要单独设计按需加载和分块。
 
 实现依据：[Three.js WebGLRenderer](https://threejs.org/docs/pages/WebGLRenderer)、[Raycaster](https://threejs.org/docs/pages/Raycaster.html)。本地执行记录见 [PROJECT_CONTEXT](PROJECT_CONTEXT.md)。
+
+## 创建选项与批量配置
+
+从仓库上级目录运行：
+
+```powershell
+# 新建官方 React TS 应用，同时添加大屏和 Three（默认首页保持官方内容）
+node ./viteplus-starter/packages/create/bin/cli.mjs --name my-three-app --type application --framework react --screen --engine three
+
+# 已有 --screen 项目首次补装，不再传 --screen，避免覆盖已有大屏
+node ./viteplus-starter/packages/create/bin/cli.mjs --name my-screen-app --type application --framework vue --engine three --apply-existing
+
+# 三个正式生成阶段：官方根、Vue TS、React JS
+node ./viteplus-starter/packages/create/bin/cli.mjs --config ./viteplus-starter/examples/three.batch.json --dry-run
+node ./viteplus-starter/packages/create/bin/cli.mjs --config ./viteplus-starter/examples/three.batch.json
+```
+
+--engine 只接受 none/three，省略等同 none，不引入 Three 依赖。新建 Three 应用必须同时显式 --screen，批量应用必须同时配置 screen=true 或尺寸/模式对象；根不能统一指定引擎。批量 JSON 应用增加 "engine":"three"，可与 uiSmoke 同用，UI 验收独立调用时去除 screen/engine 参数。CLI dry-run 展示引擎依赖、文件和页面，但不安装或写文件。交互菜单尚未增加引擎问题，通过显式参数或 JSON 选择。
+
+组合补装在 UI 安装、大屏写入前检查 Three 输出占用、语言、已有依赖版本，不能借 --engine 升级或覆盖已生成的 Three 目录。已有旧版 --three-smoke 不会自动改成按需版；需人工对比源码快照或另建样例验证。生成源码及验收页属于集成结果，业务页面仍需自行导入使用，不替换 App/main/首页或正式 Vite 配置。
+
+## 点击后加载与分块
+
+新版页面初始显示“加载 3D 场景”，此时没有 canvas。点击后由 createLazyScene 的 start() 动态导入 index.mjs，创建 WebGL；失败显示错误、按钮可重试。重复点击复用同一导入请求。卸载后移除 canvas，重新挂载需再次点击；模块可由浏览器缓存复用，但场景实例重新创建。
+
+createLazyScene 位于 src/adui-three/lazy.mjs（包内也导出 @adui/three/lazy），不静态导入 Three。接口为 start():Promise<void>、setPixelRatio(value?)、destroy()；options 沿用 ThreeOptions，另有 onState({loading,ready})。DPR 可在加载期间更新。动态 import 本身不能取消网络下载，destroy 会阻止晚到的模块创建 WebGL、抑制卸载后的回调；初始化回调同步触发卸载也释放刚创建的实例。
+
+采用原生动态导入边界，由 Vite 自动分块，不写入全局 manual chunk 配置或修改用户 Vite 文件，依据 [Vite 动态导入与分块](https://vite.dev/guide/features)。专项双入口构建（原首页 + Three HTML）产物：Vue/React 验收入口约 10.26/10.74 kB，共享框架约 64.40/219.44 kB，引擎独立分块约 525.76 kB（gzip 131.15 kB），两框架引擎文件哈希一致。入口体积不含共享框架，不能称为完整首屏大小。
+
+manifest 标记引擎 isDynamicEntry，首页没有对它的 import；生产浏览器网络捕获证明验收页点击前不请求 adui-three 分块，点击后才请求。引擎仍超过默认 500 kB，保留提醒；此轮优化加载时机与复用边界，不声称消除全部包体问题。无需下载远端模型或生产密钥。

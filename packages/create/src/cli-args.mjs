@@ -1,4 +1,5 @@
 const VALUE_OPTIONS = new Set([
+  "--engine",
   "--name",
   "--type",
   "--framework",

@@ -49,3 +49,7 @@ flowchart TD
 ## Three.js 首期
 
 新增 packages/three：框架无关的独占场景运行时，依赖可选 Three peer；index 提供固定引擎绑定，runtime 注入引擎依赖以便受控验证初始化异常与清理。--three-smoke 只补充已有大屏应用，不另建框架模板，不修改官方正式入口。Three Smoke 的组件封装负责 Vue/React 生命周期；后续正式引擎选择与模型 Loader 另行扩展，详见 [THREE_SMOKE](THREE_SMOKE.md)。
+
+## Three.js 应用选择与按需加载
+
+应用创建选项支持 engine=none/three；CLI --engine three 与新建 --screen 配合，JSON 每应用独立配置，根不接受引擎。复用已有源码写入器及官方模板流程，现有首页不变。createLazyScene 将模块加载与 WebGL 生命周期分离；用户点击后动态导入引擎，不在应用/验收页初始化时创建 GPU 资源。引擎与框架自然分块，未修改用户构建配置。

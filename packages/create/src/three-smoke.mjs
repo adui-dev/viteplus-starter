@@ -11,30 +11,31 @@ export async function planThreeSmoke(input) {
     vue = options.framework === "vue";
   const ext = vue ? (ts ? "ts" : "js") : ts ? "tsx" : "jsx";
   const files = {};
-  for (const name of ["index.mjs", "index.d.mts", "runtime.mjs"])
+  for (const name of ["index.mjs", "index.d.mts", "runtime.mjs", "lazy.mjs", "lazy.d.mts"])
     files["src/adui-three/" + name] = await readFile(
       new URL("../../three/src/" + name, import.meta.url),
       "utf8",
     );
   const statusType = ts
-    ? "import type { ThreeStatus, ThreeHandle } from '../adui-three/index.mjs'\n"
+    ? "import type { ThreeStatus } from '../adui-three/index.mjs'\nimport type { LazySceneHandle } from '../adui-three/lazy.mjs'\n"
     : "";
   if (vue) {
     files["src/three-smoke/ThreeView.vue"] = [
       "<script setup" + (ts ? ' lang="ts"' : "") + ">",
       "import { ref, onMounted, onBeforeUnmount, watch } from 'vue'",
-      "import { createThreeScene } from '../adui-three/index.mjs'",
+      "import { createLazyScene } from '../adui-three/lazy.mjs'",
       statusType,
       "const props=defineProps({pixelRatio:{type:Number,default:0}})",
       ts
         ? "const emit=defineEmits<{status:[value:ThreeStatus];error:[message:string]}>()"
         : "const emit=defineEmits(['status','error'])",
       "const host=ref" + (ts ? "<HTMLDivElement|null>" : "") + "(null)",
-      "let scene" + (ts ? ": ThreeHandle|undefined" : ""),
-      "onMounted(()=>{try{if(host.value)scene=createThreeScene(host.value,{pixelRatio:props.pixelRatio||undefined,onStatus:value=>emit('status',value),onError:error=>emit('error',String(error))})}catch(error){emit('error',String(error))}})",
+      "const loading=ref(false),ready=ref(false)",
+      "let scene" + (ts ? ": LazySceneHandle|undefined" : ""),
+      "onMounted(()=>{if(host.value)scene=createLazyScene(host.value,{pixelRatio:props.pixelRatio||undefined,onState:state=>{loading.value=state.loading;ready.value=state.ready},onStatus:value=>emit('status',value),onError:error=>emit('error',String(error))})})",
       "watch(()=>props.pixelRatio,value=>scene?.setPixelRatio(value||undefined))",
       "onBeforeUnmount(()=>scene?.destroy())",
-      '</script><template><div ref="host" class="three-host" /></template>',
+      '</script><template><div class="three-host three-wrapper"><div ref="host" class="three-host"/><button v-if="!ready" class="three-load" :disabled="loading" @click="scene?.start()">{{loading?"加载中…":"加载 3D 场景"}}</button></div></template>',
     ].join("\n");
     files["src/three-smoke/ScreenDemo.vue"] = vueDemo(ts)
       .replace(
@@ -57,7 +58,7 @@ export async function planThreeSmoke(input) {
   } else {
     files["src/three-smoke/ThreeView." + ext] = [
       "import {useEffect,useRef,useState} from 'react'",
-      "import {createThreeScene} from '../adui-three/index.mjs'",
+      "import {createLazyScene} from '../adui-three/lazy.mjs'",
       statusType,
       "export default function ThreeView({pixelRatio,onStatus,onError}" +
         (ts
@@ -65,12 +66,13 @@ export async function planThreeSmoke(input) {
           : "") +
         "){",
       "const [host,setHost]=useState" + (ts ? "<HTMLDivElement|null>" : "") + "(null)",
-      "const scene=useRef" + (ts ? "<ThreeHandle|undefined>" : "") + "(undefined)",
+      "const scene=useRef" + (ts ? "<LazySceneHandle|undefined>" : "") + "(undefined)",
+      "const [state,setState]=useState({loading:false,ready:false})",
       "const latest=useRef({pixelRatio,onStatus,onError})",
       "useEffect(()=>{latest.current={pixelRatio,onStatus,onError}})",
-      "useEffect(()=>{if(!host)return;try{scene.current=createThreeScene(host,{pixelRatio:latest.current.pixelRatio||undefined,onStatus:value=>latest.current.onStatus(value),onError:error=>latest.current.onError(String(error))})}catch(error){latest.current.onError(String(error))}return()=>{scene.current?.destroy();scene.current=undefined}},[host])",
+      "useEffect(()=>{if(!host)return;scene.current=createLazyScene(host,{pixelRatio:latest.current.pixelRatio||undefined,onState:setState,onStatus:value=>latest.current.onStatus(value),onError:error=>latest.current.onError(String(error))});return()=>{scene.current?.destroy();scene.current=undefined}},[host])",
       "useEffect(()=>scene.current?.setPixelRatio(pixelRatio||undefined),[pixelRatio])",
-      'return <div ref={setHost} className="three-host"/>',
+      'return <div className="three-host three-wrapper"><div ref={setHost} className="three-host"/>{!state.ready&&<button className="three-load" disabled={state.loading} onClick={()=>{void scene.current?.start()}}>{state.loading?"加载中…":"加载 3D 场景"}</button>}</div>',
       "}",
     ].join("\n");
     files["src/three-smoke/ScreenDemo." + ext] = reactDemo(ts)
@@ -106,7 +108,7 @@ export async function planThreeSmoke(input) {
     .replaceAll("点击引擎网格测试坐标", "点击立方体拾取；HUD 按钮测试设计坐标");
   files["src/three-smoke/demo.css"] =
     demoCss +
-    "\n.three-host{width:100%;height:100%}[data-three-status]{font:12px monospace;max-width:650px;overflow-wrap:anywhere}";
+    "\n.three-host{width:100%;height:100%}.three-wrapper{position:relative}.three-load{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}[data-three-status]{font:12px monospace;max-width:650px;overflow-wrap:anywhere}";
   files["three-smoke.html"] =
     '<!doctype html><html lang="zh-CN"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>ADui Three Smoke</title></head><body><div id="three-root"></div><script type="module" src="/src/three-smoke/main.' +
     ext +
@@ -123,19 +125,17 @@ async function inspect(path) {
     throw error;
   }
 }
-export async function addThreeSmoke(directory, input, runner = runWorkspaceVp) {
-  const options = validateProjectOptions(input),
-    plan = await planThreeSmoke(options);
-  async function preflight() {
-    for (const path of ["", "src", "src/adui-screen", "src/adui-three", "src/three-smoke"]) {
-      const stat = await inspect(join(directory, path));
-      if (stat && !stat.isDirectory()) throw new Error("Three 目标目录被占用：" + path);
-    }
-    for (const path of Object.keys(plan.files))
-      if (await inspect(join(directory, path)))
-        throw new Error("Three 文件已存在，拒绝覆盖：" + path);
+export async function preflightThreeSmoke(directory, plan) {
+  for (const path of ["", "src", "src/adui-screen", "src/adui-three", "src/three-smoke"]) {
+    const stat = await inspect(join(directory, path));
+    if (stat && !stat.isDirectory()) throw new Error("Three 目标目录被占用：" + path);
   }
-  await preflight();
+  for (const path of Object.keys(plan.files))
+    if (await inspect(join(directory, path)))
+      throw new Error("Three 文件已存在，拒绝覆盖：" + path);
+}
+export async function validateThreeTarget(directory, input, requireScreen = true) {
+  const options = validateProjectOptions(input);
   const manifestPath = join(directory, "package.json");
   if (!(await inspect(manifestPath))?.isFile()) throw new Error("缺少应用 package.json");
   const manifest = JSON.parse(await readFile(manifestPath, "utf8")),
@@ -147,11 +147,15 @@ export async function addThreeSmoke(directory, input, runner = runWorkspaceVp) {
     options.framework === "vue" ? (ts ? "main.ts" : "main.js") : ts ? "main.tsx" : "main.jsx";
   for (const path of [
     "src/" + main,
-    "src/adui-screen/core.mjs",
-    "src/adui-screen/controller.mjs",
-    "src/adui-screen/style.css",
-    "src/adui-screen/" + options.framework + ".mjs",
-    "src/adui-screen/config." + (ts ? "ts" : "js"),
+    ...(requireScreen
+      ? [
+          "src/adui-screen/core.mjs",
+          "src/adui-screen/controller.mjs",
+          "src/adui-screen/style.css",
+          "src/adui-screen/" + options.framework + ".mjs",
+          "src/adui-screen/config." + (ts ? "ts" : "js"),
+        ]
+      : []),
   ])
     if (!(await inspect(join(directory, path)))?.isFile())
       throw new Error("请先按所选框架/语言运行 --screen；缺少 " + path);
@@ -162,10 +166,17 @@ export async function addThreeSmoke(directory, input, runner = runWorkspaceVp) {
     if (deps[name] && ![version, "^" + version, "~" + version].includes(deps[name]))
       throw new Error("已有 " + name + " 版本未经本预设验证，拒绝自动升级：" + deps[name]);
   }
+  return deps;
+}
+export async function addThreeSmoke(directory, input, runner = runWorkspaceVp) {
+  const options = validateProjectOptions(input),
+    plan = await planThreeSmoke(options);
+  await preflightThreeSmoke(directory, plan);
+  const deps = await validateThreeTarget(directory, options);
   if (!deps.three) runner(directory, ["add", "three@0.186.1", "--save-exact"]);
   if (!deps["@types/three"])
     runner(directory, ["add", "-D", "@types/three@0.186.0", "--save-exact"]);
-  await preflight();
+  await preflightThreeSmoke(directory, plan);
   for (const [path, source] of Object.entries(plan.files)) {
     const target = join(directory, path);
     await mkdir(dirname(target), { recursive: true });

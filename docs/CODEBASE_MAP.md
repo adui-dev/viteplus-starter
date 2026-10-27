@@ -63,3 +63,9 @@ UI/CSS 已在 `integrations.mjs` 实现；大屏核心见 `packages/screen`；Th
 - packages/three/src/runtime.mjs、test/runtime.test.mjs：缓冲尺寸、DPR、相机、拾取、动画、异常与资源回收。
 - packages/create/src/three-smoke.mjs、test/three-smoke.test.mjs：四种应用计划、固定版本安装、独立页面及覆盖/版本/链接保护。
 - [THREE_SMOKE](THREE_SMOKE.md)：命令、API 与专项构建/浏览器验收。
+
+## Three.js 选项与延迟加载
+
+- packages/three/src/lazy.mjs、lazy.d.mts、test/lazy.test.mjs：点击后加载、去重、重试、延迟 DPR、卸载和晚到模块保护。
+- packages/create/test/engine.test.mjs：CLI/JSON 严格引擎选择、阶段隔离、真实 dry-run 与组合补装保护。
+- [three.batch.json](../examples/three.batch.json)：官方混合工作区完整引擎示例；使用说明见 [THREE_SMOKE](THREE_SMOKE.md)。

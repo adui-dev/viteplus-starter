@@ -23,6 +23,9 @@ export function validateProjectOptions(options) {
 
   const { name, type, framework } = options;
   const { workspace } = options;
+  const engine = options.engine === undefined ? "none" : options.engine;
+  if (!["none", "three"].includes(engine)) throw new Error("引擎仅支持 none 或 three");
+  if (type === "monorepo" && engine !== "none") throw new Error("Monorepo 根不配置引擎");
   const language = options.language ?? "ts";
   const ui = options.ui ?? "none";
   const css = options.css ?? "none";
@@ -81,6 +84,7 @@ export function validateProjectOptions(options) {
     ...(options.ui === undefined ? {} : { ui }),
     ...(options.css === undefined ? {} : { css }),
     ...(screen ? { screen } : {}),
+    ...(engine === "three" ? { engine } : {}),
   };
 }
 

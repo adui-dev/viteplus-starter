@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "name": "adui-three-options-demo",
+  "apps": [
+    { "name": "vue-dashboard", "framework": "vue", "screen": true, "engine": "three" },
+    {
+      "name": "react-dashboard",
+      "framework": "react",
+      "language": "js",
+      "screen": { "mode": "stretch" },
+      "engine": "three"
+    }
+  ]
+}

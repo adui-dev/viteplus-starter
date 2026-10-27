@@ -14,7 +14,12 @@ import {
   repairExistingIntegrations,
 } from "../src/integrations.mjs";
 import { addUiSmoke } from "../src/ui-smoke.mjs";
-import { addThreeSmoke } from "../src/three-smoke.mjs";
+import {
+  addThreeSmoke,
+  planThreeSmoke,
+  preflightThreeSmoke,
+  validateThreeTarget,
+} from "../src/three-smoke.mjs";
 import { addScreenPreset, planScreenPreset, preflightScreenPreset } from "../src/screen.mjs";
 import { loadBatchPlan, executeBatch, validateBatchCliArgs } from "../src/batch.mjs";
 import {
@@ -49,6 +54,7 @@ const usage = `ADui Vite+ Starter（Application / Monorepo）
   --screen-width / --screen-height：设计尺寸，默认 1920 / 1080。
   --screen-mode contain|cover|stretch|none：默认 contain；已有项目配合 --apply-existing。
   --three-smoke：向已有 --screen 应用安装 Three.js 并生成 /three-smoke.html。
+  --engine none|three：按应用集成 Three.js；新建时同时指定 --screen。
   --config <JSON 文件>：批量新建官方 Monorepo 和应用，仅可与 --dry-run 同用。
   --workspace <已有工作区路径>：在官方 pnpm Monorepo 的 apps/<name> 中添加 Application。
   例：--workspace ../my-workspace --name admin --type application --framework vue --ui tdesign --css unocss
@@ -105,6 +111,10 @@ async function main() {
   }
 
   const { command, args: vpArgs } = buildVpCommand(options);
+  if (options.engine && (args.uiSmoke || args.threeSmoke || args.repairExisting))
+    throw new Error("--engine 不能与独立验收/旧版修复模式混用");
+  if (options.engine && !options.screen && !args.applyExisting)
+    throw new Error("新建 Three 应用须同时指定 --screen");
   if (options.screen && (args.uiSmoke || args.repairExisting))
     throw new Error("--screen 不能与 --ui-smoke 或 --repair-existing 同用");
   const integrations = planIntegrations(options);
@@ -176,14 +186,20 @@ async function main() {
     if (
       !integrations.dependencies.length &&
       !integrations.devDependencies.length &&
-      !options.screen
+      !options.screen &&
+      !options.engine
     ) {
       throw new Error("未选择需要安装的 UI/CSS 集成");
     }
     if (options.screen) await preflightScreenPreset(target, await planScreenPreset(options));
+    if (options.engine) {
+      await preflightThreeSmoke(target, await planThreeSmoke(options));
+      await validateThreeTarget(target, options, !options.screen);
+    }
     if (workspace) await prepareWorkspacePeerExtensions(workspace);
     await applyIntegrations(target, options);
     if (options.screen) await addScreenPreset(target, options);
+    if (options.engine) await addThreeSmoke(target, options);
     await finishWorkspaceIntegration();
     console.log("补装完成，请在项目中执行 vp check 和 vp build");
     return;
@@ -200,6 +216,17 @@ async function main() {
           args: vpArgs,
           ...(workspace ? { cwd: commandCwd, target } : {}),
           integrations,
+          ...(options.engine
+            ? {
+                engine: {
+                  name: options.engine,
+                  dependencies: ["three@0.186.1"],
+                  devDependencies: ["@types/three@0.186.0"],
+                  files: Object.keys((await planThreeSmoke(options)).files),
+                  previewPath: "/three-smoke.html",
+                },
+              }
+            : {}),
           ...(options.screen
             ? {
                 screen: {
@@ -250,6 +277,11 @@ async function main() {
   if (result.status === 0 && options.screen) {
     await addScreenPreset(target, options);
     console.log("AdScreen 大屏预设已生成：/screen-smoke.html");
+  }
+  if (result.status === 0 && options.engine) {
+    await addThreeSmoke(target, options);
+    await finishWorkspaceIntegration();
+    console.log("Three.js 按需场景已生成：/three-smoke.html");
   }
   if (result.signal) {
     process.exitCode = 1;

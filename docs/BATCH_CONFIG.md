@@ -88,3 +88,7 @@ Chrome 中 Vue TS 与 React JS 两页面均通过按钮点击 0→1、CSS 颜色
 ## 大屏字段
 
 应用新增可选 screen：true 使用 1920×1080 contain；对象仅允许 designWidth、designHeight、mode，尺寸为 1–32768 正整数，mode 为 contain/cover/stretch/none；省略或 false 不启用。可与 uiSmoke 同用，后者单独生成，避免重复写入。示例与 API 见 [SCREEN](SCREEN.md)。
+
+## engine 应用字段
+
+每应用可用 "engine":"three"（或 none/省略），Three 必须同时启用 screen；默认不安装引擎。UI 验收阶段不重复传 engine/screen。运行样例与按需加载说明见 [THREE_SMOKE](THREE_SMOKE.md)，完整 JSON 见 [three.batch.json](../examples/three.batch.json)。

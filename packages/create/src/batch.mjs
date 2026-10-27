@@ -6,6 +6,7 @@ import { buildVpCommand, validateProjectName, validateProjectOptions } from "./o
 import { planIntegrations } from "./integrations.mjs";
 import { planUiSmoke } from "./ui-smoke.mjs";
 import { planScreenPreset } from "./screen.mjs";
+import { planThreeSmoke } from "./three-smoke.mjs";
 import { resolveWorkspaceApplication, runWorkspaceVp } from "./workspace.mjs";
 
 const cliPath = fileURLToPath(new URL("../bin/cli.mjs", import.meta.url));
@@ -37,11 +38,15 @@ export function validateBatchConfig(input) {
   const names = new Set([input.name, "website", "utils"]);
   const apps = input.apps.map((app, index) => {
     const label = "apps[" + index + "]";
-    fields(app, ["name", "framework", "language", "ui", "css", "uiSmoke", "screen"], label);
+    fields(
+      app,
+      ["name", "framework", "language", "ui", "css", "uiSmoke", "screen", "engine"],
+      label,
+    );
     portableName(app.name);
     if (names.has(app.name)) throw new Error("应用重名或与工作区/官方默认包冲突：" + app.name);
     names.add(app.name);
-    for (const key of ["framework", "language", "ui", "css"]) {
+    for (const key of ["framework", "language", "ui", "css", "engine"]) {
       if (Object.hasOwn(app, key) && typeof app[key] !== "string")
         throw new Error(label + "." + key + " 必须是字符串");
     }
@@ -55,6 +60,7 @@ export function validateBatchConfig(input) {
       css: app.css ?? "none",
     });
     if (app.uiSmoke) planUiSmoke(options);
+    if (options.engine && !options.screen) throw new Error("批量 Three 引擎须同时配置 screen");
     const { type: _type, ...selection } = options;
     return { ...selection, uiSmoke: app.uiSmoke ?? false };
   });
@@ -130,6 +136,7 @@ export async function createBatchPlan(input, cwd = process.cwd()) {
       app.css,
     ];
     const uiArgs = [...args];
+    if (app.engine) args.push("--engine", app.engine);
     if (app.screen)
       args.push(
         "--screen",
@@ -150,6 +157,17 @@ export async function createBatchPlan(input, cwd = process.cwd()) {
       args,
       official: { ...buildVpCommand(options), cwd: workspaceRoot },
       integrations: planIntegrations(options),
+      ...(app.engine
+        ? {
+            engine: {
+              name: app.engine,
+              dependencies: ["three@0.186.1"],
+              devDependencies: ["@types/three@0.186.0"],
+              files: Object.keys((await planThreeSmoke(options)).files),
+              previewPath: "/three-smoke.html",
+            },
+          }
+        : {}),
       ...(app.screen
         ? {
             screen: {

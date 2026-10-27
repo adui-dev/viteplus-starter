@@ -4,6 +4,10 @@
   "private": true,
   "type": "module",
   "exports": {
+    "./lazy": {
+      "types": "./src/lazy.d.mts",
+      "import": "./src/lazy.mjs"
+    },
     ".": {
       "types": "./src/index.d.mts",
       "import": "./src/index.mjs"
