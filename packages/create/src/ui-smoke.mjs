@@ -48,17 +48,10 @@ function vueComponent(css) {
 }
 
 function reactComponent(css) {
-  const lines = [
-    "import { useState } from 'react'",
-    "import { createRoot } from 'react-dom/client'",
-    "import { Button } from 'antd'",
-    "import 'antd/dist/reset.css'",
-  ];
-  if (css === "tailwindcss") lines.push("import '../starter.tailwind.css'");
-  if (css === "unocss") lines.push("import 'virtual:uno.css'");
+  const lines = ["import { useState } from 'react'", "import { Button } from 'antd'"];
   lines.push(
     "",
-    "function SmokeApp() {",
+    "export default function SmokeApp() {",
     "  const [clicks, setClicks] = useState(0)",
     "  return (",
     "    <main style={{ maxWidth: 680, margin: '64px auto', padding: 24, fontFamily: 'sans-serif' }}>",
@@ -76,15 +69,7 @@ function reactComponent(css) {
       "      </div>",
     );
   }
-  lines.push(
-    "    </main>",
-    "  )",
-    "}",
-    "",
-    "const root = document.getElementById('ui-smoke-root')",
-    "if (root) createRoot(root).render(<SmokeApp />)",
-    "",
-  );
+  lines.push("    </main>", "  )", "}", "");
   return lines.join("\n");
 }
 
@@ -111,7 +96,17 @@ export function planUiSmoke(input) {
       imports.join("\n") + "\n\ncreateApp(SmokeApp).mount('#ui-smoke-root')\n";
     files["src/ui-smoke/SmokeApp.vue"] = vueComponent(css);
   } else {
-    files["src/ui-smoke/" + mainFile] = reactComponent(css);
+    const imports = [
+      "import { createRoot } from 'react-dom/client'",
+      `import SmokeApp from './SmokeApp.${extension}'`,
+      "import 'antd/dist/reset.css'",
+    ];
+    if (css === "tailwindcss") imports.push("import '../starter.tailwind.css'");
+    if (css === "unocss") imports.push("import 'virtual:uno.css'");
+    files["src/ui-smoke/" + mainFile] =
+      imports.join("\n") +
+      "\n\nconst root = document.getElementById('ui-smoke-root')\nif (root) createRoot(root).render(<SmokeApp />)\n";
+    files["src/ui-smoke/SmokeApp." + extension] = reactComponent(css);
   }
   return { framework, language, ui, css, files, previewPath: "/ui-smoke.html" };
 }

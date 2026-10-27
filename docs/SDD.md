@@ -80,6 +80,8 @@
 - `--ui-smoke` 只用于现有独立 Application，不能与 `--dry-run`、`--apply-existing`、`--repair-existing` 同时使用；仅支持 Vue + TDesign / React + Ant Design，TS/JS 均适用。
 - 新增 `ui-smoke.html`、`src/ui-smoke/`，不改动业务入口或 Vite 配置；写入使用 `wx` 防覆盖；仅对新文件调用 `vp fmt`。
 - Vue `<t-button>` 验证组件自动导入；React 显式引用 `Button`；均含点击计数及可选 UnoCSS/Tailwind 视觉标记。
+- React 独立生成 `SmokeApp.jsx|tsx`，仅默认导出组件；`main.jsx|tsx` 仅导入组件、样式并挂载。组件与非组件入口分离，符合官方 Fast Refresh lint 规则，不使用禁用规则或注释压制警告。
+- 新组件文件纳入同批写入预检；即使只有 `SmokeApp` 已存在，也在写入 HTML/入口或调用格式化前拒绝覆盖。旧验收页不自动改写或迁移。
 - 由 Vite+ 开发服务器访问 `/ui-smoke.html`；需要用户在浏览器验证真实效果，不将单元测试或构建成功视为浏览器验收成功。
 
 ## P4：已有 Monorepo 逐应用生成

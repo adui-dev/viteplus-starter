@@ -82,3 +82,11 @@
 - 统一项目自有源码、测试、配置和文档格式，清除此前的全仓格式失败，不改变运行逻辑和依赖版本。
 - 第三方 `git-commit`、`gitmoji` Skills 按安装原文保留，根 fmt 仅排除这两个目录以保持来源哈希；项目源码、测试和文档仍完整参与检查。
 - `node --test` 71/71、文档静态检查、根 `vp check` 均通过；根检查 35 文件格式正确，18 文件无警告或 lint 错误。无 CI/CD。
+
+## 2026-10-27 React UI Smoke 质量修复
+
+- React TS/JS 新版验收页独立生成 `SmokeApp.tsx|jsx` 与 `main.tsx|jsx`，修复 `react/only-export-components` 警告；不关闭 lint 规则，旧验收页不自动覆盖。
+- 新增组件文件预存在时的写入前保护测试，JS/TS 均验证不会先写 HTML/入口或调用格式化。72 项单元测试、文档检查、根 `vp check` 全部通过。
+- 实机复验：既有 `starter-react-p3`（TS）新增新版页面，`vp check` 17 文件格式正确、5 文件无警告或 lint/type 错误，完整 `vp run build`（tsc -b + Vite）通过；全新官方 `quality-react-js-20261027`（JS）同样通过检查（14 文件格式、5 文件无警告或 lint/type 错误）和构建。
+- Chrome 两页面均通过按钮点击 0→1、Tailwind 样式和控制台无 warn/error 验收；TS 页面在点击后修改组件标题再恢复，Fast Refresh 两次更新均保留计数 1。临时标题改动已恢复，开发服务验收后停止。
+- 自有文件格式基线与 React 行为修复分步提交；继续保持无 CI/CD、无依赖升级、无发布。

@@ -15,6 +15,8 @@ node .\viteplus-starter\packages\create\bin\cli.mjs --name starter-react-js --ty
 
 `--ui-smoke` 不是创建新工程的命令；它只新增 `ui-smoke.html` 和 `src/ui-smoke/` 文件，已有同名文件会报错而不会覆盖。生成器会检查项目类型、已安装的依赖与 Vite 配置，并格式化新增文件。
 
+新版 React 页面将组件放在 `src/ui-smoke/SmokeApp.jsx`（TS 为 `.tsx`），挂载入口放在 `main.jsx|tsx`。组件文件只导出组件，避免旧版把组件与挂载混放时的 Fast Refresh lint 警告。已有验收页不会自动升级：请先人工备份并移走旧验收 HTML/目录，再重新运行；生成器仍拒绝覆盖任何同名文件。
+
 ## Vue / TDesign / UnoCSS
 
 ```powershell
@@ -53,3 +55,11 @@ vp dev
 两项目 `vp check` 与 `vp build` 均退出 0，但 React 的新增 `src/ui-smoke/main.jsx:7` 有 `react/only-export-components` 警告（当前组件与挂载在同一无导出文件中）；不能称为无警告通过。Vue 首次启动进行了 TDesign 依赖预构建，完成后页面正常。
 
 仓库 `node --test` 59 项通过，文档校验通过；仓库根 `vp check` 因 31 个文件格式问题退出 1。以上不代表 TypeScript 验收页或其他 UI/CSS 组合已经通过。
+
+## 2026-10-27 质量修复复验
+
+React 新版通过独立组件模块修复 Fast Refresh lint 警告。已有 `starter-react-p3` 的 TS 页面和新官方 `quality-react-js-20261027` 的 JS 页面均通过 `vp check`，无警告或 lint/type 错误；两应用的完整 build 脚本通过，TS 包含 `tsc -b`。浏览器中按钮点击 0→1、Tailwind 样式正常，控制台无 warn/error。
+
+TS 页面额外验证了热更新：点击到 1 后修改组件标题，再恢复原标题，两次刷新均保留计数 1。此验证未改动正式 App/main 或项目配置。
+
+生成器当前 72 项单元测试、文档校验和全仓 `vp check` 已全部通过，前文格式失败与 React 警告为修复前的历史记录。Vue TS/JS 的浏览器验收见项目状态中的 P3/P4 记录；尚未穷举所有 UI/CSS 组合。

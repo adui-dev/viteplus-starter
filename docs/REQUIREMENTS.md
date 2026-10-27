@@ -22,7 +22,7 @@
 
 ### FR-003 UI 集成
 
-- 状态：Vue TS/JS + TDesign/UnoCSS、React TS/JS + Ant Design/Tailwind 四种代表组合的安装、检查及构建已验证；其余组合和真实组件渲染待验收；优先级：P1。
+- 状态：Vue TS/JS + TDesign/UnoCSS、React TS/JS + Ant Design/Tailwind 四种代表组合已验证安装、检查、构建及真实组件渲染；其余组合待验收；优先级：P1。
 - 目标：None / Element Plus（Vue 专属）/ Ant Design（Vue 为 ant-design-vue，React 为 antd）/ TDesign（对应框架包），单选。
 - 验收：生成后组件正常加载、类型检查和构建成功；React 不出现 Element Plus。
 
@@ -64,7 +64,7 @@
 
 ### NFR-002 本地验证（无 CI）
 
-- 状态：进行中；优先级：P0。
+- 状态：基础本地检查已实现，2026-10-27 单元测试、文档校验及根 `vp check` 全部通过；跨组合验收持续扩展；优先级：P0。
 - 验收：提供本地单元测试、文档检查与构建说明；**不得新增 CI/CD 工作流**。
 
 ### NFR-003 可维护性
@@ -95,7 +95,7 @@
 
 ### FR-009 UI 组件实际渲染验收
 
-- 状态：验收页面生成工具已实现；2026-10-27 Vue/JS/TDesign/UnoCSS、React/JS/Ant Design/Tailwind 的浏览器渲染、点击及 CSS 验收通过；TS 和其余组合待验收。React 验收入口仍有一条 Fast Refresh lint 警告；优先级：P1。
+- 状态：验收页面生成工具已实现；Vue TS/JS/TDesign/UnoCSS、React TS/JS/Ant Design/Tailwind 的代表组合已通过浏览器渲染、点击及 CSS 验收。React Fast Refresh lint 警告已通过分离组件与挂载入口修复，TS 实测热更新保留点击状态；其余组合待验收；优先级：P1。
 - 目标：显式 `--ui-smoke` 在已有 Vue/TDesign、React/Ant Design TS/JS 应用中添加隔离验收页面，测试组件加载、点击计数与 CSS 原子类。
 - 验收：无需修改 App 或 main 入口，拒绝覆盖同名文件；浏览器中组件按钮可见、计数改变、CSS 样式正确且无控制台错误。
 - 范围：不支持未配置相应 UI 的应用，也不支持 Monorepo 根；不得增加 CI。

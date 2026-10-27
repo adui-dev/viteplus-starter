@@ -41,8 +41,12 @@ test("React JS Ant Design/Tailwind 生成 JSX 点击演示", () => {
     ui: "antd",
     css: "tailwindcss",
   });
-  assert.match(result.files["src/ui-smoke/main.jsx"], /<Button type="primary"/);
-  assert.match(result.files["src/ui-smoke/main.jsx"], /setClicks/);
+  assert.match(result.files["src/ui-smoke/SmokeApp.jsx"], /<Button type="primary"/);
+  assert.match(result.files["src/ui-smoke/SmokeApp.jsx"], /setClicks/);
+  assert.match(result.files["src/ui-smoke/SmokeApp.jsx"], /export default function SmokeApp/);
+  assert.doesNotMatch(result.files["src/ui-smoke/SmokeApp.jsx"], /createRoot/);
+  assert.match(result.files["src/ui-smoke/main.jsx"], /import SmokeApp from '\.\/SmokeApp.jsx'/);
+  assert.doesNotMatch(result.files["src/ui-smoke/main.jsx"], /function SmokeApp|useState/);
   assert.match(result.files["src/ui-smoke/main.jsx"], /starter.tailwind.css/);
   assert.match(result.files["ui-smoke.html"], /main\.jsx/);
 });
@@ -55,6 +59,8 @@ test("React TS 使用 main.tsx", () => {
     css: "none",
   });
   assert.ok(result.files["src/ui-smoke/main.tsx"]);
+  assert.match(result.files["src/ui-smoke/main.tsx"], /import SmokeApp from '\.\/SmokeApp.tsx'/);
+  assert.ok(result.files["src/ui-smoke/SmokeApp.tsx"]);
 });
 test("不支持未知组合或 Monorepo 根目录", () => {
   assert.throws(() =>
@@ -129,8 +135,34 @@ test("React JS 已有应用可创建隔离验收页", async () => {
   await fakeProject(options, async (dir) => {
     const result = await addUiSmoke(dir, options, () => {});
     assert.ok(result.written.includes("src/ui-smoke/main.jsx"));
+    assert.ok(result.written.includes("src/ui-smoke/SmokeApp.jsx"));
     assert.match(await readFile(join(dir, "ui-smoke.html"), "utf8"), /ui-smoke\/main\.jsx/);
   });
+});
+
+test("React 新组件文件已存在时，在写入 HTML 或入口前拒绝覆盖", async () => {
+  for (const language of ["js", "ts"]) {
+    const options = { name: "demo", type: "application", framework: "react", language, ui: "antd" };
+    await fakeProject(options, async (dir) => {
+      const extension = language === "js" ? "jsx" : "tsx";
+      await mkdir(join(dir, "src/ui-smoke"));
+      const componentPath = join(dir, "src/ui-smoke/SmokeApp." + extension);
+      await writeFile(componentPath, "original component");
+      let formatted = false;
+      await assert.rejects(
+        addUiSmoke(dir, options, () => {
+          formatted = true;
+        }),
+        /拒绝覆盖/,
+      );
+      assert.equal(formatted, false);
+      assert.equal(await readFile(componentPath, "utf8"), "original component");
+      await assert.rejects(readFile(join(dir, "ui-smoke.html")), { code: "ENOENT" });
+      await assert.rejects(readFile(join(dir, "src/ui-smoke/main." + extension)), {
+        code: "ENOENT",
+      });
+    });
+  }
 });
 test("缺少组件依赖时拒绝写入任何测试文件", async () => {
   const options = {
