@@ -106,3 +106,13 @@
 - dry-run 展示规范化选项、根官方命令、每应用的 CLI argv 与官方模板命令、依赖计划、可选验收页路径/文件；不写目录。执行前重新从规范化配置构建计划，避免使用过期或被修改的阶段命令。
 - 根调用带 --no-interactive 的官方 monorepo；生成后再次统一预检全部应用，检查新根非 junction/符号链接。随后按应用顺序串行调用既有 CLI，验收页紧随对应应用；Node 子进程使用 argv，不把路径拼入 shell。没有复制框架模板或替代迁移流程。
 - `executeBatch` 记录成功阶段；任一步失败抛出包含 completed/failed/pending/workspaceRoot 的错误，并给用户可读摘要，保留部分生成目录及安装。它不提供事务回滚或自动恢复，根生成失败也不会删除现场。
+
+## P5：大屏插件设计
+
+共享包 packages/screen 分为纯布局、DOM 控制器、框架适配三层，使用可选 Vue/React peer；仅锁定新增图，不升级已有依赖。引擎层保持原生 CSS 像素，HUD 按双轴比例变换，缩放浮层位于 HUD 内，原生浮层位于 shell 内。父容器负责尺寸，核心不含业务顶部常量或引擎依赖。
+
+控制器通过 ResizeObserver、resize、fullscreenchange 合并到一帧；首次同步布局，卸载取消观察、事件与帧。clientToDesign 处理容器边框、居中偏移及非等比坐标；隐藏返回 null。全屏 API 拒绝按 Promise 上报。Vue 使用 Symbol provide/inject、按各配置值监听（防止内联对象造成递归）；React DOM 回调 ref 存入状态，渲染阶段不读写 ref，适配官方严格 refs 检查。
+
+生成器 --screen 仅增强官方应用，复制 core/controller/CSS、所选框架与声明至 src/adui-screen，生成独立 screen-smoke.html。预检所有待写文件与父路径，已有文件/链接拒绝，写入使用 wx；不覆盖正式入口，不增加应用依赖。--apply-existing 允许仅补装大屏；批量应用字段增加 screen，uiSmoke 阶段去除 screen 参数防止重复补装。CLI 不提供自动覆盖升级，交互菜单暂未新增大屏问题，使用显式参数或 JSON。
+
+核心支持 allowUpscale 与 engineInsets，CLI/JSON 首期仅选择尺寸和模式，复杂设置由应用源码配置。开发验收页默认不参与正式首页构建；真实引擎 canvas 尺寸、DPR、资源生命周期与全屏成功路径仍需专项验收。操作与契约见 [SCREEN](SCREEN.md)。

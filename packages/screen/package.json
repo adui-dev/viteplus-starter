@@ -1,0 +1,37 @@
+{
+  "name": "@adui/screen",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/core.d.mts",
+      "import": "./src/core.mjs"
+    },
+    "./controller": {
+      "types": "./src/controller.d.mts",
+      "import": "./src/controller.mjs"
+    },
+    "./vue": {
+      "types": "./src/vue.d.mts",
+      "import": "./src/vue.mjs"
+    },
+    "./react": {
+      "types": "./src/react.d.mts",
+      "import": "./src/react.mjs"
+    },
+    "./style.css": "./src/style.css"
+  },
+  "peerDependencies": {
+    "react": ">=18 <20",
+    "vue": "^3.3.0"
+  },
+  "peerDependenciesMeta": {
+    "vue": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    }
+  }
+}

@@ -32,7 +32,7 @@
 | `AGENTS.md`                                          | Agent 规则及导航入口                                                  |
 | `docs/`                                              | 需求、架构、设计、状态、Skills、Harness、ADR                          |
 
-UI/CSS 已在 `integrations.mjs` 实现；3D、大屏及模型安全模块**尚无真实实现目录**。
+UI/CSS 已在 `integrations.mjs` 实现；大屏核心见 `packages/screen`；3D 与模型安全模块尚未实现。
 
 ## P4 Monorepo 多应用
 
@@ -48,3 +48,11 @@ UI/CSS 已在 `integrations.mjs` 实现；3D、大屏及模型安全模块**尚�
 - `packages/create/src/ui-smoke.mjs`：在已有应用内生成隔离 UI 验收页，React 组件与挂载入口分离，不覆盖业务文件。
 - `packages/create/test/ui-smoke.test.mjs`：涵盖 Vue/React、JS/TS、依赖预检、文件覆盖保护。
 - `docs/UI_SMOKE.md`：独立页面的运行、人工验收和清理说明。
+
+## P5：分层大屏适配
+
+- `packages/screen/src/core.mjs`：纯布局、独立轴比例、设计单位内缩、坐标反算；controller.mjs 负责 DOM 测量、合帧、全屏与清理。
+- `packages/screen/src/vue.mjs`、react.mjs 与对应声明：框架组件、上下文、分层插槽与公开操作；style.css 定义引擎/HUD/浮层。
+- `packages/create/src/screen-options.mjs`：CLI/批量严格输入归一化；screen.mjs：源码快照和独立页面预检/写入；screen-demo.mjs：Vue/React 演示。
+- `packages/screen/test/screen.test.mjs`、`packages/create/test/screen.test.mjs`：布局边界、坐标、控制器清理、四种生成组合、路径/覆盖与批量参数保护。
+- [SCREEN](SCREEN.md)、[配置示例](../examples/screen.batch.json)：API、迁移和验收边界。

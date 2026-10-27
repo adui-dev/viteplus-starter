@@ -14,6 +14,7 @@ import {
   repairExistingIntegrations,
 } from "../src/integrations.mjs";
 import { addUiSmoke } from "../src/ui-smoke.mjs";
+import { addScreenPreset, planScreenPreset, preflightScreenPreset } from "../src/screen.mjs";
 import { loadBatchPlan, executeBatch, validateBatchCliArgs } from "../src/batch.mjs";
 import {
   normalizeNewWorkspaceApplication,
@@ -43,6 +44,9 @@ const usage = `ADui Vite+ Starter（Application / Monorepo）
 说明：
   Application 委托 Vite+ 官方 vite:application，按框架和语言选择 vue/vue-ts/react/react-ts。
   --language ts|js（默认 ts）；Monorepo 根不指定语言。
+  --screen：生成 AdScreen 大屏插件及 /screen-smoke.html，保留正式首页。
+  --screen-width / --screen-height：设计尺寸，默认 1920 / 1080。
+  --screen-mode contain|cover|stretch|none：默认 contain；已有项目配合 --apply-existing。
   --config <JSON 文件>：批量新建官方 Monorepo 和应用，仅可与 --dry-run 同用。
   --workspace <已有工作区路径>：在官方 pnpm Monorepo 的 apps/<name> 中添加 Application。
   例：--workspace ../my-workspace --name admin --type application --framework vue --ui tdesign --css unocss
@@ -99,6 +103,8 @@ async function main() {
   }
 
   const { command, args: vpArgs } = buildVpCommand(options);
+  if (options.screen && (args.uiSmoke || args.repairExisting))
+    throw new Error("--screen 不能与 --ui-smoke 或 --repair-existing 同用");
   const integrations = planIntegrations(options);
   if (options.workspace && args.repairExisting)
     throw new Error("--workspace 不支持旧版 --repair-existing");
@@ -148,11 +154,17 @@ async function main() {
     if (!dependencies["vite-plus"] || !dependencies[options.framework]) {
       throw new Error("现有目录不是所选 Vite+ Vue/React 应用，拒绝修改");
     }
-    if (!integrations.dependencies.length && !integrations.devDependencies.length) {
+    if (
+      !integrations.dependencies.length &&
+      !integrations.devDependencies.length &&
+      !options.screen
+    ) {
       throw new Error("未选择需要安装的 UI/CSS 集成");
     }
+    if (options.screen) await preflightScreenPreset(target, await planScreenPreset(options));
     if (workspace) await prepareWorkspacePeerExtensions(workspace);
     await applyIntegrations(target, options);
+    if (options.screen) await addScreenPreset(target, options);
     await finishWorkspaceIntegration();
     console.log("补装完成，请在项目中执行 vp check 和 vp build");
     return;
@@ -164,7 +176,21 @@ async function main() {
   if (args.dryRun) {
     console.log(
       JSON.stringify(
-        { command, args: vpArgs, ...(workspace ? { cwd: commandCwd, target } : {}), integrations },
+        {
+          command,
+          args: vpArgs,
+          ...(workspace ? { cwd: commandCwd, target } : {}),
+          integrations,
+          ...(options.screen
+            ? {
+                screen: {
+                  options: options.screen,
+                  files: Object.keys((await planScreenPreset(options)).files),
+                  previewPath: "/screen-smoke.html",
+                },
+              }
+            : {}),
+        },
         null,
         2,
       ),
@@ -202,6 +228,10 @@ async function main() {
     console.log("UI/CSS 插件配置已写入，请运行 vp check 和 vp build 验证");
   }
   if (result.status === 0) await finishWorkspaceIntegration();
+  if (result.status === 0 && options.screen) {
+    await addScreenPreset(target, options);
+    console.log("AdScreen 大屏预设已生成：/screen-smoke.html");
+  }
   if (result.signal) {
     process.exitCode = 1;
   } else if (result.status !== 0) {

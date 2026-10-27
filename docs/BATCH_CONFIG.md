@@ -84,3 +84,7 @@ root 的 ready 会调用检查、默认库测试和所有包的完整 build 脚�
 Chrome 中 Vue TS 与 React JS 两页面均通过按钮点击 0→1、CSS 颜色/圆角/内边距与无控制台 warn/error 验收。官方默认包保留，根无 UI/CSS 直接依赖，无 CI/CD。重复创建被安全拒绝，原根 manifest 哈希未变。
 
 生成器 81 项测试、文档校验和根 `vp check` 通过；受控测试覆盖实际生成中失败即停与保留部分文件。更多证据见 [项目状态](PROJECT_CONTEXT.md)。这只覆盖代表组合，不表示所有 UI/CSS 组合均已实机验收。
+
+## 大屏字段
+
+应用新增可选 screen：true 使用 1920×1080 contain；对象仅允许 designWidth、designHeight、mode，尺寸为 1–32768 正整数，mode 为 contain/cover/stretch/none；省略或 false 不启用。可与 uiSmoke 同用，后者单独生成，避免重复写入。示例与 API 见 [SCREEN](SCREEN.md)。

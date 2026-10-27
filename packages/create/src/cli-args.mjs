@@ -7,6 +7,9 @@ const VALUE_OPTIONS = new Set([
   "--css",
   "--workspace",
   "--config",
+  "--screen-width",
+  "--screen-height",
+  "--screen-mode",
 ]);
 
 export function parseCliArgs(argv) {
@@ -27,6 +30,12 @@ export function parseCliArgs(argv) {
   for (let i = 0; i < argv.length; i += 1) {
     const token = argv[i];
     if (token === "--help" || token === "-h") return { help: true };
+    if (token === "--screen") {
+      if (seen.has(token)) throw new Error("参数不能重复: " + token);
+      options.screen = true;
+      seen.add(token);
+      continue;
+    }
     if (token === "--ui-smoke") {
       if (seen.has(token)) throw new Error("参数不能重复: " + token);
       options.uiSmoke = true;

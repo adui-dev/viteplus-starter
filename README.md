@@ -121,3 +121,7 @@ Application / Monorepo、Vue / React、Element Plus / Ant Design / TDesign、Uno
 本仓库明确**不创建或维护任何 CI/CD 工作流**。本地测试不等于 CI。
 
 许可证：[MIT](LICENSE)。
+
+## 大屏适配
+
+已提供分层大屏插件和 --screen 预设，支持 Vue/React、TS/JS、已有项目补装与 Monorepo 应用配置。独立验收页不修改正式首页，详见 [使用与迁移](docs/SCREEN.md)。真实 3D 引擎与模型安全仍待实现。

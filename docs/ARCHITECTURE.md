@@ -41,3 +41,7 @@ flowchart TD
 ## 架构决策
 
 [ADR-0001：官方 Vite+ 模板作为唯一基础来源](adr/0001-official-viteplus-templates.md)。
+
+## P5：共享大屏核心
+
+新增 packages/screen 作为框架无关核心与 Vue/React 适配器来源；生成器只向官方应用增量添加源码快照和独立验收页，不维护新的框架工程模板，也不修改正式页面。框架为可选 peer，不给应用引入另一框架。布局与引擎渲染生命周期分离，具体接口见 [SCREEN](SCREEN.md)。

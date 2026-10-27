@@ -113,3 +113,7 @@ vp build
 ## 本地 UI Smoke 验收
 
 使用 `--ui-smoke` 在**已创建的项目**中增加隔离验收页，见 [UI Smoke 验收步骤](UI_SMOKE.md)。运行 `vp dev` 并在浏览器访问 `/ui-smoke.html`，确认真实组件按钮、点击计数、原子 CSS 的展示效果。此操作需人工检查，不会替换原首页，且 `vp build` 成功不能单独代表真实组件渲染通过。
+
+## 大屏验收
+
+按 [SCREEN](SCREEN.md) 运行 --screen；Vue/React 的 TS/JS 都应检查与构建，独立页面通过开发服务器验证四模式、容器变化、坐标、交互、卸载重挂与控制台。全屏必须实测 fullscreenElement 和退出恢复，遇到浏览器 not granted 只能记录拒绝路径，不能标记成功。真实 3D 视口与 DPR 待引擎接入后验收。

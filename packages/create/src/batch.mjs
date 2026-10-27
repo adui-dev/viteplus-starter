@@ -5,6 +5,7 @@ import { spawnSync } from "node:child_process";
 import { buildVpCommand, validateProjectName, validateProjectOptions } from "./options.mjs";
 import { planIntegrations } from "./integrations.mjs";
 import { planUiSmoke } from "./ui-smoke.mjs";
+import { planScreenPreset } from "./screen.mjs";
 import { resolveWorkspaceApplication, runWorkspaceVp } from "./workspace.mjs";
 
 const cliPath = fileURLToPath(new URL("../bin/cli.mjs", import.meta.url));
@@ -36,7 +37,7 @@ export function validateBatchConfig(input) {
   const names = new Set([input.name, "website", "utils"]);
   const apps = input.apps.map((app, index) => {
     const label = "apps[" + index + "]";
-    fields(app, ["name", "framework", "language", "ui", "css", "uiSmoke"], label);
+    fields(app, ["name", "framework", "language", "ui", "css", "uiSmoke", "screen"], label);
     portableName(app.name);
     if (names.has(app.name)) throw new Error("应用重名或与工作区/官方默认包冲突：" + app.name);
     names.add(app.name);
@@ -128,6 +129,17 @@ export async function createBatchPlan(input, cwd = process.cwd()) {
       "--css",
       app.css,
     ];
+    const uiArgs = [...args];
+    if (app.screen)
+      args.push(
+        "--screen",
+        "--screen-width",
+        String(app.screen.designWidth),
+        "--screen-height",
+        String(app.screen.designHeight),
+        "--screen-mode",
+        app.screen.mode,
+      );
     steps.push({
       kind: "application",
       label: "应用 " + app.name,
@@ -138,6 +150,15 @@ export async function createBatchPlan(input, cwd = process.cwd()) {
       args,
       official: { ...buildVpCommand(options), cwd: workspaceRoot },
       integrations: planIntegrations(options),
+      ...(app.screen
+        ? {
+            screen: {
+              options: app.screen,
+              files: Object.keys((await planScreenPreset(options)).files),
+              previewPath: "/screen-smoke.html",
+            },
+          }
+        : {}),
     });
     if (app.uiSmoke)
       steps.push({
@@ -147,7 +168,7 @@ export async function createBatchPlan(input, cwd = process.cwd()) {
         cwd: parent,
         target: join(workspaceRoot, "apps", app.name, "ui-smoke.html"),
         command: process.execPath,
-        args: [...args, "--ui-smoke"],
+        args: [...uiArgs, "--ui-smoke"],
         previewPath: "/ui-smoke.html",
         files: Object.keys(planUiSmoke(options).files),
       });

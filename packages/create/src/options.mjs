@@ -1,3 +1,4 @@
+import { normalizeScreenPreset } from "./screen-options.mjs";
 const PROJECT_TYPES = new Set(["application", "monorepo"]);
 const FRAMEWORK_TEMPLATES = Object.freeze({
   vue: Object.freeze({ ts: "vue-ts", js: "vue" }),
@@ -25,6 +26,11 @@ export function validateProjectOptions(options) {
   const language = options.language ?? "ts";
   const ui = options.ui ?? "none";
   const css = options.css ?? "none";
+  const screen = normalizeScreenPreset(options.screen, {
+    designWidth: options["screen-width"],
+    designHeight: options["screen-height"],
+    mode: options["screen-mode"],
+  });
 
   validateProjectName(name);
 
@@ -65,6 +71,7 @@ export function validateProjectOptions(options) {
   if (type === "monorepo" && (ui !== "none" || css !== "none")) {
     throw new Error("Monorepo 根目录不配置 UI/CSS，请在各应用内选择");
   }
+  if (type === "monorepo" && screen) throw new Error("Monorepo 根不配置大屏，请在应用中选择");
   return {
     name,
     type,
@@ -73,6 +80,7 @@ export function validateProjectOptions(options) {
     ...(options.language === undefined ? {} : { language }),
     ...(options.ui === undefined ? {} : { ui }),
     ...(options.css === undefined ? {} : { css }),
+    ...(screen ? { screen } : {}),
   };
 }
 

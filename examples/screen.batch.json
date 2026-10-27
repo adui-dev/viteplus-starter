@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "name": "adui-screen-demo",
+  "apps": [
+    { "name": "vue-screen", "framework": "vue", "screen": true },
+    {
+      "name": "react-screen",
+      "framework": "react",
+      "language": "js",
+      "screen": { "designWidth": 1920, "designHeight": 1080, "mode": "stretch" }
+    }
+  ]
+}
