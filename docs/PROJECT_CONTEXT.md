@@ -5,8 +5,8 @@
 ## 项目定位与约束
 
 - 仓库：`adui-dev/viteplus-starter`。Vite+ 官方 `vite:application` / `vite:monorepo` 是唯一基础工程来源，Vue/React Application 按语言选 `vue` / `vue-ts` / `react` / `react-ts`。
-- 已实现：基础 CLI 交互与参数模式、Application UI/CSS 集成、旧项目补装及 `--repair-existing`、UI Smoke、通过 `--workspace` 逐个添加 Monorepo 应用、本地单元测试与文档检查。
-- 规划中：Monorepo 批量配置与自定义布局、其余 UI/CSS 兼容矩阵、大屏、Three.js/CesiumJS/Babylon.js、3D 模型安全加载。
+- 已实现：基础 CLI 交互与参数模式、Application UI/CSS 集成、旧项目补装及 `--repair-existing`、UI Smoke、通过 `--workspace` 逐个添加及通过 JSON 批量新建 Monorepo 应用、本地单元测试与文档检查。
+- 规划中：Monorepo 自定义布局与显式恢复、其余 UI/CSS 兼容矩阵、大屏、Three.js/CesiumJS/Babylon.js、3D 模型安全加载。
 - 严格要求：**不得添加任何 CI/CD、自动发布或部署工作流**；仅人工本地测试。
 
 ## 用户 Windows 实机验收（已确认）
@@ -33,7 +33,7 @@
 
 ## 下一步
 
-1. 本轮完成 P4 JSON 批量生成及完整混合工作区验收；逐应用和四种代表组合已有实机记录（见文末）。
+1. P4 JSON 批量生成及完整混合工作区验收已完成；逐应用和四种代表组合已有实机记录（见文末）。
 2. 下一阶段进入大屏适配首期：按应用选择设计尺寸与 contain/cover/stretch，验证 resize、全屏、指针坐标与清理行为。
 3. 再推进 3D 引擎、模型安全加载与其余 UI/CSS 组合，不能将代表组合通过视为完整矩阵通过。
 
@@ -98,4 +98,14 @@
 - 已接入 `--config`：version 1 的严格 JSON 描述一个新工作区与 1–32 个应用，支持逐应用框架、TS/JS、UI/CSS 和可选验收页；目标为 cwd/name，不是配置文件目录。
 - 预先拒绝所有非法选项、未知字段、重名、默认包冲突、Windows 设备名和已有目标（含悬空链接）；dry-run 无写入，执行前重新规划；根官方生成后再次校验全部应用，根/应用/验收页串行执行。
 - 实际应用阶段复用既有 CLI，依赖与路径通过 argv 传递。失败摘要包含已完成/失败/未执行阶段并保留现场；不自动回滚或续跑。
-- 当前 81 项测试、文档检查和根 `vp check` 通过；示例工作区 `adui-batch-demo` 正在实机生成，结果另行补充。未增加依赖、CI/CD 或发布配置。
+- 工具接入阶段 81 项测试、文档检查和根 `vp check` 通过；示例工作区 `adui-batch-demo` 的后续实机结果见下节。未增加依赖、CI/CD 或发布配置。
+
+### P4 第二期实机验收结果
+
+- 使用提交中的 `examples/monorepo.batch.json` 在仓库上级目录直接运行 `--config`，完整生成 `D:\Workspace\adui-studio\adui-batch-demo`，5 个阶段均完成：官方根、Vue TS admin、其验收页、React JS portal、其验收页。
+- 根无 Vue/React UI/CSS 直接依赖，两个应用插件与依赖隔离，官方 website/utils 保留，未产生 `.github/workflows`。
+- 根 `vp run ready` 退出 0：检查通过、utils 1 项测试通过、全部包完整构建共 8 项任务全部成功；官方 utils 构建仍有 TypeScript 7 API 实验性提示，未改模板版本。
+- 构建后根 `vp check` 再次通过：47 文件格式正确，20 文件无警告、lint/type 错误；Vue 声明的格式排除保持有效。
+- Chrome 两验收页按钮显示、点击计数 0→1、CSS 颜色/8px 圆角/16px 内边距正常，控制台均无 warn/error；验收后开发服务已停止。
+- 重复执行相同 batch 退出 1，明确拒绝已有根，根 package.json 哈希保持不变。失败阶段停止及保留部分文件由受控测试覆盖，不破坏真实工作区制造失败。
+- 生成器最终 81 项测试、文档校验和全仓 `vp check` 均通过；功能与实机验收记录分步提交并按用户授权推送。下一步：P5 大屏适配首期。

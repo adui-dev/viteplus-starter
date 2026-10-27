@@ -79,4 +79,8 @@ root 的 ready 会调用检查、默认库测试和所有包的完整 build 脚�
 
 ## 验证状态
 
-本轮单元与受控失败测试已覆盖配置、顺序和文件保护；全新混合工作区实机验收进行中，最终证据见 [项目状态](PROJECT_CONTEXT.md)。所有结果以实际执行为准。
+2026-10-27，使用仓库样例 JSON 完整创建 `D:\Workspace\adui-studio\adui-batch-demo`，5 个生成阶段全部完成。根 `vp run ready` 的 8 项任务全部成功，构建后 `vp check` 再次通过（47 文件格式正确、20 文件无警告或 lint/type 错误）；官方 utils 构建有 TypeScript 7 API 实验性提示。
+
+Chrome 中 Vue TS 与 React JS 两页面均通过按钮点击 0→1、CSS 颜色/圆角/内边距与无控制台 warn/error 验收。官方默认包保留，根无 UI/CSS 直接依赖，无 CI/CD。重复创建被安全拒绝，原根 manifest 哈希未变。
+
+生成器 81 项测试、文档校验和根 `vp check` 通过；受控测试覆盖实际生成中失败即停与保留部分文件。更多证据见 [项目状态](PROJECT_CONTEXT.md)。这只覆盖代表组合，不表示所有 UI/CSS 组合均已实机验收。
