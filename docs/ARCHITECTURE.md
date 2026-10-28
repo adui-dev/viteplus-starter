@@ -71,3 +71,5 @@ packages/model-security 独立于 Three/Vue/React，分离 Node 封装工具、�
 ## 创建器模型集成
 
 model-protection.mjs 将按应用的 modelProtection 选项映射到已有安全安装器和密钥生成器，不再通过用户手动分两步安装。Three 默认 embedded，明确 none 关闭，external 保留离线解锁。先预检 env/脚本/输出占用，再执行官方模板及增量集成；密钥只在执行阶段生成，dry-run 不含密钥。package 的 KEY 生成/备份轮换与按文件 IV 生成各自负责，不配置共享 IV。
+
+multi-engine.mjs 编排逐应用多个独立引擎预设，不新增框架模板或同页运行时，沿用官方创建和既有补装边界。

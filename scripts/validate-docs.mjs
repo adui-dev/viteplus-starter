@@ -16,6 +16,7 @@ const required = [
   "docs/GENERATOR_STATUS.md",
   "docs/CESIUM.md",
   "docs/BABYLON.md",
+  "docs/MULTI_ENGINE.md",
   "docs/adr/0001-official-viteplus-templates.md",
   ".agents/skills/starter-preset-development/SKILL.md",
 ];

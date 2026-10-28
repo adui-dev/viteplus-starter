@@ -238,3 +238,15 @@
 - React 重挂成功截图保存 D:/Workspace/adui-studio/babylon-react-acceptance.jpg，未纳入 Git；本轮两个临时浏览器标签页已关闭、两个生产预览服务已停止。未修改业务工程、模型或生产密钥。
 - 最终 161/161 Node 测试、294 个只读组合计划（新增 42 Babylon，实际构建数仍标 0）、文档检查、根 vp check（136 格式文件、98 代码文件，无警告错误）与 git diff --check 通过。仓库依赖和锁文件未改，无流水线或发布；按中文 emoji 分功能与验收文档提交并推送。
 - 下一步：设计按应用多引擎选项，兼容现有单引擎 --engine 与 JSON engine，校验依赖/文件/配置组合与应用隔离，再分别推进各引擎模型适配，继续以生成器能力为主线。
+
+## 2026-10-29 CLI/JSON 多引擎编排
+
+- 新增 --engines 逗号列表与应用 engines 数组，和旧 engine 互斥；非空、不重复、仅 three/cesium/babylon，规范排序。旧单选与交互单选保持兼容，交互多选尚未接入。详细命令、批量样例和限制见 [MULTI_ENGINE](MULTI_ENGINE.md)。
+- multi-engine 复用单引擎子阶段：基础官方工程/UI/CSS/大屏只在第一阶段执行，后续首次补装；各引擎目录/验收页独立，不创建同页混合运行时。包含 Three 默认 embedded，仅传入 Three 阶段；其余引擎保持 none。计划合并依赖/文件/地址，dry-run 展示模型保护生成标记但不生成 KEY。
+- 现有应用统一预检所有引擎的文件、版本和模型保护输出，后续冲突在首阶段写入前拒绝；失败即停并保留现场，不自动回滚、覆盖或跳过续跑。补齐 Three 对官方 catalog 已安装版本的核对，不执行依赖入口。
+- 新增五项受控测试：28 个多选输入变体覆盖七种非空子集及四框架语言，幂等规范化/无文件冲突、非法/混用拒绝、后续输出冲突零子阶段执行、失败停止、JSON 应用隔离和 Three catalog。原 294 单引擎计划矩阵仍为单独范围，不混称全部真实创建。
+- 实际通过官方入口创建独立 adui-multi-vue-ts（三引擎 + 默认 Three embedded），check 80 格式/58 代码文件通过，首页构建通过；未复制业务 KEY 或模型。官方工具选用的 Node/pnpm 版本来自其当前运行环境，仓库依赖与锁文件未升级。
+- 已有官方 adui-babylon-workspace 新增 React JS multi-react（三引擎 + none），旧成员保留；根 ready 0/9 缓存、9/9 成功，148 格式/98 lint/type 文件无错误警告，utils 一项测试通过。保留 TypeScript API 实验性与构建插件计时提示。
+- 两应用通过 verify-multi-build 联合构建：Vue 为 index/three/cesium/babylon/model 五入口，React 为四入口；Cesium 四类资源目录完整，临时配置移除，产物保留各自 dist/multi-verify，部署 base=/multi-check/。保留默认 500 kB 提醒。未执行本轮组合产物浏览器渲染，不用历史单引擎截图替代；新 JSON 组合有计划验证，未从头执行整个批量样例。
+- 最终 166/166 Node 测试、文档校验、根 vp check（141 格式文件/101 代码文件）与 git diff --check 通过。未添加流水线或发布。中文 emoji 分功能与验收文档提交推送。
+- 下一步：接入交互多选，并对组合产物做浏览器隔离/按需加载验收；之后推进 Cesium/Babylon 模型适配。

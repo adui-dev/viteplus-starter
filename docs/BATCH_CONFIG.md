@@ -94,3 +94,5 @@ Chrome 中 Vue TS 与 React JS 两页面均通过按钮点击 0→1、CSS 颜色
 ## engine 应用字段
 
 每应用可用 "engine":"three" 、"engine":"cesium" 或 "engine":"babylon"（none/省略不安装引擎），必须同时启用 screen。UI 验收阶段不重复传 engine/screen。运行样例见 [THREE_SMOKE](THREE_SMOKE.md)、[CESIUM](CESIUM.md)，Babylon 见 [指南](BABYLON.md) 与 [示例](../examples/babylon.batch.json)。完整 JSON 见 [three.batch.json](../examples/three.batch.json)、[cesium.batch.json](../examples/cesium.batch.json)。
+
+应用 engines 数组与 engine 互斥，规范执行顺序及模型保护边界见 [多引擎说明](MULTI_ENGINE.md)。

@@ -145,3 +145,5 @@ Three 验收页现支持选择自包含 GLB、清除与重新加载；已使用 
 支持无服务端的模型自动加密构建：`.env` 配置、GLB 扫描、`.adui` 输出、密钥拆分与可选域名限制。默认自动加载，以提高直接复用门槛为目标，见 [模型自动打包](docs/MODEL_BUILD.md)。
 
 创建 Three 项目时现默认启用模型保护，可用 `--model-protection embedded|external|none` 选择；交互创建和批量 JSON 同步支持。生成项目提供 `models:keygen` / `models:keyrotate` 脚本，IV 按模型自动生成。见 [模型构建指南](docs/MODEL_BUILD.md) 和 [五应用示例](examples/models.batch.json)。
+
+多引擎用 --engines three,cesium,babylon，CLI/JSON 用法与限制见 [说明](docs/MULTI_ENGINE.md)。

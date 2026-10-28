@@ -7,11 +7,11 @@
 | 需求              | 当前能力                                                                   | 尚未完成或范围限制                                                                       |
 | ----------------- | -------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
 | FR-001 官方模板   | Vue/React × TS/JS；官方 Application/Monorepo 入口已实测                    | 不维护自有框架工程模板                                                                   |
-| FR-002 交互       | 名称、框架、语言、UI/CSS、大屏、Three/Cesium/Babylon、模型保护与确认/取消  | 尚无引擎多选                                                                             |
+| FR-002 交互       | 名称、框架、语言、UI/CSS、大屏、Three/Cesium/Babylon、模型保护与确认/取消  | 交互多选待接入                                                                           |
 | FR-003 UI         | Vue Element Plus/Ant Design Vue/TDesign，React Ant Design/TDesign 生成计划 | 实际组件渲染仅验收 Vue TDesign、React Ant Design；不把依赖安装或首页构建视为组件渲染完成 |
 | FR-004 CSS        | UnoCSS/Tailwind 配置及代表组合已验收                                       | 未逐一真实构建全部 UI/CSS 组合                                                           |
 | FR-005 大屏       | 四种模式、坐标换算、浮层、全屏及三种引擎的原生像素层                       | Cesium/Babylon 全屏与 DPR 专项仍待验收                                                   |
-| FR-006 引擎       | 按应用选择 none/three/cesium/babylon、按需加载、实例清理                   | 多引擎多选未实现；Cesium/Babylon 首期分别为本地椭球/立方体                               |
+| FR-006 引擎       | 按应用选择 none/three/cesium/babylon、按需加载、实例清理                   | CLI/JSON 多选已接入，交互多选待接入；Cesium/Babylon 首期分别为本地椭球/立方体            |
 | FR-007 模型保护   | GLB → .adui、自动构建/加载、按应用密钥、KEY 脚本及关闭选项                 | FBX/OBJ、压缩格式及其他引擎未实现；客户端拆分提高复用门槛，不能视为不可提取              |
 | FR-008 工作区隔离 | 官方 pnpm apps/*，逐应用和批量配置、不同框架/语言/预设                     | 自定义布局与其他包管理器未支持                                                           |
 | FR-009 UI 验收页  | Vue TDesign / React Ant Design，TS/JS、点击及 CSS 验收                     | 工具不支持其他 UI 组件库的渲染验收                                                       |
@@ -65,3 +65,5 @@ Ant Design Vue 另补充 pnpm 的 core-js: false 构建脚本规则并定向格�
 ## 后续主线
 
 Cesium 与 Babylon 首期逐应用预设已接入，真实检查、构建与浏览器证据以状态记录为准，详见 [CESIUM](CESIUM.md)、[BABYLON](BABYLON.md)。接下来设计多引擎选项，保持现有单引擎参数兼容及应用间隔离，再推进各引擎模型适配。新增预设仍通过官方基础模板增强，不把验收页面体验当作生成器功能完成条件。
+
+2026-10-29：CLI/JSON 多引擎编排已接入，交互仍单选，联合构建与浏览器证据分开记录，见 [说明](MULTI_ENGINE.md)。

@@ -178,3 +178,5 @@ engine.mjs 统一引擎计划供 CLI/批量调用；Cesium 对应独立增量安
 create/babylon 增量安装固定 @babylonjs/core 9.32.1，只新增源码快照和独立页面，不改 Vite 配置、正式入口或首页。按应用核对 manifest、框架/语言入口、大屏文件、输出路径及 catalog 实际安装版本，安装后再次预检。工作区由官方包管理器维护 catalog/锁文件，不执行依赖入口校验版本。
 
 runtime 管理 Engine、Scene 与渲染循环；初始化异常和帧异常停止循环并释放已返回对象。lazy 管理异步导入、画布与 ResizeObserver，点击前不导入场景，晚到结果丢弃、失败可重试、销毁幂等。组件只处理框架挂载/卸载，场景放入 AdScreen 引擎层；ES 深路径引入本地立方体所需模块，不引入在线资产或静态资源插件。模型/加密保持独立，当前 Babylon 拒绝 embedded/external。见 [BABYLON](BABYLON.md)。
+
+多引擎通过规范排序和单引擎子阶段复用实现；统一输出冲突/版本预检，基础工程、大屏仅首阶段创建，保护只传 Three。失败保留现场。设计与限制见 [MULTI_ENGINE](MULTI_ENGINE.md)。

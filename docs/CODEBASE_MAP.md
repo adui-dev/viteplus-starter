@@ -119,3 +119,5 @@ UI/CSS 已在 `integrations.mjs` 实现；大屏核心见 `packages/screen`；Th
 - create/src/babylon.mjs、test/babylon.test.mjs：四组合页面、依赖/catalog 校验、链接与输出保护、交互和批量隔离；engine/CLI/prompts 统一入口。
 - packages/babylon/src/runtime/lazy：Engine/Scene、渲染循环、延迟导入、画布与尺寸观察；test/lifecycle.test.mjs 验证异常、晚到、重试和清理。
 - scene/demo：本地立方体与点击入口；scripts/verify-babylon-build.mjs：[双入口专项](BABYLON.md)，[批量示例](../examples/babylon.batch.json)。
+
+create/src/multi-engine.mjs、test/multi-engine.test.mjs：多选校验、规范顺序、失败停止、应用隔离；scripts/verify-multi-build.mjs：联合构建，见 [说明](MULTI_ENGINE.md)。
