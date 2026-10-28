@@ -21,8 +21,17 @@ export async function planThreeSmoke(input) {
   ])
     files["src/adui-three/" + name] = (
       await readFile(new URL("../../three/src/" + name, import.meta.url), "utf8")
-    ).replaceAll("../../model-security/src/adui.mjs", "./adui.mjs");
-  for (const name of ["adui.mjs", "adui.d.mts", "local-grant.mjs", "local-grant.d.mts"])
+    ).replaceAll("../../model-security/src/", "./");
+  for (const name of [
+    "adui.mjs",
+    "adui.d.mts",
+    "local-grant.mjs",
+    "local-grant.d.mts",
+    "offline-keyring.mjs",
+    "offline-keyring.d.mts",
+    "bundled.mjs",
+    "bundled.d.mts",
+  ])
     files["src/adui-three/" + name] = await readFile(
       new URL("../../model-security/src/" + name, import.meta.url),
       "utf8",

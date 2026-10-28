@@ -1,4 +1,5 @@
 import { decryptAdui } from "../../model-security/src/adui.mjs";
+import { fetchBundledAdui } from "../../model-security/src/bundled.mjs";
 export function createLazyScene(host, options = {}, loader = () => import("./index.mjs")) {
   const { onState = () => {}, ...settings } = options;
   let disposed = false,
@@ -11,6 +12,36 @@ export function createLazyScene(host, options = {}, loader = () => import("./ind
     modelAbort?.abort();
     modelAbort = null;
     scene?.cancelModelLoad?.();
+  }
+  async function loadProtected(input, options) {
+    if (disposed) return false;
+    invalidate();
+    const request = modelVersion,
+      abort = new AbortController();
+    modelAbort = abort;
+    const cancel = () => {
+      abort.abort();
+      if (request === modelVersion) scene?.cancelModelLoad?.();
+    };
+    options?.signal?.addEventListener("abort", cancel, { once: true });
+    if (options?.signal?.aborted) cancel();
+    let plain;
+    try {
+      const buffer = typeof input === "function" ? await input(abort.signal) : input;
+      plain = await decryptAdui(buffer, { authorize: options?.authorize, signal: abort.signal });
+      if (disposed || request !== modelVersion || abort.signal.aborted) return false;
+      await handle.start();
+      if (disposed || request !== modelVersion || abort.signal.aborted || !scene) return false;
+      return await scene.loadModel(plain);
+    } catch (error) {
+      if (!disposed && request === modelVersion && !abort.signal.aborted)
+        settings.onError?.(error instanceof Error ? error : new Error(String(error)));
+      return false;
+    } finally {
+      if (plain) new Uint8Array(plain).fill(0);
+      options?.signal?.removeEventListener("abort", cancel);
+      if (modelAbort === abort) modelAbort = null;
+    }
   }
   const handle = {
     start() {
@@ -52,34 +83,11 @@ export function createLazyScene(host, options = {}, loader = () => import("./ind
       if (disposed || !scene || request !== modelVersion) return false;
       return scene.loadModel(buffer);
     },
-    async loadEncryptedModel(buffer, options) {
-      if (disposed) return false;
-      invalidate();
-      const request = modelVersion,
-        abort = new AbortController();
-      modelAbort = abort;
-      const cancel = () => {
-        abort.abort();
-        if (request === modelVersion) scene?.cancelModelLoad?.();
-      };
-      options?.signal?.addEventListener("abort", cancel, { once: true });
-      if (options?.signal?.aborted) cancel();
-      let plain;
-      try {
-        plain = await decryptAdui(buffer, { authorize: options?.authorize, signal: abort.signal });
-        if (disposed || request !== modelVersion || abort.signal.aborted) return false;
-        await handle.start();
-        if (disposed || request !== modelVersion || abort.signal.aborted || !scene) return false;
-        return await scene.loadModel(plain);
-      } catch (error) {
-        if (!disposed && request === modelVersion && !abort.signal.aborted)
-          settings.onError?.(error instanceof Error ? error : new Error(String(error)));
-        return false;
-      } finally {
-        if (plain) new Uint8Array(plain).fill(0);
-        options?.signal?.removeEventListener("abort", cancel);
-        if (modelAbort === abort) modelAbort = null;
-      }
+    loadEncryptedModel(buffer, options) {
+      return loadProtected(buffer, options);
+    },
+    loadBundledModel(asset, options) {
+      return loadProtected((signal) => fetchBundledAdui(asset, { signal }), options);
     },
     clearModel() {
       invalidate();

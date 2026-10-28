@@ -1,5 +1,6 @@
 import type { ThreeOptions } from "./index.mjs";
 import type { DecryptOptions } from "../../model-security/src/adui.mjs";
+import type { BundledModel } from "../../model-security/src/bundled.mjs";
 export interface LazySceneState {
   loading: boolean;
   ready: boolean;
@@ -10,6 +11,7 @@ export interface LazySceneHandle {
   loadModel(buffer: ArrayBuffer): Promise<boolean>;
   cancelModelLoad(): void;
   loadEncryptedModel(buffer: ArrayBuffer, options: DecryptOptions): Promise<boolean>;
+  loadBundledModel(asset: BundledModel, options: DecryptOptions): Promise<boolean>;
   clearModel(): void;
   destroy(): void;
 }

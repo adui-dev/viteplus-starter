@@ -133,3 +133,7 @@ vp build
 ## .adui 验收
 
 按 [MODEL_SECURITY](MODEL_SECURITY.md) 在源码及 public 之外生成临时密钥与 .adui；独立页面先加载场景再选验收密钥和加密模型。核对错误密钥/篡改拒绝、旧模型保留、清除授权/卸载和恢复；四组合执行 check/build，并以 Three HTML 作生产构建输入。密钥和模型都不提交 Git，检查日志/产物无明文密钥，不以本地 provider 代替服务端鉴权完成。
+
+## 模型构建插件验收
+
+按 [MODEL_BUILD](MODEL_BUILD.md) 安装到当前版本 Three 应用；使用独立生成的测试 env，不复制业务工程生产密钥。执行 verify-model-build 真实双模式构建与 HTTP 检查；四组合额外以 model-smoke.html 为输入构建（包含 sourcemap 检查）。浏览器确认 embedded 自动加载、external 锁定/解锁、配置域名允许与拒绝；检查无原 GLB、已知明文副本或原始密钥字面量。不将掩码拆分称为无法提取。

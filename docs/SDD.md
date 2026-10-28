@@ -146,3 +146,9 @@ Monorepo 实测新增 Vue JS 时发现根项目合并多份官方 *.vue 声明�
 packages/model-security 提供无引擎依赖的 Web Crypto AES-256-GCM v1 二进制封装，随机 96 bit IV、128 bit tag，完整头部作 AAD；仅元数据 modelId/keyId/format 明文，不含密钥。Node CLI 独立生成密钥与 .adui，拒绝覆盖/链接路径，不修改 GLB；浏览器只通过 authorize 回调获得有到期时间的不可导出 decrypt CryptoKey。具体布局及生产服务契约见 [MODEL_SECURITY](MODEL_SECURITY.md)。
 
 lazy 适配先授权/认证解密再走原 GLB Loader；模型请求代次、AbortSignal 与运行时 invalidate 防止晚到模型安装。临时明文在提交后最终清零，不承诺抹除所有内存副本。Vue/React TS/JS 验收支持 .glb/.adui 和独立本地密钥 provider；验收 provider 不等同生产服务，切换密钥/清除授权/卸载使待处理授权失效。
+
+## 模型自动打包设计
+
+模型构建插件默认 embedded：buildStart 扫描全部 GLB（即使首页未引用虚拟目录仍输出 .adui），虚拟模块只暴露目录及哈希资源 URL，AES-GCM 使用随机 IV。密钥由 env 提供，授权模块以随机掩码拆分重建 non-extractable decrypt CryptoKey；配置的 hostname 限制在生产授权时执行。源密钥可被逆向重建，这是提高复用门槛的明确边界。
+
+开发 middleware 禁止原模型/env 直接访问，内存提供密文；文件变更与新增删除失效目录并全页刷新。generateBundle 与 writeBundle 检查已知明文/密钥泄漏，public 预检拒绝原模型和密钥。外置模式独立 keyring 和同源流式限长下载共享原生命周期。安装器增量配置并 wx 备份，不覆盖旧快照；JS 无独立配置时生成 jsconfig 以隔离虚拟模块声明，不禁用类型检查。详见 [MODEL_BUILD](MODEL_BUILD.md)。

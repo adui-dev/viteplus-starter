@@ -84,3 +84,11 @@ UI/CSS 已在 `integrations.mjs` 实现；大屏核心见 `packages/screen`；Th
 - packages/model-security/test/adui.test.mjs、cli.test.mjs：原生互操作、篡改、授权与真实 CLI。
 - Three lazy/model/runtime：授权晚到保护、取消与清理；three-smoke：四组合密钥/模型入口。
 - [MODEL_SECURITY](MODEL_SECURITY.md)：v1 格式、命令、浏览器 API 与生产授权契约。
+
+## 模型自动打包
+
+- model-security/src/vite.mjs、vite.d.mts、virtual-models.d.ts：env、扫描/监听、虚拟目录、拆分密钥、域名与产物检查。
+- src/setup.mjs、smoke.mjs、bin/setup.mjs：增量安装、Vite 原件备份、四组合独立页面。
+- src/bundled.mjs、offline-keyring.mjs 与声明：同源限长获取及可选离线解锁。
+- test/vite.test.mjs、offline.test.mjs、setup.test.mjs：保护边界和安装/加载测试。
+- scripts/verify-model-build.mjs：真实 Vite+ 构建、HTTP 和加密回归；[MODEL_BUILD](MODEL_BUILD.md) 为使用指南。

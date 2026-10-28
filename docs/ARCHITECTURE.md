@@ -61,3 +61,7 @@ model.mjs 独立处理自包含 GLB 预检、请求代次与返回资产的去�
 ## .adui 模型封装
 
 packages/model-security 独立于 Three/Vue/React，分离 Node 封装工具、浏览器 AES-GCM 核心和本地验收授权 provider。Three lazy 仅持有授权回调并将解密缓冲交给 GLB 运行时；无静态密钥或生产服务实现。生成器随引擎复制公共源码，不更改正式入口或 Vite 配置。服务端授权接口契约和边界见 [MODEL_SECURITY](MODEL_SECURITY.md)。
+
+## 无服务端模型构建
+
+按用户最终要求以防直接复用为目标，新增 Vite 插件在 Node 读取 env、扫描 GLB、生成 .adui；虚拟目录与运行时 key 模块分离。embedded 默认自动解密，采用每次构建随机掩码拆分和可选域名限制；external 才要求独立解锁文件。原始密钥字面量与模型明文均做产物检查，不把客户端混淆视为不可破解。详情见 [MODEL_BUILD](MODEL_BUILD.md)。

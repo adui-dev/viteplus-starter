@@ -6,8 +6,26 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 import { decryptAdui } from "../src/adui.mjs";
+import { parseEnv } from "node:util";
 const cli = fileURLToPath(new URL("../bin/cli.mjs", import.meta.url));
 const run = (args) => spawnSync(process.execPath, [cli, ...args], { encoding: "utf8" });
+test("env 密钥生成与独立解锁导出不覆盖、不回显密钥", async (t) => {
+  const root = await mkdtemp(join(tmpdir(), "adui-env-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  const env = join(root, ".env.local"),
+    out = join(root, "unlock.key.json");
+  const generated = run(["keygen-env", "--out", env, "--key-id", "test"]);
+  assert.equal(generated.status, 0);
+  const vars = parseEnv(await readFile(env, "utf8"));
+  assert.equal(Buffer.from(vars.ADUI_MODEL_KEY, "base64").length, 32);
+  assert.ok(!generated.stdout.includes(vars.ADUI_MODEL_KEY));
+  const exported = run(["export-unlock", "--env-file", env, "--out", out]);
+  assert.equal(exported.status, 0);
+  assert.ok(!exported.stdout.includes(vars.ADUI_MODEL_KEY));
+  assert.equal(JSON.parse(await readFile(out, "utf8")).key, vars.ADUI_MODEL_KEY);
+  assert.equal(run(["keygen-env", "--out", env, "--key-id", "test"]).status, 1);
+  assert.equal(run(["export-unlock", "--env-file", env, "--out", out]).status, 1);
+});
 test("真实 CLI：.adui 往返、保留原件、输出保护和密钥不泄露", async (t) => {
   const dir = await mkdtemp(join(tmpdir(), "adui-crypto-"));
   t.after(() => rm(dir, { recursive: true, force: true }));
