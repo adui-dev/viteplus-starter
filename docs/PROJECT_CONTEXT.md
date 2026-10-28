@@ -223,3 +223,18 @@
 - 开发服务另验证 HTML、Worker JS、Assets JSON、Widgets CSS 均 HTTP 200 且 MIME 正确；未声称开发浏览器渲染已实测。浏览器后续连接不可用，已有生产渲染证据保留；临时 viewport 已恢复，本轮三个预览/开发服务已停止。
 - 最终 153/153 Node 测试、252 个组合计划（新增 42 Cesium，实际构建数仍标 0）、文档校验、根 vp check（123 格式文件、88 代码文件，无警告错误）与 git diff --check 通过。未改仓库依赖版本或锁文件，未新增流水线或发布。按中文 emoji 分功能和验收文档提交并推送。
 - 下一步：接入 Babylon 逐应用生成预设，沿用官方模板、按需加载、原配置保护和 Vue/React/Monorepo 本地验收；之后再设计多引擎选择及各引擎模型适配。
+
+## 2026-10-28 Babylon 逐应用生成预设
+
+- CLI --engine babylon、交互菜单及批量 JSON 已接入，engine.mjs 输出独立依赖/文件/页面计划。保持官方 vite:application 的 Vue/React × TS/JS、vite:monorepo 根及逐应用集成；新建要求 screen，已有匹配的大屏应用可 --apply-existing，默认不选引擎。
+- 新增 packages/babylon：固定 @babylonjs/core 9.32.1，ES 深路径模块构建本地立方体、相机和光照；无 CDN、在线纹理、额外静态资源插件。只增加源码快照与 /babylon-smoke.html，正式首页、App/main 及 Vite 配置不修改。组件放入 AdScreen 原生像素引擎层，不扩展业务查看器操作。
+- lazy 点击后才导入场景，重复加载共用请求，卸载期间导入完成不创建场景；失败允许重试。runtime 管理 Engine/Scene/循环，初始化和渲染异常停止循环并释放已返回对象，lazy 清除画布，卸载断开 ResizeObserver；尺寸变化调用 resize。受控测试覆盖晚到、重试、帧异常、同步初始化错误不误报 ready、幂等销毁；不宣称 GPU 堆测量或清空所有模块缓存。
+- 安装前后检查入口/大屏/输出及祖先链接，重复和安装期间文件冲突拒绝，不覆盖现场；固定版本与 catalog 实际安装元数据核对，拒绝缺失元数据或未知版本，不执行依赖入口。不改 Vite 配置所以无需配置备份，格式化只涉及新增文件与 package.json。
+- Babylon 首期不接模型加载/保护，不生成 KEY 脚本，显式 embedded/external 拒绝；Three 原默认 embedded 保留。模型适配、多引擎多选及 Babylon DPR/全屏专项仍未实现，不将最小场景称为这些需求已完成。
+- 仓库外通过官方入口创建独立 adui-babylon-vue-ts、adui-babylon-react-js；check 分别 38/23、33/21 格式/代码文件，无警告错误，正式首页构建通过。React 一次构建输出插件计时提示，未关闭；依赖下载遇到网络延迟后完成，未更换镜像或全局安装策略。
+- 完整执行 examples/babylon.batch.json，创建 adui-babylon-workspace、Vue JS cube-vue、React TS cube-react，三个生成阶段全部成功，官方 website/utils 保留。root ready 0/8 缓存、8/8 成功，86 格式/50 lint/type 文件无警告错误，utils 一项测试通过；保留官方 TypeScript 7 API 实验性提示。
+- 四应用均完成 index + babylon-smoke 双入口专项构建，Vue 验证 /babylon-check/，React 验证 ./，产物保留各应用 dist/babylon-verify，临时配置删除；专项在根检查完成后单独执行，未与同一工作区检查并行。场景主分块约 879–910 kB/gzip 205–214 kB，另有按需着色器/内部功能分块，保留默认 500 kB 提醒，不称整个引擎仅此体积。
+- Chrome React 相对路径生产页与 Vue 子路径生产页均显示真实蓝色立方体，初始 canvas=0，点击后 ready=true，控制台 warn/error 为空。React 网络捕获显示场景及默认材质着色器只在点击后请求，并走本地 assets；两框架卸载后 canvas=0，重挂回到等待加载，再点击均恢复 ready。只读核对两框架画布缓冲与显示尺寸一致，不扩大为完整 DPR/窗口/全屏验收。
+- React 重挂成功截图保存 D:/Workspace/adui-studio/babylon-react-acceptance.jpg，未纳入 Git；本轮两个临时浏览器标签页已关闭、两个生产预览服务已停止。未修改业务工程、模型或生产密钥。
+- 最终 161/161 Node 测试、294 个只读组合计划（新增 42 Babylon，实际构建数仍标 0）、文档检查、根 vp check（136 格式文件、98 代码文件，无警告错误）与 git diff --check 通过。仓库依赖和锁文件未改，无流水线或发布；按中文 emoji 分功能与验收文档提交并推送。
+- 下一步：设计按应用多引擎选项，兼容现有单引擎 --engine 与 JSON engine，校验依赖/文件/配置组合与应用隔离，再分别推进各引擎模型适配，继续以生成器能力为主线。

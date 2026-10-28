@@ -36,7 +36,7 @@
 | apps[].css       | 否   | none / unocss / tailwindcss，默认 none                                     |
 | apps[].uiSmoke   | 否   | 布尔值，默认 false；true 仅支持 Vue/TDesign、React/Ant Design              |
 
-apps[].screen 支持大屏预设，apps[].engine 支持 three/cesium，apps[].modelProtection 支持 embedded/external/none；Three 默认 embedded，Cesium 暂不接入模型保护，显式 embedded/external 拒绝。根不能统一设置模型保护。示例见 [模型五应用配置](../examples/models.batch.json)、[Cesium 配置](../examples/cesium.batch.json)。
+apps[].screen 支持大屏预设，apps[].engine 支持 three/cesium/babylon，apps[].modelProtection 支持 embedded/external/none；Three 默认 embedded，Cesium/Babylon 暂不接入模型保护，显式 embedded/external 拒绝。根不能统一设置模型保护。示例见 [模型五应用配置](../examples/models.batch.json)、[Cesium 配置](../examples/cesium.batch.json)。
 
 未知字段、null/错误类型会报错，不忽略拼错的选项。根不允许设置 framework/language/UI/CSS。名称不允许路径或 Windows 保留设备名称；根也不能与默认 website/utils 包重名。仅支持最大 1 MiB 的 JSON，接受 UTF-8 BOM。
 
@@ -93,4 +93,4 @@ Chrome 中 Vue TS 与 React JS 两页面均通过按钮点击 0→1、CSS 颜色
 
 ## engine 应用字段
 
-每应用可用 "engine":"three" 或 "engine":"cesium"（none/省略不安装引擎），必须同时启用 screen。UI 验收阶段不重复传 engine/screen。运行样例见 [THREE_SMOKE](THREE_SMOKE.md)、[CESIUM](CESIUM.md)，完整 JSON 见 [three.batch.json](../examples/three.batch.json)、[cesium.batch.json](../examples/cesium.batch.json)。
+每应用可用 "engine":"three" 、"engine":"cesium" 或 "engine":"babylon"（none/省略不安装引擎），必须同时启用 screen。UI 验收阶段不重复传 engine/screen。运行样例见 [THREE_SMOKE](THREE_SMOKE.md)、[CESIUM](CESIUM.md)，Babylon 见 [指南](BABYLON.md) 与 [示例](../examples/babylon.batch.json)。完整 JSON 见 [three.batch.json](../examples/three.batch.json)、[cesium.batch.json](../examples/cesium.batch.json)。

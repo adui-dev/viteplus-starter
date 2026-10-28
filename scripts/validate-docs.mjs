@@ -15,6 +15,7 @@ const required = [
   "docs/HARNESS.md",
   "docs/GENERATOR_STATUS.md",
   "docs/CESIUM.md",
+  "docs/BABYLON.md",
   "docs/adr/0001-official-viteplus-templates.md",
   ".agents/skills/starter-preset-development/SKILL.md",
 ];

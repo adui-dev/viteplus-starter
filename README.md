@@ -4,6 +4,8 @@
 
 Cesium 预设已接入 --engine cesium，提供本地椭球、按需加载与资源配置；创建和批量用法见 [Cesium 指南](docs/CESIUM.md)。
 
+Babylon 预设使用 --engine babylon，提供本地立方体和独立验收页，支持四种框架/语言及工作区；用法见 [Babylon 指南](docs/BABYLON.md)。
+
 ## JSON 批量新建 Monorepo
 
 一份配置可以按顺序创建官方工作区、不同框架的应用和可选 UI 验收页：
