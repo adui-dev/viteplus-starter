@@ -13,7 +13,7 @@ test("引擎选项严格校验、默认不引入 Three；Monorepo 根与不支�
   assert.equal(validateProjectOptions(base).engine, undefined);
   assert.equal(validateProjectOptions({ ...base, engine: "none" }).engine, undefined);
   assert.equal(validateProjectOptions({ ...base, engine: "three" }).engine, "three");
-  for (const engine of ["cesium", "three;echo", null, true, {}, ["three"]])
+  for (const engine of ["babylon", "three;echo", null, true, {}, ["three"]])
     assert.throws(() => validateProjectOptions({ ...base, engine }), /引擎/);
   assert.throws(
     () => validateProjectOptions({ name: "demo", type: "monorepo", engine: "three" }),

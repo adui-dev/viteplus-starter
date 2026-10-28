@@ -9,6 +9,8 @@ import { parseCliArgs } from "../src/cli-args.mjs";
 import { buildVpCommand, validateProjectOptions } from "../src/options.mjs";
 import { collectProjectOptions } from "../src/prompts.mjs";
 import { inspectPath } from "../src/safe-paths.mjs";
+import { addCesium, preflightCesium } from "../src/cesium.mjs";
+import { planEngine } from "../src/engine.mjs";
 import {
   planModelProtection,
   preflightModelProtection,
@@ -60,7 +62,7 @@ const usage = `ADui Vite+ Starter（Application / Monorepo）
   --screen-width / --screen-height：设计尺寸，默认 1920 / 1080。
   --screen-mode contain|cover|stretch|none：默认 contain；已有项目配合 --apply-existing。
   --three-smoke：向已有 --screen 应用安装 Three.js 并生成 /three-smoke.html。
-  --engine none|three：按应用集成 Three.js；新建时同时指定 --screen。
+  --engine none|three|cesium：按应用集成引擎；新建时同时指定 --screen。
   --model-protection embedded|external|none：Three 默认 embedded；可选择外置密钥或关闭。
   启用模型保护时自动生成项目 .env.local 与 models:keygen / models:keyrotate 脚本，IV 按模型随机生成。
   --config <JSON 文件>：批量新建官方 Monorepo 和应用，仅可与 --dry-run 同用。
@@ -73,7 +75,7 @@ const usage = `ADui Vite+ Starter（Application / Monorepo）
   --apply-existing 用于首次补装；--repair-existing 用于修复旧版 starter.plugins 跨文件引用。
   旧插件文件会备份成 starter.plugins.ts.bak；两种模式不重装基础模板。
   --ui-smoke 为已有应用创建独立的 /ui-smoke.html 验证页，不修改正式首页。
-  大屏与 Three.js 独立验收页已支持；其他引擎尚未实现。
+  大屏、Three.js 与 Cesium 独立验收页已支持；Babylon 尚未实现。
 `;
 
 async function main() {
@@ -122,7 +124,7 @@ async function main() {
   if (options.engine && (args.uiSmoke || args.threeSmoke || args.repairExisting))
     throw new Error("--engine 不能与独立验收/旧版修复模式混用");
   if (options.engine && !options.screen && !args.applyExisting)
-    throw new Error("新建 Three 应用须同时指定 --screen");
+    throw new Error("新建引擎应用须同时指定 --screen");
   if (options.screen && (args.uiSmoke || args.repairExisting))
     throw new Error("--screen 不能与 --ui-smoke 或 --repair-existing 同用");
   const integrations = planIntegrations(options);
@@ -202,7 +204,8 @@ async function main() {
       throw new Error("未选择需要安装的 UI/CSS 集成");
     }
     if (options.screen) await preflightScreenPreset(target, await planScreenPreset(options));
-    if (options.engine) {
+    if (options.engine === "cesium") await preflightCesium(target, options, !options.screen);
+    if (options.engine === "three") {
       await preflightThreeSmoke(target, await planThreeSmoke(options));
       await validateThreeTarget(target, options, !options.screen);
     }
@@ -210,7 +213,8 @@ async function main() {
     if (workspace) await prepareWorkspacePeerExtensions(workspace);
     await applyIntegrations(target, options);
     if (options.screen) await addScreenPreset(target, options);
-    if (options.engine) await addThreeSmoke(target, options);
+    if (options.engine === "three") await addThreeSmoke(target, options);
+    if (options.engine === "cesium") await addCesium(target, options);
     await addModelProtection(target, options);
     await finishWorkspaceIntegration();
     console.log("补装完成，请在项目中执行 vp check 和 vp build");
@@ -234,11 +238,7 @@ async function main() {
           ...(options.engine
             ? {
                 engine: {
-                  name: options.engine,
-                  dependencies: ["three@0.186.1"],
-                  devDependencies: ["@types/three@0.186.0"],
-                  files: Object.keys((await planThreeSmoke(options)).files),
-                  previewPath: "/three-smoke.html",
+                  ...(await planEngine(options)),
                 },
               }
             : {}),
@@ -295,9 +295,13 @@ async function main() {
     console.log("AdScreen 大屏预设已生成：/screen-smoke.html");
   }
   if (result.status === 0 && options.engine) {
-    await addThreeSmoke(target, options);
+    if (options.engine === "three") await addThreeSmoke(target, options);
+    if (options.engine === "cesium") await addCesium(target, options);
     await finishWorkspaceIntegration();
-    console.log("Three.js 按需场景已生成：/three-smoke.html");
+    console.log(
+      "引擎按需场景已生成：" +
+        (options.engine === "cesium" ? "/cesium-smoke.html" : "/three-smoke.html"),
+    );
   }
   if (result.status === 0 && planModelProtection(options)) {
     await addModelProtection(target, options);

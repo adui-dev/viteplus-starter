@@ -6,16 +6,19 @@ import { planIntegrations, generateIntegration } from "../packages/create/src/in
 import { planUiSmoke } from "../packages/create/src/ui-smoke.mjs";
 import { planScreenPreset } from "../packages/create/src/screen.mjs";
 import { planThreeSmoke } from "../packages/create/src/three-smoke.mjs";
+import { planCesium } from "../packages/create/src/cesium.mjs";
 import { planModelProtection } from "../packages/create/src/model-protection.mjs";
 export async function verifyGeneratorMatrix() {
   let cases = 0,
     uiSmoke = 0,
     screen = 0,
     three = 0,
-    protectedModels = 0;
+    protectedModels = 0,
+    cesium = 0;
   const profiles = [
     {},
     { screen: true },
+    { screen: true, engine: "cesium" },
     ...["none", "embedded", "external"].map((modelProtection) => ({
       screen: true,
       engine: "three",
@@ -84,7 +87,11 @@ export async function verifyGeneratorMatrix() {
               );
               screen++;
             }
-            if (options.engine) {
+            if (options.engine === "cesium") {
+              add(Object.keys((await planCesium(options)).files));
+              cesium++;
+            }
+            if (options.engine === "three") {
               add(Object.keys((await planThreeSmoke(options)).files));
               three++;
             }
@@ -103,6 +110,7 @@ export async function verifyGeneratorMatrix() {
     uiSmokePlans: uiSmoke,
     screenPlans: screen,
     threePlans: three,
+    cesiumPlans: cesium,
     modelProtectionPlans: protectedModels,
     actualBuilds: 0,
   };

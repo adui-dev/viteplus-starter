@@ -1,0 +1,20 @@
+{
+  "name": "@adui/cesium",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./lazy": {
+      "types": "./src/lazy.d.mts",
+      "import": "./src/lazy.mjs"
+    }
+  },
+  "peerDependencies": {
+    "cesium": "1.146.0"
+  },
+  "peerDependenciesMeta": {
+    "cesium": {
+      "optional": true
+    }
+  }
+}

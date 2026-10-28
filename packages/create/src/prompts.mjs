@@ -112,10 +112,12 @@ export async function collectProjectOptions(partial, ask, report = console.error
     if (options.screen === undefined) {
       options.screen = await askUntilValid(
         ask,
-        "大屏适配 [1] 不启用 [2] 启用 (默认 " + (options.engine === "three" ? "2" : "1") + "): ",
+        "大屏适配 [1] 不启用 [2] 启用 (默认 " +
+          (options.engine && options.engine !== "none" ? "2" : "1") +
+          "): ",
         choiceValidator(
           { 1: false, 2: true, no: false, yes: true },
-          options.engine === "three" ? "2" : "1",
+          options.engine && options.engine !== "none" ? "2" : "1",
         ),
         report,
       );
@@ -123,8 +125,11 @@ export async function collectProjectOptions(partial, ask, report = console.error
     if (options.screen && options.engine === undefined)
       options.engine = await askUntilValid(
         ask,
-        "3D 引擎 [1] None [2] Three.js (默认 1): ",
-        choiceValidator({ 1: "none", 2: "three", none: "none", three: "three" }, "1"),
+        "3D 引擎 [1] None [2] Three.js [3] Cesium (默认 1): ",
+        choiceValidator(
+          { 1: "none", 2: "three", 3: "cesium", none: "none", three: "three", cesium: "cesium" },
+          "1",
+        ),
         report,
       );
     if (
@@ -151,7 +156,7 @@ export async function collectProjectOptions(partial, ask, report = console.error
   }
   const selected = validateProjectOptions(options);
   if (selected.engine && !selected.screen && !partial.applyExisting)
-    throw new Error("新建 Three 应用须同时启用大屏");
+    throw new Error("新建引擎应用须同时启用大屏");
   if (!prompted) return selected;
 
   const description =

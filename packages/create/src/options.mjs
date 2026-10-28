@@ -24,7 +24,8 @@ export function validateProjectOptions(options) {
   const { name, type, framework } = options;
   const { workspace } = options;
   const engine = options.engine === undefined ? "none" : options.engine;
-  if (!["none", "three"].includes(engine)) throw new Error("引擎仅支持 none 或 three");
+  if (!["none", "three", "cesium"].includes(engine))
+    throw new Error("引擎仅支持 none、three 或 cesium");
   if (type === "monorepo" && engine !== "none") throw new Error("Monorepo 根不配置引擎");
   if (options.modelProtection !== undefined && options["model-protection"] !== undefined)
     throw new Error("模型保护参数不能重复");
@@ -96,7 +97,7 @@ export function validateProjectOptions(options) {
     ...(options.ui === undefined ? {} : { ui }),
     ...(options.css === undefined ? {} : { css }),
     ...(screen ? { screen } : {}),
-    ...(engine === "three" ? { engine } : {}),
+    ...(engine !== "none" ? { engine } : {}),
     ...(engine === "three" || rawProtection !== undefined ? { modelProtection } : {}),
   };
 }

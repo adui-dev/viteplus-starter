@@ -6,7 +6,7 @@ import { buildVpCommand, validateProjectName, validateProjectOptions } from "./o
 import { planIntegrations } from "./integrations.mjs";
 import { planUiSmoke } from "./ui-smoke.mjs";
 import { planScreenPreset } from "./screen.mjs";
-import { planThreeSmoke } from "./three-smoke.mjs";
+import { planEngine } from "./engine.mjs";
 import { planModelProtection } from "./model-protection.mjs";
 import { resolveWorkspaceApplication, runWorkspaceVp } from "./workspace.mjs";
 
@@ -71,7 +71,7 @@ export function validateBatchConfig(input) {
       css: app.css ?? "none",
     });
     if (app.uiSmoke) planUiSmoke(options);
-    if (options.engine && !options.screen) throw new Error("批量 Three 引擎须同时配置 screen");
+    if (options.engine && !options.screen) throw new Error("批量引擎须同时配置 screen");
     const { type: _type, ...selection } = options;
     return { ...selection, uiSmoke: app.uiSmoke ?? false };
   });
@@ -173,11 +173,7 @@ export async function createBatchPlan(input, cwd = process.cwd()) {
       ...(app.engine
         ? {
             engine: {
-              name: app.engine,
-              dependencies: ["three@0.186.1"],
-              devDependencies: ["@types/three@0.186.0"],
-              files: Object.keys((await planThreeSmoke(options)).files),
-              previewPath: "/three-smoke.html",
+              ...(await planEngine(options)),
             },
           }
         : {}),

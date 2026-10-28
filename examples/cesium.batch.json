@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "name": "adui-cesium-workspace",
+  "apps": [
+    {
+      "name": "globe-vue",
+      "framework": "vue",
+      "language": "js",
+      "screen": true,
+      "engine": "cesium"
+    },
+    {
+      "name": "globe-react",
+      "framework": "react",
+      "language": "ts",
+      "screen": true,
+      "engine": "cesium"
+    }
+  ]
+}
