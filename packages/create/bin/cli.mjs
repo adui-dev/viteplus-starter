@@ -264,7 +264,8 @@ async function main() {
       : spawnSync(command, vpArgs, { cwd: commandCwd, stdio: "inherit" });
 
   if (result.error) throw result.error;
-  if (result.status === 0 && workspace) await normalizeNewWorkspaceApplication(workspace);
+  if (result.status === 0 && workspace)
+    await normalizeNewWorkspaceApplication(workspace, undefined, options);
   if (
     result.status === 0 &&
     (integrations.dependencies.length || integrations.devDependencies.length)

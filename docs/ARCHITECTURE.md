@@ -53,3 +53,7 @@ flowchart TD
 ## Three.js 应用选择与按需加载
 
 应用创建选项支持 engine=none/three；CLI --engine three 与新建 --screen 配合，JSON 每应用独立配置，根不接受引擎。复用已有源码写入器及官方模板流程，现有首页不变。createLazyScene 将模块加载与 WebGL 生命周期分离；用户点击后动态导入引擎，不在应用/验收页初始化时创建 GPU 资源。引擎与框架自然分块，未修改用户构建配置。
+
+## GLB 模型边界
+
+model.mjs 独立处理自包含 GLB 预检、请求代次与返回资产的去重清理，runtime.mjs 负责挂载、模型包围盒/相机适配与查看器环境光；index.mjs 仅在选择模型时动态导入官方 GLTFLoader。UI 以本地 ArrayBuffer 传递，不硬编码用户路径或打包测试模型。模型授权与加解密继续保持独立规划边界。

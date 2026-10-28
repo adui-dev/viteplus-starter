@@ -201,7 +201,7 @@ export function runWorkspaceVp(cwd, args) {
 
 // Official monorepo app templates may retain imports that the root lint rule rejects.
 // Use Vite+'s own targeted fixer; never format or lint-fix existing sibling applications.
-export async function normalizeNewWorkspaceApplication(context, runner = runWorkspaceVp) {
+export async function normalizeNewWorkspaceApplication(context, runner = runWorkspaceVp, options) {
   const configs = [];
   for (const filename of [
     "vite.config.ts",
@@ -214,4 +214,30 @@ export async function normalizeNewWorkspaceApplication(context, runner = runWork
   if (configs.length !== 1) throw new Error("无法唯一识别新应用 Vite 配置");
   runner(context.target, ["lint", configs[0], "--fix"]);
   runner(context.target, ["fmt", configs[0], "--write"]);
+  // Give Vue JS its own project scope instead of merging wildcard declarations into the root.
+  if (options?.framework === "vue" && options.language === "js") {
+    const path = join(context.target, "tsconfig.json");
+    if (!(await inspect(path)) && !(await inspect(join(context.target, "jsconfig.json")))) {
+      await writeFile(
+        path,
+        JSON.stringify(
+          {
+            compilerOptions: {
+              allowJs: true,
+              noEmit: true,
+              target: "ES2022",
+              module: "ESNext",
+              moduleResolution: "bundler",
+              types: ["vite/client"],
+            },
+            include: ["src/**/*", configs[0]],
+          },
+          null,
+          2,
+        ) + "\n",
+        { flag: "wx" },
+      );
+      runner(context.target, ["fmt", "tsconfig.json", "--write"]);
+    }
+  }
 }

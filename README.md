@@ -129,3 +129,7 @@ Application / Monorepo、Vue / React、Element Plus / Ant Design / TDesign、Uno
 ## Three.js 真实场景
 
 已有大屏应用可单独运行 --three-smoke，验证真实 WebGL、DPR、拾取、全屏与卸载清理，保留正式首页。详见 [Three.js 验收](docs/THREE_SMOKE.md)。已支持 --engine three 和逐应用 JSON engine 字段；其他引擎和模型安全仍待实现。
+
+## 本地 GLB
+
+Three 验收页现支持选择自包含 GLB、清除与重新加载；已使用 DamagedHelmet 验证。加载器按需导入，测试模型不打包进仓库。接口与边界见 [GLB 加载说明](docs/THREE_SMOKE.md)；模型授权及加解密仍待实现。

@@ -132,3 +132,11 @@ options.mjs 严格归一化 engine=none/three，默认不保留 none 字段、�
 batch.mjs 接受逐应用 engine 字段，Three 要求 screen，同时规划依赖、文件及独立页面；应用阶段直接传 --engine three，保留 root/app 失败摘要与串行保护，uiSmoke 独立阶段不重复传 engine/screen。--engine three 生成可复用源码与示例页面，不替换正式业务首页，不等同实现多引擎多选或模型安全。
 
 lazy.mjs 在 start 时动态 import，复用未完成请求，失败可重试；destroy 使晚到模块失效并避免回调已卸载组件，构造期间的同步卸载也回收已创建对象。Vue/React ThreeView 仅静态导入轻量 lazy API；DPR 与组件 ready/loading 状态随生命周期更新。模块下载本身不取消。分块由 Vite 自然生成，专项构建和生产网络验证见 THREE_SMOKE；旧快照不自动覆盖迁移。
+
+## GLB 本地模型设计
+
+模型加载控制器按版本丢弃晚到结果，安装前校验包围边界，成功后释放旧资产；解析/安装失败移除新返回资产并保留旧模型。clear/destroy 使 pending 结果失效；同步安装回调发生卸载也清理新对象。资源以 Set 去重，支持材质数组、多个场景、共享纹理位图及骨架。未追踪加载器拒绝前未返回的内部对象，不宣称测得驱动内存完全回收。
+
+ThreeHandle/LazySceneHandle 暴露 loadModel/clearModel，文件 UI 在 arrayBuffer 前检查大小并在异步读完后核对仍是同一实例；失败提示可由下一次选择清除。GLTFLoader 使用 parseAsync，拒绝外部资源 URI；无远端模型下载或密钥。RoomEnvironment/PMREM 用于 PBR，环境属于查看器，模型清除仅释放模型，卸载再释放环境/renderer/context。相机半径按归一化后的包围球计算并留边距，已修复实测头盔裁切。
+
+Monorepo 实测新增 Vue JS 时发现根项目合并多份官方 *.vue 声明导致 duplicate component。仅对新 Vue JS 成员在无 tsconfig/jsconfig 时补充独立 tsconfig 范围（src 与自身 Vite 配置），不改 env.d.ts、不覆盖已有项目配置，不设置 skipLibCheck/checkJs 或禁用 lint。其他框架/语言维持原流程。

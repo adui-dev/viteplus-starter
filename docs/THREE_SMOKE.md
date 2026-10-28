@@ -69,3 +69,17 @@ createLazyScene 位于 src/adui-three/lazy.mjs（包内也导出 @adui/three/laz
 采用原生动态导入边界，由 Vite 自动分块，不写入全局 manual chunk 配置或修改用户 Vite 文件，依据 [Vite 动态导入与分块](https://vite.dev/guide/features)。专项双入口构建（原首页 + Three HTML）产物：Vue/React 验收入口约 10.26/10.74 kB，共享框架约 64.40/219.44 kB，引擎独立分块约 525.76 kB（gzip 131.15 kB），两框架引擎文件哈希一致。入口体积不含共享框架，不能称为完整首屏大小。
 
 manifest 标记引擎 isDynamicEntry，首页没有对它的 import；生产浏览器网络捕获证明验收页点击前不请求 adui-three 分块，点击后才请求。引擎仍超过默认 500 kB，保留提醒；此轮优化加载时机与复用边界，不声称消除全部包体问题。无需下载远端模型或生产密钥。
+
+## GLB 本地加载
+
+新版 Three 页面加载场景后提供“选择 GLB 模型”和“清除模型”。选择本机 .glb 后使用 File.arrayBuffer 在浏览器中解析，不通过应用 HTTP 上传模型，不将文件复制进生成器仓库。输入框读完后清空以便再次选择同一文件；当前加载状态见 model/modelError/modelMeshes。已有源码快照不自动升级。
+
+ThreeHandle 与 LazySceneHandle 新增 loadModel(buffer:ArrayBuffer):Promise<boolean>、clearModel()。GLTFLoader 在首次加载模型时动态导入；只有 ready 才替换当前模型。新请求覆盖旧请求，晚到解析结果立即释放；加载失败保留上一个可见模型。清除恢复立方体，卸载释放模型与查看器独占资源。
+
+首期支持 20 字节至 32 MiB、glTF 2.0、自包含 GLB。选择文件时先检查 file.size，解析前校验文件头、声明长度、首 JSON 块与分块边界；拒绝外部 buffer/image URI 和未配置的 Draco/KTX2/Meshopt 解码需求。此检查不等同加密认证，也未实现远端 URL、授权或 AES-GCM。动画数据可以解析，但本例不播放动画。
+
+模型按包围盒居中并归一化，再以带边距的包围球按相机比例适配，避免头盔上下被裁切。程序化 RoomEnvironment/PMREM 与灯光支持 PBR 内嵌贴图，不下载外部 HDR。环境贴图由查看器复用，清除模型时保留，卸载时释放。
+
+模型清理遍历所有返回场景，按引用去重释放 geometry、material、texture、skeleton，并关闭已返回纹理的 ImageBitmap。只管理本实例独占资源，不接管跨实例共享缓存；解析失败未返回的加载器内部对象不宣称已经逐一追踪，GPU 驱动实际堆内存也未做测量。官方 API 依据见 [GLTFLoader](https://threejs.org/docs/pages/GLTFLoader)。
+
+实机使用用户提供的 C:/Users/ADui/Downloads/DamagedHelmet.glb（3,773,916 字节，一个 mesh、五张内嵌 JPEG）；原文件 SHA-256 为 a1e3b04de97b11de564ce6e53b95f02954a297f0008183ac63a4f5974f6b32d8，前后相同。模型文件未纳入 Git；仓库只提交加载能力、测试与说明。

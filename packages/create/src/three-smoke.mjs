@@ -11,7 +11,14 @@ export async function planThreeSmoke(input) {
     vue = options.framework === "vue";
   const ext = vue ? (ts ? "ts" : "js") : ts ? "tsx" : "jsx";
   const files = {};
-  for (const name of ["index.mjs", "index.d.mts", "runtime.mjs", "lazy.mjs", "lazy.d.mts"])
+  for (const name of [
+    "index.mjs",
+    "index.d.mts",
+    "runtime.mjs",
+    "model.mjs",
+    "lazy.mjs",
+    "lazy.d.mts",
+  ])
     files["src/adui-three/" + name] = await readFile(
       new URL("../../three/src/" + name, import.meta.url),
       "utf8",
@@ -34,8 +41,12 @@ export async function planThreeSmoke(input) {
       "let scene" + (ts ? ": LazySceneHandle|undefined" : ""),
       "onMounted(()=>{if(host.value)scene=createLazyScene(host.value,{pixelRatio:props.pixelRatio||undefined,onState:state=>{loading.value=state.loading;ready.value=state.ready},onStatus:value=>emit('status',value),onError:error=>emit('error',String(error))})})",
       "watch(()=>props.pixelRatio,value=>scene?.setPixelRatio(value||undefined))",
-      "onBeforeUnmount(()=>scene?.destroy())",
-      '</script><template><div class="three-host three-wrapper"><div ref="host" class="three-host"/><button v-if="!ready" class="three-load" :disabled="loading" @click="scene?.start()">{{loading?"加载中…":"加载 3D 场景"}}</button></div></template>',
+      "onBeforeUnmount(()=>{scene?.destroy();scene=undefined})",
+      "async function openModel(event" +
+        (ts ? ": Event" : "") +
+        "){const input=event.target;if(!(input instanceof HTMLInputElement))return;const file=input.files?.[0],active=scene;input.value='';if(!file||!active)return;if(file.size>32*1024*1024){emit('error','GLB 不得超过 32 MiB');return}emit('error','');try{const buffer=await file.arrayBuffer();if(scene===active)await active.loadModel(buffer)}catch(error){if(scene===active)emit('error',String(error))}}",
+      "function clearModel(){scene?.clearModel();emit('error','')}",
+      '</script><template><div class="three-host three-wrapper"><div ref="host" class="three-host"/><button v-if="!ready" class="three-load" :disabled="loading" @click="scene?.start()">{{loading?"加载中…":"加载 3D 场景"}}</button><div v-if="ready" class="three-model-controls"><label>选择 GLB 模型<input aria-label="选择 GLB 模型" type="file" accept=".glb" @change="openModel"/></label><button @click="clearModel">清除模型</button></div></div></template>',
     ].join("\n");
     files["src/three-smoke/ScreenDemo.vue"] = vueDemo(ts)
       .replace(
@@ -72,7 +83,10 @@ export async function planThreeSmoke(input) {
       "useEffect(()=>{latest.current={pixelRatio,onStatus,onError}})",
       "useEffect(()=>{if(!host)return;scene.current=createLazyScene(host,{pixelRatio:latest.current.pixelRatio||undefined,onState:setState,onStatus:value=>latest.current.onStatus(value),onError:error=>latest.current.onError(String(error))});return()=>{scene.current?.destroy();scene.current=undefined}},[host])",
       "useEffect(()=>scene.current?.setPixelRatio(pixelRatio||undefined),[pixelRatio])",
-      'return <div className="three-host three-wrapper"><div ref={setHost} className="three-host"/>{!state.ready&&<button className="three-load" disabled={state.loading} onClick={()=>{void scene.current?.start()}}>{state.loading?"加载中…":"加载 3D 场景"}</button>}</div>',
+      "async function openModel(event" +
+        (ts ? ": import('react').ChangeEvent<HTMLInputElement>" : "") +
+        "){const file=event.target.files?.[0],active=scene.current;event.target.value='';if(!file||!active)return;if(file.size>32*1024*1024){latest.current.onError('GLB 不得超过 32 MiB');return}latest.current.onError('');try{const buffer=await file.arrayBuffer();if(scene.current===active)await active.loadModel(buffer)}catch(error){if(scene.current===active)latest.current.onError(String(error))}}",
+      'return <div className="three-host three-wrapper"><div ref={setHost} className="three-host"/>{!state.ready&&<button className="three-load" disabled={state.loading} onClick={()=>{void scene.current?.start()}}>{state.loading?"加载中…":"加载 3D 场景"}</button>}{state.ready&&<div className="three-model-controls"><label>选择 GLB 模型<input aria-label="选择 GLB 模型" type="file" accept=".glb" onChange={openModel}/></label><button onClick={()=>{scene.current?.clearModel();latest.current.onError("")}}>清除模型</button></div>}</div>',
       "}",
     ].join("\n");
     files["src/three-smoke/ScreenDemo." + ext] = reactDemo(ts)
@@ -108,7 +122,7 @@ export async function planThreeSmoke(input) {
     .replaceAll("点击引擎网格测试坐标", "点击立方体拾取；HUD 按钮测试设计坐标");
   files["src/three-smoke/demo.css"] =
     demoCss +
-    "\n.three-host{width:100%;height:100%}.three-wrapper{position:relative}.three-load{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}[data-three-status]{font:12px monospace;max-width:650px;overflow-wrap:anywhere}";
+    "\n.three-host{width:100%;height:100%}.three-wrapper{position:relative}.three-load{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}.three-model-controls{position:absolute;left:12px;top:12px;display:flex;gap:12px;align-items:center;background:#10243ee8;padding:8px;max-width:calc(100% - 24px);flex-wrap:wrap;font-size:13px}[data-three-status]{font:12px monospace;max-width:650px;overflow-wrap:anywhere}";
   files["three-smoke.html"] =
     '<!doctype html><html lang="zh-CN"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>ADui Three Smoke</title></head><body><div id="three-root"></div><script type="module" src="/src/three-smoke/main.' +
     ext +

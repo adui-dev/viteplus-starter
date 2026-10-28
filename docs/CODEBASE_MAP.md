@@ -69,3 +69,9 @@ UI/CSS 已在 `integrations.mjs` 实现；大屏核心见 `packages/screen`；Th
 - packages/three/src/lazy.mjs、lazy.d.mts、test/lazy.test.mjs：点击后加载、去重、重试、延迟 DPR、卸载和晚到模块保护。
 - packages/create/test/engine.test.mjs：CLI/JSON 严格引擎选择、阶段隔离、真实 dry-run 与组合补装保护。
 - [three.batch.json](../examples/three.batch.json)：官方混合工作区完整引擎示例；使用说明见 [THREE_SMOKE](THREE_SMOKE.md)。
+
+## GLB 模型加载
+
+- packages/three/src/model.mjs、test/model.test.mjs：GLB 预检、包围球归一化、请求代次、晚到/失败清理、资产去重。
+- runtime/index/lazy 与声明：加载/清除 API、内嵌贴图、PBR 环境、相机适配；ThreeView：本地文件选择。
+- workspace.mjs/工作区测试：新 Vue JS 成员的独立声明作用域，不覆盖官方 env 或已有配置。

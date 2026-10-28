@@ -3,7 +3,7 @@ export function createLazyScene(host, options = {}, loader = () => import("./ind
   let disposed = false,
     scene = null,
     pending = null;
-  return {
+  const handle = {
     start() {
       if (disposed || scene) return Promise.resolve();
       if (pending) return pending;
@@ -35,6 +35,14 @@ export function createLazyScene(host, options = {}, loader = () => import("./ind
       settings.pixelRatio = value;
       if (!disposed) scene?.setPixelRatio(value);
     },
+    async loadModel(buffer) {
+      await handle.start();
+      if (disposed || !scene) return false;
+      return scene.loadModel(buffer);
+    },
+    clearModel() {
+      if (!disposed) scene?.clearModel();
+    },
     destroy() {
       if (disposed) return;
       disposed = true;
@@ -42,4 +50,5 @@ export function createLazyScene(host, options = {}, loader = () => import("./ind
       scene = null;
     },
   };
+  return handle;
 }

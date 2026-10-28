@@ -6,6 +6,8 @@ export interface LazySceneState {
 export interface LazySceneHandle {
   start(): Promise<void>;
   setPixelRatio(value?: number): void;
+  loadModel(buffer: ArrayBuffer): Promise<boolean>;
+  clearModel(): void;
   destroy(): void;
 }
 export function createLazyScene(

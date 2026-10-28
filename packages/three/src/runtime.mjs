@@ -1,3 +1,4 @@
+import { createModelController, modelBounds } from "./model.mjs";
 export function bufferSize(width, height, pixelRatio, maxDimension = 8192) {
   if (![width, height].every((value) => Number.isFinite(value) && value >= 0))
     throw new Error("无效的 Three.js 容器尺寸");
@@ -19,7 +20,8 @@ export function mountScene(THREE, host, options = {}) {
   bufferSize(0, 0, override ?? view.devicePixelRatio ?? 1);
   const renderer = new THREE.WebGLRenderer({ antialias: true });
   const canvas = renderer.domElement;
-  let geometry, material, observer;
+  let geometry, material, observer, models, modelGroup, environment;
+  let modelRadius = 1;
   let disposed = false,
     key = "";
   let status = {
@@ -32,6 +34,9 @@ export function mountScene(THREE, host, options = {}) {
     picks: 0,
     selected: false,
     disposed: false,
+    model: "empty",
+    modelError: "",
+    modelMeshes: 0,
   };
   const notify = () => options.onStatus?.({ ...status });
   const cleanup = () => {
@@ -42,6 +47,8 @@ export function mountScene(THREE, host, options = {}) {
     view.removeEventListener("resize", resize);
     canvas.removeEventListener("pointerdown", pick);
     canvas.removeEventListener("webglcontextlost", lost);
+    models?.destroy();
+    environment?.dispose();
     geometry?.dispose();
     material?.dispose();
     renderer.dispose();
@@ -65,6 +72,7 @@ export function mountScene(THREE, host, options = {}) {
       renderer.setPixelRatio(size.pixelRatio);
       renderer.setSize(size.width, size.height, false);
       camera.aspect = size.width / size.height;
+      if (modelGroup) fitCamera();
       camera.updateProjectionMatrix();
     }
     status = { ...status, ...size };
@@ -80,8 +88,8 @@ export function mountScene(THREE, host, options = {}) {
     scene.updateMatrixWorld(true);
     camera.updateMatrixWorld(true);
     raycaster.setFromCamera({ x: x * 2 - 1, y: 1 - y * 2 }, camera);
-    const selected = raycaster.intersectObject(mesh).length > 0;
-    material.color.set(selected ? 0xffb454 : 0x43d9d0);
+    const selected = raycaster.intersectObject(modelGroup ?? mesh, true).length > 0;
+    if (!modelGroup) material.color.set(selected ? 0xffb454 : 0x43d9d0);
     status = { ...status, picks: status.picks + 1, selected };
     notify();
   }
@@ -90,6 +98,14 @@ export function mountScene(THREE, host, options = {}) {
     cleanup();
     options.onError?.(new Error("WebGL 上下文已丢失，请卸载后重新挂载"));
     notify();
+  }
+  function fitCamera() {
+    camera.position.z =
+      modelRadius / Math.sin((camera.fov * Math.PI) / 360) / Math.min(1, camera.aspect);
+    camera.near = camera.position.z / 100;
+    camera.far = camera.position.z * 100;
+    camera.lookAt(0, 0, 0);
+    camera.updateProjectionMatrix();
   }
   try {
     scene = new THREE.Scene();
@@ -102,6 +118,59 @@ export function mountScene(THREE, host, options = {}) {
     mesh = new THREE.Mesh(geometry, material);
     scene.add(mesh);
     raycaster = new THREE.Raycaster();
+    models = createModelController({
+      parse: (buffer) => THREE.parseGlb(buffer),
+      install(asset) {
+        const box = new THREE.Box3().setFromObject(asset.scene);
+        const size = box.getSize(new THREE.Vector3()),
+          center = box.getCenter(new THREE.Vector3());
+        const bounds = modelBounds(size);
+        if (![center.x, center.y, center.z].every(Number.isFinite))
+          throw new Error("GLB 场景中心无效");
+        if (!environment) {
+          environment = THREE.createEnvironment(renderer);
+          scene.environment = environment.texture;
+          scene.add(new THREE.HemisphereLight(0xffffff, 0x334455, 1.5));
+          const keyLight = new THREE.DirectionalLight(0xffffff, 3);
+          keyLight.position.set(3, 4, 5);
+          scene.add(keyLight);
+        }
+        const group = new THREE.Group();
+        asset.viewRoot = group;
+        asset.scene.position.sub(center);
+        group.add(asset.scene);
+        group.scale.setScalar(bounds.scale);
+        modelRadius = bounds.radius;
+        modelGroup = group;
+        scene.add(group);
+        fitCamera();
+        let meshes = 0;
+        asset.scene.traverse((node) => {
+          if (node.isMesh) meshes++;
+        });
+        status.modelMeshes = meshes;
+      },
+      remove(asset) {
+        if (asset.viewRoot) scene.remove(asset.viewRoot);
+        if (modelGroup === asset.viewRoot) {
+          modelGroup = null;
+          status.modelMeshes = 0;
+        }
+      },
+      onState(model, modelError) {
+        if (disposed) return;
+        mesh.visible = !modelGroup;
+        if (!modelGroup) {
+          camera.position.z = 5;
+          camera.near = 0.1;
+          camera.far = 100;
+          camera.updateProjectionMatrix();
+        }
+        status = { ...status, model, modelError, selected: false };
+        notify();
+      },
+      onError: (error) => options.onError?.(error),
+    });
     Object.assign(canvas.style, { display: "block", width: "100%", height: "100%" });
     canvas.setAttribute("aria-label", "Three.js 场景");
     host.appendChild(canvas);
@@ -117,6 +186,7 @@ export function mountScene(THREE, host, options = {}) {
       if (!status.width || !status.height) return;
       mesh.rotation.y = time * 0.0003;
       mesh.rotation.x = 0.25;
+      if (modelGroup) modelGroup.rotation.y = Math.sin(time * 0.00015) * 0.25;
       renderer.render(scene, camera);
       status.frames++;
     });
@@ -134,6 +204,12 @@ export function mountScene(THREE, host, options = {}) {
       bufferSize(0, 0, value ?? view.devicePixelRatio ?? 1);
       override = value;
       resize();
+    },
+    loadModel(buffer) {
+      return models.load(buffer);
+    },
+    clearModel() {
+      models.clear();
     },
     destroy() {
       if (disposed) return;

@@ -8,6 +8,9 @@ export interface ThreeStatus {
   picks: number;
   selected: boolean;
   disposed: boolean;
+  model: "empty" | "loading" | "ready" | "error";
+  modelError: string;
+  modelMeshes: number;
 }
 export interface ThreeOptions {
   pixelRatio?: number;
@@ -18,6 +21,8 @@ export interface ThreeHandle {
   readonly canvas: HTMLCanvasElement;
   readonly status: ThreeStatus;
   setPixelRatio(value?: number): void;
+  loadModel(buffer: ArrayBuffer): Promise<boolean>;
+  clearModel(): void;
   destroy(): void;
 }
 export function createThreeScene(host: HTMLElement, options?: ThreeOptions): ThreeHandle;

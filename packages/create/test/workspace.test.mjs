@@ -275,3 +275,30 @@ test("真实 CLI dry-run 显示工作区 cwd；已有目录创建失败且不覆
   assert.equal(await readFile(join(root, "apps", "console", "keep.txt"), "utf8"), "keep");
   assert.equal(await readFile(join(root, "vite.config.ts"), "utf8"), rootConfig);
 });
+
+test("新 Vue JS 成员隔离声明作用域，保留已有项目配置及官方 env 声明", async (t) => {
+  const root = await fixture(t),
+    target = join(root, "apps", "vue-js");
+  await mkdir(join(target, "src"), { recursive: true });
+  await writeFile(join(target, "vite.config.js"), rootConfig);
+  const shim = 'declare module "*.vue" { const component: unknown; export default component; }';
+  await writeFile(join(target, "src/env.d.ts"), shim);
+  const calls = [];
+  await normalizeNewWorkspaceApplication({ target }, (_cwd, args) => calls.push(args), {
+    framework: "vue",
+    language: "js",
+  });
+  const config = JSON.parse(await readFile(join(target, "tsconfig.json"), "utf8"));
+  assert.equal(config.compilerOptions.moduleResolution, "bundler");
+  assert.deepEqual(config.include, ["src/**/*", "vite.config.js"]);
+  assert.equal(config.compilerOptions.skipLibCheck, undefined);
+  assert.equal(config.compilerOptions.checkJs, undefined);
+  assert.equal(await readFile(join(target, "src/env.d.ts"), "utf8"), shim);
+  await writeFile(join(target, "tsconfig.json"), "user config");
+  await normalizeNewWorkspaceApplication({ target }, () => {}, {
+    framework: "vue",
+    language: "js",
+  });
+  assert.equal(await readFile(join(target, "tsconfig.json"), "utf8"), "user config");
+  assert.equal(calls.length, 3);
+});
