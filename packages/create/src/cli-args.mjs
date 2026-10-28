@@ -1,5 +1,6 @@
 const VALUE_OPTIONS = new Set([
   "--engine",
+  "--engines",
   "--model-protection",
   "--name",
   "--type",
@@ -74,7 +75,7 @@ export function parseCliArgs(argv) {
       if (!value || value.startsWith("--")) {
         throw new Error(`${token} 缺少参数`);
       }
-      options[token.slice(2)] = value;
+      options[token.slice(2)] = token === "--engines" ? value.split(",") : value;
       seen.add(token);
       continue;
     }

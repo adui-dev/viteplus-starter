@@ -6,6 +6,7 @@ import { basename, join, resolve } from "node:path";
 import { stdin, stdout } from "node:process";
 import { createInterface } from "node:readline/promises";
 import { parseCliArgs } from "../src/cli-args.mjs";
+import { runMultiEngine } from "../src/multi-engine.mjs";
 import { buildVpCommand, validateProjectOptions } from "../src/options.mjs";
 import { collectProjectOptions } from "../src/prompts.mjs";
 import { inspectPath } from "../src/safe-paths.mjs";
@@ -63,6 +64,7 @@ const usage = `ADui Vite+ Starter（Application / Monorepo）
   --screen-width / --screen-height：设计尺寸，默认 1920 / 1080。
   --screen-mode contain|cover|stretch|none：默认 contain；已有项目配合 --apply-existing。
   --three-smoke：向已有 --screen 应用安装 Three.js 并生成 /three-smoke.html。
+  --engines three,cesium,babylon：多选，不能与 --engine 混用。
   --engine none|three|cesium|babylon：按应用集成引擎；新建时同时指定 --screen。
   --model-protection embedded|external|none：Three 默认 embedded；可选择外置密钥或关闭。
   启用模型保护时自动生成项目 .env.local 与 models:keygen / models:keyrotate 脚本，IV 按模型随机生成。
@@ -100,6 +102,10 @@ async function main() {
   }
 
   const incomplete = !args.name || !args.type || (args.type === "application" && !args.framework);
+  if (args.engines !== undefined) {
+    console.log(JSON.stringify(await runMultiEngine(args), null, 2));
+    return;
+  }
   let options;
   if (incomplete) {
     if (args.dryRun || !stdin.isTTY) {

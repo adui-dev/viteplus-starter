@@ -1,6 +1,7 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { inspectPath } from "./safe-paths.mjs";
 import { dirname, join } from "node:path";
+import { createRequire } from "node:module";
 import { validateProjectOptions } from "./options.mjs";
 import { runWorkspaceVp } from "./workspace.mjs";
 import { demoCss, vueDemo, reactDemo } from "./screen-demo.mjs";
@@ -195,6 +196,14 @@ export async function validateThreeTarget(directory, input, requireScreen = true
     ["three", "0.186.1"],
     ["@types/three", "0.186.0"],
   ]) {
+    if (deps[name] === "catalog:") {
+      const metadata = JSON.parse(
+        await readFile(createRequire(manifestPath).resolve(name + "/package.json"), "utf8"),
+      );
+      if (metadata.name !== name || typeof metadata.version !== "string")
+        throw new Error("无法确认 Three catalog 版本");
+      deps[name] = metadata.version;
+    }
     if (deps[name] && ![version, "^" + version, "~" + version].includes(deps[name]))
       throw new Error("已有 " + name + " 版本未经本预设验证，拒绝自动升级：" + deps[name]);
   }

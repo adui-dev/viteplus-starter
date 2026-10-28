@@ -22,6 +22,26 @@ export function validateProjectOptions(options) {
   }
 
   const { name, type, framework } = options;
+  if (options.engines !== undefined) {
+    if (options.engine !== undefined) throw new Error("engine 与 engines 不能混用");
+    const list = options.engines;
+    if (
+      !Array.isArray(list) ||
+      !list.length ||
+      list.length > 3 ||
+      list.some((value) => !["three", "cesium", "babylon"].includes(value)) ||
+      new Set(list).size !== list.length
+    )
+      throw new Error("engines 必须是不重复的引擎数组");
+    if (type !== "application") throw new Error("Monorepo 根不配置引擎");
+    const engines = ["three", "cesium", "babylon"].filter((value) => list.includes(value));
+    const { engines: _engines, ...rest } = options;
+    const { engine: _engine, ...normalized } = validateProjectOptions({
+      ...rest,
+      engine: engines[0],
+    });
+    return { ...normalized, engines };
+  }
   const { workspace } = options;
   const engine = options.engine === undefined ? "none" : options.engine;
   if (!["none", "three", "cesium", "babylon"].includes(engine))

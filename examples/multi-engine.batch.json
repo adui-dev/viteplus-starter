@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "name": "adui-multi-workspace",
+  "apps": [
+    {
+      "name": "viewer",
+      "framework": "react",
+      "language": "js",
+      "screen": true,
+      "engines": ["three", "cesium", "babylon"],
+      "modelProtection": "none"
+    },
+    { "name": "portal", "framework": "vue", "engine": "babylon", "screen": true }
+  ]
+}

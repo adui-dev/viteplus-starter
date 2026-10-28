@@ -50,6 +50,7 @@ export function validateBatchConfig(input) {
         "uiSmoke",
         "screen",
         "engine",
+        "engines",
         "modelProtection",
       ],
       label,
@@ -71,7 +72,8 @@ export function validateBatchConfig(input) {
       css: app.css ?? "none",
     });
     if (app.uiSmoke) planUiSmoke(options);
-    if (options.engine && !options.screen) throw new Error("批量引擎须同时配置 screen");
+    if ((options.engine || options.engines) && !options.screen)
+      throw new Error("批量引擎须同时配置 screen");
     const { type: _type, ...selection } = options;
     return { ...selection, uiSmoke: app.uiSmoke ?? false };
   });
@@ -148,6 +150,7 @@ export async function createBatchPlan(input, cwd = process.cwd()) {
     ];
     const uiArgs = [...args];
     if (app.engine) args.push("--engine", app.engine);
+    if (app.engines) args.push("--engines", app.engines.join(","));
     if (app.modelProtection !== undefined) args.push("--model-protection", app.modelProtection);
     if (app.screen)
       args.push(
@@ -170,7 +173,7 @@ export async function createBatchPlan(input, cwd = process.cwd()) {
       official: { ...buildVpCommand(options), cwd: workspaceRoot },
       integrations: planIntegrations(options),
       ...(planModelProtection(options) ? { modelProtection: planModelProtection(options) } : {}),
-      ...(app.engine
+      ...(app.engine || app.engines
         ? {
             engine: {
               ...(await planEngine(options)),
