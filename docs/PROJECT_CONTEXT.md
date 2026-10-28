@@ -169,3 +169,18 @@
 - 工作区 ready 首次 12/12 成功（1 缓存），最终源码再次 12/12 成功（10 缓存）；最终根检查 221 格式文件、144 lint/type 文件无错误警告，utils 一项测试沿用缓存。官方 TypeScript 7 API 实验性提示保留。
 - 两 TS 应用完成 index + three-smoke 双入口专项生产构建，临时配置删除，产物位于忽略的 dist/adui-verify；GLTFLoader 45.19 kB，引擎约 577 kB，默认 500 kB 提醒保留。根 122/122 Node 测试（包括原生 Node crypto 互操作、头/IV/密文/tag 篡改、过期/拒绝/取消/快照/晚到、真实 CLI）、文档检查和 vp check 通过，未改依赖版本或锁文件。
 - 按中文 emoji 分步提交推送，无流水线或发布。下一步：实现可接真实服务的 HTTP 授权适配器，校验模型/密钥响应绑定、同源传输、到期与失败关闭，再提供受控本地服务联调示例；不将演示密钥 provider 迁入生产。
+
+## 2026-10-28 无服务端模型自动构建
+
+- 用户最终确认目标为防直接复用、提高寻找密钥的成本，不要求不可破解。默认 embedded 模式：env 配置、模型自动扫描/加密、浏览器自动解密；保留 external 独立解锁模式。不再推进生产授权服务。参考 zhgk-web-v3 的 env/脚本/CustomModel 加载方式，只读取实现与变量名/长度，未回显、复制或修改业务密钥/工程。
+- 新增 aduiModels Vite 插件、增量安装器和四组合 model-smoke 独立页；只支持当前版本官方 Three 应用。安装器 wx 备份 Vite 原配置并保留其他字段；正式首页/App/main、大屏及既有 Three 快照不覆盖，旧快照拒绝自动升级。JS 无 tsconfig/jsconfig 时补独立 jsconfig，解决 Monorepo 虚拟模块默认导出 models 声明冲突，不关闭类型检查。
+- Node 读取 ADUI_MODEL_KEY/Base64 与 KEY_ID，可指定 envFile；embedded 支持参考变量 VITE_ADUI_AES_KEY 的 UTF-8 32 字节形式，但不使用固定 VITE_ADUI_AES_IV。继续采用自包含 GLB + .adui v1 AES-256-GCM/随机 IV，旧 CBC/Base64 文件须从原 GLB 重新生成，不混称兼容。
+- buildStart 自动扫描并输出全部 GLB 密文，即使正式首页没有导入虚拟目录也输出 .adui。虚拟模型目录提供哈希 URL；原 GLB 不作为资产复制。密钥在运行时代码中采用随机掩码拆分，产物无原始 Base64/hex/二进制密钥字面量，但浏览器会重建，明确可逆向。可选 hostname 限制在生产模式生效，不能称为强授权。
+- 开发 middleware 拒绝原模型与 env/密钥直访，返回内存密文；监听变更与新增删除，密钥轮换同时使目录及密钥模块缓存失效。构建前检查 public，generateBundle/writeBundle 检查已知明文、Base64 副本与原始密钥。失败可能保留输出，不部署失败产物；未知第三方自定义编码不在完整识别承诺内。
+- 新增 keygen-env、export-unlock 和同源/限长流式下载；运行时共享取消/晚到保护与模型清理。无服务端、无新增依赖版本/锁文件修改、无流水线或发布。
+- 四种官方样例：独立 adui-model-vue-ts/external、adui-model-react-ts/embedded；既有工作区新 JS model-vue/external、model-react/embedded。生成独立测试 env，未复用业务密钥；将用户 DamagedHelmet 复制到样例受保护目录，未纳入本仓库。两 TS check 分别 55 格式/38 代码与 53/36，通过原首页构建。
+- 四组合 index + model-smoke 专项构建全部通过，临时配置移除；TS 专项产物在 dist/model-verify，JS 专项之后的根 ready 重建为默认 dist（专项之前已验证）。专项开启 sourcemap 检查，未设为业务默认。GLTFLoader 约 45.23 kB、引擎约 577 kB，500 kB 提醒保留。
+- 工作区 ready 初次修复后 14/14 成功（1 缓存），最终 14/14 成功（10 缓存）；根 321 格式文件/218 lint/type 文件无错误警告，官方 utils 一项测试仍通过，TypeScript 7 API 实验性提醒保留。四份最终产物各有一个 .adui，无 GLB/完整明文/Base64 副本或原始密钥字面量，分别解密后 SHA-256 均与原件 a1e3b04de97b11de564ce6e53b95f02954a297f0008183ac63a4f5974f6b32d8 一致，原件未改动。
+- Chrome 实测 React 生产与开发自动加载原头盔，model=ready/modelMeshes=1、贴图完整、最终 warn/error 为空；生产 127.0.0.1 被允许，localhost 被同一份产物拒绝且 canvas=0。Vue external 初始锁定，导入独立解锁文件后生产页 ready；刷新重锁。截图保存在会话输出目录。
+- 真实 verify-model-build 脚本在受控临时目录测试两模式 build/decrypt、HTTP 明文/密钥 403、密文 200、模型变更加密、env 自定义文件轮换失效。曾因写 .env.local 触发 Vite 自身自动重启导致测试旧随机端口断连，已改用插件管理的私有 env 文件进行轮换验证；没有跳过检查。
+- 最终 131/131 Node 测试、文档校验、根 vp check（96 文件格式/66 代码无 lint 警告错误）及真实构建回归全部通过。功能和实机记录按中文 emoji 分步提交推送，不附加额外后缀。下一步：将模型构建插件接入创建器交互及批量 JSON，生成时自动选择并配置，继续保留官方模板与无覆盖边界。
