@@ -133,3 +133,5 @@ Application / Monorepo、Vue / React、Element Plus / Ant Design / TDesign、Uno
 ## 本地 GLB
 
 Three 验收页现支持选择自包含 GLB、清除与重新加载；已使用 DamagedHelmet 验证。加载器按需导入，测试模型不打包进仓库。接口与边界见 [GLB 加载说明](docs/THREE_SMOKE.md)；模型授权及加解密仍待实现。
+
+模型现支持 AES-256-GCM `.adui` 封装和浏览器授权解密，操作与边界见 [模型加密](docs/MODEL_SECURITY.md)。生产授权服务仍需业务接入。

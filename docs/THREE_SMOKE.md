@@ -27,7 +27,7 @@ node ./viteplus-starter/packages/create/bin/cli.mjs --name starter-react-js --ty
 
 拾取使用 canvas.getBoundingClientRect 将 client 坐标转换到 NDC，不用设计稿坐标替代引擎坐标。点击中心命中后立方体变为橙色；HUD 按钮另行展示设计坐标换算，两套坐标各自作用于对应层。
 
-destroy 幂等：取消 setAnimationLoop、断开观察器、移除窗口/canvas 监听，释放本实例独占的 geometry、material、renderer，主动丢弃其 WebGL context，并移除 canvas。初始化失败释放已分配资源；意外 contextlost 停止循环并通知 UI，需卸载/重挂恢复。本例不接管外部共享 renderer、材质或纹理，也不实现模型加载、加解密或其他引擎。
+destroy 幂等：取消 setAnimationLoop、断开观察器、移除窗口/canvas 监听，释放本实例独占的 geometry、material、renderer，主动丢弃其 WebGL context，并移除 canvas。初始化失败释放已分配资源；意外 contextlost 停止循环并通知 UI，需卸载/重挂恢复。本例不接管外部共享 renderer、材质或纹理，其他引擎未实现；模型加载与 .adui 加解密扩展见文末。
 
 ## 验收与边界
 
@@ -83,3 +83,7 @@ ThreeHandle 与 LazySceneHandle 新增 loadModel(buffer:ArrayBuffer):Promise<boo
 模型清理遍历所有返回场景，按引用去重释放 geometry、material、texture、skeleton，并关闭已返回纹理的 ImageBitmap。只管理本实例独占资源，不接管跨实例共享缓存；解析失败未返回的加载器内部对象不宣称已经逐一追踪，GPU 驱动实际堆内存也未做测量。官方 API 依据见 [GLTFLoader](https://threejs.org/docs/pages/GLTFLoader)。
 
 实机使用用户提供的 C:/Users/ADui/Downloads/DamagedHelmet.glb（3,773,916 字节，一个 mesh、五张内嵌 JPEG）；原文件 SHA-256 为 a1e3b04de97b11de564ce6e53b95f02954a297f0008183ac63a4f5974f6b32d8，前后相同。模型文件未纳入 Git；仓库只提交加载能力、测试与说明。
+
+## .adui 加密模型
+
+新增 AES-256-GCM .adui 封装、loadEncryptedModel 授权回调与本地验收密钥入口。明文 GLB 仍可用；选择 .adui 前先导入匹配的本地验收密钥，清除授权会同时清除模型。正式业务替换 provider，不将密钥写入前端。格式、CLI、授权契约与限制见 [MODEL_SECURITY](MODEL_SECURITY.md)。旧快照不自动覆盖升级。

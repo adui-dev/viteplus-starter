@@ -139,6 +139,9 @@ export function createModelController({
         return false;
       }
     },
+    invalidate() {
+      ++version;
+    },
     clear() {
       if (disposed) return;
       ++version;

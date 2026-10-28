@@ -22,6 +22,7 @@ export interface ThreeHandle {
   readonly status: ThreeStatus;
   setPixelRatio(value?: number): void;
   loadModel(buffer: ArrayBuffer): Promise<boolean>;
+  cancelModelLoad(): void;
   clearModel(): void;
   destroy(): void;
 }

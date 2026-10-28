@@ -205,6 +205,9 @@ export function mountScene(THREE, host, options = {}) {
       override = value;
       resize();
     },
+    cancelModelLoad() {
+      models.invalidate();
+    },
     loadModel(buffer) {
       return models.load(buffer);
     },

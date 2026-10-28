@@ -140,3 +140,9 @@ lazy.mjs 在 start 时动态 import，复用未完成请求，失败可重试；
 ThreeHandle/LazySceneHandle 暴露 loadModel/clearModel，文件 UI 在 arrayBuffer 前检查大小并在异步读完后核对仍是同一实例；失败提示可由下一次选择清除。GLTFLoader 使用 parseAsync，拒绝外部资源 URI；无远端模型下载或密钥。RoomEnvironment/PMREM 用于 PBR，环境属于查看器，模型清除仅释放模型，卸载再释放环境/renderer/context。相机半径按归一化后的包围球计算并留边距，已修复实测头盔裁切。
 
 Monorepo 实测新增 Vue JS 时发现根项目合并多份官方 *.vue 声明导致 duplicate component。仅对新 Vue JS 成员在无 tsconfig/jsconfig 时补充独立 tsconfig 范围（src 与自身 Vite 配置），不改 env.d.ts、不覆盖已有项目配置，不设置 skipLibCheck/checkJs 或禁用 lint。其他框架/语言维持原流程。
+
+## .adui 加密封装与授权分层
+
+packages/model-security 提供无引擎依赖的 Web Crypto AES-256-GCM v1 二进制封装，随机 96 bit IV、128 bit tag，完整头部作 AAD；仅元数据 modelId/keyId/format 明文，不含密钥。Node CLI 独立生成密钥与 .adui，拒绝覆盖/链接路径，不修改 GLB；浏览器只通过 authorize 回调获得有到期时间的不可导出 decrypt CryptoKey。具体布局及生产服务契约见 [MODEL_SECURITY](MODEL_SECURITY.md)。
+
+lazy 适配先授权/认证解密再走原 GLB Loader；模型请求代次、AbortSignal 与运行时 invalidate 防止晚到模型安装。临时明文在提交后最终清零，不承诺抹除所有内存副本。Vue/React TS/JS 验收支持 .glb/.adui 和独立本地密钥 provider；验收 provider 不等同生产服务，切换密钥/清除授权/卸载使待处理授权失效。

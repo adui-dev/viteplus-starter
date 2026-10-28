@@ -32,7 +32,7 @@
 | `AGENTS.md`                                          | Agent 规则及导航入口                                                  |
 | `docs/`                                              | 需求、架构、设计、状态、Skills、Harness、ADR                          |
 
-UI/CSS 已在 `integrations.mjs` 实现；大屏核心见 `packages/screen`；Three.js 核心见 packages/three；其他引擎与模型安全尚未实现。
+UI/CSS 已在 `integrations.mjs` 实现；大屏核心见 `packages/screen`；Three.js 核心见 packages/three；其他引擎与生产授权服务尚未实现；.adui 加解密见文末。
 
 ## P4 Monorepo 多应用
 
@@ -75,3 +75,12 @@ UI/CSS 已在 `integrations.mjs` 实现；大屏核心见 `packages/screen`；Th
 - packages/three/src/model.mjs、test/model.test.mjs：GLB 预检、包围球归一化、请求代次、晚到/失败清理、资产去重。
 - runtime/index/lazy 与声明：加载/清除 API、内嵌贴图、PBR 环境、相机适配；ThreeView：本地文件选择。
 - workspace.mjs/工作区测试：新 Vue JS 成员的独立声明作用域，不覆盖官方 env 或已有配置。
+
+## .adui 模型加密
+
+- packages/model-security/src/adui.mjs 与声明：认证封装、元数据预检、授权 grant、到期/取消和解密。
+- packages/model-security/src/local-grant.mjs 与声明：仅本地验收的密钥导入与失效。
+- packages/model-security/bin/cli.mjs：keygen/encrypt、安全路径和 .adui 无覆盖输出。
+- packages/model-security/test/adui.test.mjs、cli.test.mjs：原生互操作、篡改、授权与真实 CLI。
+- Three lazy/model/runtime：授权晚到保护、取消与清理；three-smoke：四组合密钥/模型入口。
+- [MODEL_SECURITY](MODEL_SECURITY.md)：v1 格式、命令、浏览器 API 与生产授权契约。

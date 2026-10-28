@@ -15,14 +15,14 @@ flowchart TD
   K --> F
   F --> G[可选集成引擎 - 规划中]
   G --> H[UI / CSS / 大屏 / 3D]
-  H --> I[模型安全适配 - 规划中]
+  H --> I[模型安全适配 - 首期 .adui]
   I --> J[本地测试和构建]
 ```
 
 ## 模块边界
 
 - `packages/create`：CLI、配置校验、官方命令调用和 UI/CSS 应用集成；已建立最小实现。
-- `packages/*` 未来可容纳共享模型加解密核心及引擎适配；尚未创建。
+- `packages/three` 提供引擎适配，`packages/model-security` 提供共享加解密源码与独立工具；生产授权服务尚未创建。
 - `scripts/validate-docs.mjs`：本地文档静态校验；不是 CI。
 - 官方 Vite+ 负责应用模板、基础工具链；不得偷偷替换官方模板。
 - `workspace.mjs` 预检已有官方 pnpm 根、成员路径与同名包；子应用仍交给 `vite:application`，以工作区根为 cwd，不传 Git 初始化参数。UI/CSS 安装在子应用中，官方管理共享锁文件和 catalog；Vue TS 声明格式忽略规则仅在根增量合并。
@@ -56,4 +56,8 @@ flowchart TD
 
 ## GLB 模型边界
 
-model.mjs 独立处理自包含 GLB 预检、请求代次与返回资产的去重清理，runtime.mjs 负责挂载、模型包围盒/相机适配与查看器环境光；index.mjs 仅在选择模型时动态导入官方 GLTFLoader。UI 以本地 ArrayBuffer 传递，不硬编码用户路径或打包测试模型。模型授权与加解密继续保持独立规划边界。
+model.mjs 独立处理自包含 GLB 预检、请求代次与返回资产的去重清理，runtime.mjs 负责挂载、模型包围盒/相机适配与查看器环境光；index.mjs 仅在选择模型时动态导入官方 GLTFLoader。UI 以本地 ArrayBuffer 传递，不硬编码用户路径或打包测试模型。模型授权与加解密由独立 model-security 核心和 lazy 前置适配负责，生产授权服务待接入。
+
+## .adui 模型封装
+
+packages/model-security 独立于 Three/Vue/React，分离 Node 封装工具、浏览器 AES-GCM 核心和本地验收授权 provider。Three lazy 仅持有授权回调并将解密缓冲交给 GLB 运行时；无静态密钥或生产服务实现。生成器随引擎复制公共源码，不更改正式入口或 Vite 配置。服务端授权接口契约和边界见 [MODEL_SECURITY](MODEL_SECURITY.md)。
