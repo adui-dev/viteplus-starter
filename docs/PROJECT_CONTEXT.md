@@ -156,3 +156,16 @@
 - Monorepo 初次根检查暴露多 Vue 应用的 *.vue 声明合并导致 duplicate component。生成器仅在新 Vue JS 成员无 tsconfig/jsconfig 时补充独立配置范围；不改官方 env 声明、不覆盖已有配置、不设置 skipLibCheck/checkJs、不禁用规则。实机作用域修复及不覆盖回归测试通过。
 - Vue/React TS 均完成专项双入口（index + three-smoke）构建，临时配置已移除，产物在各样例忽略的 dist/glb-verify；GLTFLoader 分块约 45.19 kB、gzip 13.47 kB，引擎约 577 kB，保留默认 500 kB 提醒；不以默认首页构建替代该结果。
 - 最终 113/113 Node 测试、文档检查、仓库 vp check 与冻结离线安装通过，未升级依赖或修改锁文件。功能与实机记录分步提交推送，不附加额外后缀；无流水线或发布。下一步：设计 AES-GCM 模型封装、解密加载与授权接口契约，继续保持授权/解密/引擎边界分离。
+
+## 2026-10-28 .adui 模型加密首期
+
+- 按用户指定固定 .adui 后缀，新增 packages/model-security 独立源码核心和 Node keygen/encrypt 工具；未新增应用依赖或发布包。AES-256-GCM 使用随机 12 字节 IV、128 bit tag、完整头作 AAD，modelId/keyId/format 元数据可读且经认证，密钥不随模型保存。32 MiB 自包含 GLB，严格版本/flags/长度/字段校验。
+- CLI 保留原 GLB，输出 wx、路径含祖先拒绝链接/junction、输入读取受大小约束，不回显密钥或错误 JSON 内容；密钥和 .adui 仅在仓库外生成。Windows ACL 未修改，不把 POSIX mode 当作 Windows 私有权限已落实。
+- 浏览器 authorize 回调返回不可导出、decrypt-only AES-256 CryptoKey 和 expiresAt；解密前后检查有效期和取消。lazy 请求代次使晚到授权/解密失效，运行时 invalidate 丢弃晚到解析资产；失败保留已有模型，临时明文最终清零，不声称擦除 Web Crypto/JS/GPU 全部副本。
+- Vue/React TS/JS 验收页支持 .glb/.adui 和独立本地验收密钥文件，内存 grant 10 分钟；清除授权同时清除模型，卸载清除引用。生产授权接口、响应/失败/撤销约定写入 MODEL_SECURITY，生产服务与 HTTP 适配仍未实现，浏览器解密不等同 DRM。
+- 真实生成 C:/Users/ADui/Downloads/DamagedHelmet.adui，3,774,024 字节；独立演示密钥 C:/Users/ADui/Downloads/helmet-demo.key.json，仅本地验收。解密 3,773,916 字节，SHA-256 与未改动原件均为 a1e3b04de97b11de564ce6e53b95f02954a297f0008183ac63a4f5974f6b32d8。两应用专项构建 JS 未包含该演示密钥文本；密钥和模型未纳入 Git。
+- Chrome Vue TS/React TS 均完成原 .adui 认证解密、完整头盔及贴图渲染；未授权拒绝、篡改 tag 拒绝且保留旧模型、React 同 keyId 错误密钥拒绝、有效密钥恢复、Vue 清除授权后再次拒绝。两框架卸载 canvas=0/disposed=true，重挂重新授权可恢复；React 重挂后不继承授权。共享源码更新后完整刷新复验最终版本，最终 model=ready/modelMeshes=1，控制台 warn/error 为空。
+- 通过官方入口生成独立 adui-encrypted-vue-ts、adui-encrypted-react-ts；既有官方 Monorepo 新增 JS encrypted-vue/encrypted-react，旧成员源码未覆盖。初检发现 React unbound-method 警告，改为显式函数回调转发，未禁用规则。最终两 TS check 无警告，Vue 42 文件/27 代码文件，React 40/25；原首页构建通过。
+- 工作区 ready 首次 12/12 成功（1 缓存），最终源码再次 12/12 成功（10 缓存）；最终根检查 221 格式文件、144 lint/type 文件无错误警告，utils 一项测试沿用缓存。官方 TypeScript 7 API 实验性提示保留。
+- 两 TS 应用完成 index + three-smoke 双入口专项生产构建，临时配置删除，产物位于忽略的 dist/adui-verify；GLTFLoader 45.19 kB，引擎约 577 kB，默认 500 kB 提醒保留。根 122/122 Node 测试（包括原生 Node crypto 互操作、头/IV/密文/tag 篡改、过期/拒绝/取消/快照/晚到、真实 CLI）、文档检查和 vp check 通过，未改依赖版本或锁文件。
+- 按中文 emoji 分步提交推送，无流水线或发布。下一步：实现可接真实服务的 HTTP 授权适配器，校验模型/密钥响应绑定、同源传输、到期与失败关闭，再提供受控本地服务联调示例；不将演示密钥 provider 迁入生产。
