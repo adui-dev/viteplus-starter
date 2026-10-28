@@ -1,5 +1,7 @@
 # ADui Vite+ Starter
 
+项目定位、需求完成度和计划/构建/浏览器验收的区别见 [生成器能力与验收范围](docs/GENERATOR_STATUS.md)。
+
 ## JSON 批量新建 Monorepo
 
 一份配置可以按顺序创建官方工作区、不同框架的应用和可选 UI 验收页：

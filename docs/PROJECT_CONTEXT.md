@@ -196,3 +196,15 @@
 - 四组合完成 index + model-smoke 专项构建，临时配置移除，产物在各成员忽略的 dist/models-verify。专项启用 sourcemap 做泄漏检查，正式默认配置未改；引擎约 577 kB 默认 500 kB 提醒保留。四份产物各有一个 .adui，无原 GLB、完整明文/Base64 副本或原始 KEY 二进制/Base64/hex 字面量；用各自当前 KEY 解密后的 SHA-256 均与原 DamagedHelmet 的 a1e3b04de97b11de564ce6e53b95f02954a297f0008183ac63a4f5974f6b32d8 一致，四个 IV 不同，原件未修改。
 - Chrome 新创建器生成的 Vue TS 与 React JS 生产页面均自动加载完整头盔，model=ready/modelMeshes=1，最终控制台 warn/error 为空；已保存 Vue 截图。真实 Windows PTY 预填名称/框架/语言/UI/CSS 后，交互选择 Application/大屏/Three/默认 embedded，再选 N 取消，进程成功结束且目标目录不存在。
 - 最终 138/138 Node 测试、文档检查、根 vp check（101 格式文件、70 代码文件无 lint 警告错误）及真实 verify-model-build 回归通过。新增测试覆盖模式/错误类型/交互确认/批量隔离/dry-run无密钥、独立 KEY 与原件保护、脚本生成/备份轮换/多行 env 保留/链接拒绝。未改仓库依赖或锁文件，不增加流水线，不发布。按中文 emoji 分步提交推送。下一步：完善模型查看器的加载进度、旋转缩放与视角复位，继续保持模型保护和渲染边界分离。
+
+## 2026-10-28 生成器主线核对与文件保护补验
+
+- 用户指出模型查看器体验与项目主线的关系，已修正上一节下一步建议：本项目是 Vite+ 项目生成器，验收页用于证明集成，当前不开发旋转缩放、视角复位。新增 GENERATOR_STATUS，逐项核对需求、已实现能力和未覆盖范围，清理架构文档中的旧计划表述。
+- safe-paths 统一检查目标与全部祖先，拒绝符号链接/junction 和悬空目标；CLI、UI/CSS、UI Smoke、大屏和 Three 复用。安装前后复查入口、Vite 配置和新输出，拒绝安装期间的文件冲突、用户改动及目录链接替换，保留现场，不承诺事务回滚或恶意并发替换下的原子性。
+- UI/CSS 格式化改为只处理本次输出、修改配置与 package.json。真实 React TS 补装前创建带非标准空白的独立文档，补装后逐字节一致；之后只移除本轮创建的验收文档，再执行项目检查。
+- 新增 verify-generator-matrix，只读验证 210 个有效计划：60 UI Smoke、168 大屏、126 Three、84 模型保护；核对官方模板、框架依赖隔离、语言、原配置/入口字段保留、输出路径及无密钥计划。此命令实际创建/构建数量为 0，不称全部 210 组合构建或渲染通过。
+- 仓库外通过官方入口新建 audit-element-vue-js（Vue JS / Element Plus / Tailwind）、audit-antd-vue-ts（Vue TS / Ant Design Vue / UnoCSS）、audit-tdesign-react-js（React JS / TDesign / UnoCSS）和 audit-preserve-react-ts（React TS，之后 --apply-existing 补 Ant Design / Tailwind）。四个项目最终 vp check 与 vp run build 全部通过，分别为 13/5、16/6、11/4、14/3 格式/代码文件，检查无警告或错误；本轮只验证配置、依赖与正式首页构建，未声称这些 UI 的浏览器组件渲染通过。
+- Ant Design Vue 4.2.6 首次安装因 pnpm 12.15.0 拒绝 core-js 3.51.0 未审查 postinstall 而停止，源码/配置未写入。核对脚本仅为支持信息后，新增精确 allowBuilds/core-js: false 增量规则；保留 catalog、其他规则和已有明确用户选择，复杂配置拒绝自动合并。失败样例通过 --apply-existing 成功重试，不执行该脚本、不放开全局脚本权限。Monorepo 根策略的定向修改和不写成员策略文件有受控测试。
+- 本轮真实 verify-model-build 使用原 DamagedHelmet.glb 回归，两模式 build/decrypt、明文/密钥 HTTP 403、密文 200、模型变更加密及 env 轮换均通过，未修改用户模型或业务工程。
+- 最终 145/145 Node 测试、210 组合计划、文档校验、根 vp check（108 格式文件、76 代码文件，无警告错误）及 git diff --check 通过。仓库依赖版本/锁文件未修改，未增加流水线或发布；按中文 emoji 分步提交并推送。
+- 下一步：接入 FR-006 Cesium 生成预设，先完成逐应用依赖/资源路径/配置与最小场景，再验收 Vue、React 和工作区构建；之后推进 Babylon 和多引擎选择。仍保留官方基础模板，不把查看器体验作为下一阶段主线。

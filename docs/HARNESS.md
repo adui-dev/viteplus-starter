@@ -141,3 +141,7 @@ vp build
 ## 创建器模型保护验收
 
 执行 examples/models.batch.json 并运行根 ready，确认四个启用保护的成员各自 KEY 不同，关闭成员无 Node 模型插件/env/模型页/KEY 脚本。Git check-ignore 验证 .env.local 和轮换备份。用 vp run models:keygen 验证拒绝覆盖及缺失时生成，用 models:keyrotate 验证备份和其他 env 保留；轮换后构建必须对新 KEY 输出新密文，不能重放旧缓存。四组合专项 model-smoke 页面构建并检查原 GLB/密钥字面量缺失，浏览器验证默认自动加载。TTY 交互选完保护后取消，确认无目录写入。
+
+## 生成器主线验证
+
+先运行 node scripts/verify-generator-matrix.mjs，核对 210 个配置组合的官方命令、语言、文件冲突与依赖隔离；输出 actualBuilds=0，不能称为真实项目验收。再针对缺口创建代表官方项目并运行 check/build，组件真实效果需独立浏览器验收。文件保护回归使用受控 temp/junction，不向业务工程写入；UI/CSS 格式化应保持无关文档与兄弟文件原样。当前覆盖表见 [GENERATOR_STATUS](GENERATOR_STATUS.md)。

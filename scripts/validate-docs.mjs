@@ -13,6 +13,7 @@ const required = [
   "docs/CODEBASE_MAP.md",
   "docs/SKILLS.md",
   "docs/HARNESS.md",
+  "docs/GENERATOR_STATUS.md",
   "docs/adr/0001-official-viteplus-templates.md",
   ".agents/skills/starter-preset-development/SKILL.md",
 ];

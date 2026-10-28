@@ -160,3 +160,9 @@ lazy 适配先授权/认证解密再走原 GLB Loader；模型请求代次、Abo
 planModelProtection 只列模式/文件/脚本/执行时生成标记；执行前检查 env、模型脚本、目录/链接及配置形态。新增模型集成在官方模板、UI/大屏/Three 就绪后运行安全安装器，生成项目独有 .env.local、空 src/models 与 MODEL_GUIDE，再定向格式化。Vite、package 和已有 Git 忽略文件分别备份；保留已有脚本，冲突拒绝。
 
 project-key.mjs 同时是可导入的生成函数与生成项目中的 keygen.mjs 脚本；models:keygen 禁止覆盖已有 KEY，models:keyrotate 先 wx 备份再更新 KEY/标识，保留其他 env 配置，输出不含密钥值。新增 .env.local* 忽略规则覆盖轮换备份。IV 仍由 encryptAdui 对每个模型随机生成，不在 env 生成固定 IV。
+
+## 生成器路径保护复查
+
+safe-paths.mjs 从目标逐级 lstat 到根，拒绝目标或任意祖先符号链接/junction，避免仅检查最终文件仍跟随父目录链接。CLI 创建目标、UI/CSS、UI Smoke、大屏和 Three 写入复用这一检查；新文件仍用 wx。UI/CSS 在安装依赖前及完成后检查新增输出占用、路径类型和入口/Vite 配置原文，变化时拒绝覆盖，保留安装现场。格式化只传本次修改文件及 package.json，不再格式化整个项目。受控回归及组合计划矩阵见 [GENERATOR_STATUS](GENERATOR_STATUS.md)。
+
+Ant Design Vue 当前依赖 core-js，pnpm 12 会拒绝未审查的安装脚本。已核对 core-js 3.51.0 postinstall 仅输出支持信息，因此安装前在最近的 pnpm-workspace.yaml 增量补充 allowBuilds/core-js: false，不执行脚本，也不关闭整体构建策略校验。保留 catalog、其他依赖策略及已有明确的 core-js true/false 选择；复杂映射、版本规则或重复键拒绝自动合并。Monorepo 写根策略，格式化只额外包含该 YAML。依据见 [pnpm 构建策略文档](https://github.com/pnpm/pnpm.io/blob/main/docs/settings/build.md)。

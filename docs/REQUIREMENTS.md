@@ -6,7 +6,7 @@
 - 旧版生成器存在插件相对导入 TS2307 与格式问题。修复要求：生成阶段内联插件、自动格式化并提供保留备份的旧项目修复入口。
 - 用户 2026-10-26 反馈：两组旧项目修复后 `vp build` 均通过，React 的 `vp check` 直接通过，Vue 的 `vp check --fix` 修正生成声明后通过；不得新增 CI/CD。
 
-状态定义：**已实现 / 进行中 / 规划中 / 待确认**。当前项目仍处于初始化阶段。
+状态定义：**已实现 / 进行中 / 规划中 / 待确认**。已完成官方工程创建和多项按应用预设集成；当前完成度及未覆盖范围以 [生成器状态](GENERATOR_STATUS.md) 为准，不将计划验证当成真实构建/渲染。
 
 ### FR-001 官方工程模板
 
@@ -23,6 +23,7 @@
 ### FR-003 UI 集成
 
 - 状态：Vue TS/JS + TDesign/UnoCSS、React TS/JS + Ant Design/Tailwind 四种代表组合已验证安装、检查、构建及真实组件渲染；其余组合待验收；优先级：P1。
+- 2026-10-28 补验：Vue JS Element Plus/Tailwind、Vue TS Ant Design Vue/UnoCSS、React JS TDesign/UnoCSS 已通过生成、检查和首页构建；这些补验不含组件渲染。Ant Design Vue 安装仅补充 core-js 的显式禁用构建脚本规则，保留已有用户策略。
 - 目标：None / Element Plus（Vue 专属）/ Ant Design（Vue 为 ant-design-vue，React 为 antd）/ TDesign（对应框架包），单选。
 - 验收：生成后组件正常加载、类型检查和构建成功；React 不出现 Element Plus。
 

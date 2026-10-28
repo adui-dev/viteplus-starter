@@ -100,3 +100,10 @@ UI/CSS 已在 `integrations.mjs` 实现；大屏核心见 `packages/screen`；Th
 - model-security/src/project-key.mjs、test/project-key.test.mjs：项目 KEY 生成/备份轮换及链接/覆盖保护，复制为 adui-model-build/keygen.mjs。
 - model-security/setup：追加 package 脚本和忽略规则，并备份原 package/Git 配置。
 - [models.batch.json](../examples/models.batch.json)：四种框架语言 + 关闭模式，详见 [MODEL_BUILD](MODEL_BUILD.md)。
+
+## 生成器质量核对
+
+- create/src/safe-paths.mjs：目标及祖先路径检查；file-protection.test.mjs：链接、悬空目标、安装期间修改与站外保护。
+- create/src/build-policy.mjs、test/build-policy.test.mjs：Ant Design Vue 的 core-js 安装脚本显式禁用策略，保留已有根配置与用户选择。
+- scripts/verify-generator-matrix.mjs、create/test/generator-matrix.test.mjs：210 个有效组合的只读计划/配置隔离检查，不执行实际构建。
+- [GENERATOR_STATUS](GENERATOR_STATUS.md)：需求状态、实测边界与主线优先级。
