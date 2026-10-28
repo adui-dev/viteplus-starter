@@ -184,3 +184,15 @@
 - Chrome 实测 React 生产与开发自动加载原头盔，model=ready/modelMeshes=1、贴图完整、最终 warn/error 为空；生产 127.0.0.1 被允许，localhost 被同一份产物拒绝且 canvas=0。Vue external 初始锁定，导入独立解锁文件后生产页 ready；刷新重锁。截图保存在会话输出目录。
 - 真实 verify-model-build 脚本在受控临时目录测试两模式 build/decrypt、HTTP 明文/密钥 403、密文 200、模型变更加密、env 自定义文件轮换失效。曾因写 .env.local 触发 Vite 自身自动重启导致测试旧随机端口断连，已改用插件管理的私有 env 文件进行轮换验证；没有跳过检查。
 - 最终 131/131 Node 测试、文档校验、根 vp check（96 文件格式/66 代码无 lint 警告错误）及真实构建回归全部通过。功能和实机记录按中文 emoji 分步提交推送，不附加额外后缀。下一步：将模型构建插件接入创建器交互及批量 JSON，生成时自动选择并配置，继续保留官方模板与无覆盖边界。
+
+## 2026-10-28 创建器模型保护与 KEY 脚本
+
+- 创建器 CLI 新增 --model-protection embedded/external/none，Three 默认 embedded，可关闭，非 Three 不允许启用，工作区根拒绝统一设置。完整非交互参数不多问；交互增加大屏/引擎/模型保护，确认摘要含选择。严格 JSON 每应用 modelProtection，同步 dry-run 模式/文件/脚本/执行时生成标记，不生成或回显 KEY；UI Smoke 阶段不重复传保护参数。
+- 新增 model-protection 集成层：官方模板与 UI/大屏/Three 后复用安全安装器，自动创建 src/models 空目录、MODEL_GUIDE 和项目专属 .env.local。预检 env、模型脚本、目录/链接及 Vite 配置形态；补装仍先验证 Three 兼容版本，再验证模型输出占用，均在 UI/配置写入前完成。none 不创建模型插件/env/独立模型页/KEY 脚本；既有引擎基础源码保留。
+- 按用户新增要求，在生成项目 package.json 提供 models:keygen 与 models:keyrotate。project-key.mjs 复制为 adui-model-build/keygen.mjs：缺失时生成 256 位 KEY，已有 KEY 不覆盖；rotate 先 wx 备份，再更新 KEY/标识，保留其他 env 配置（含多行值与注释）。不回显密钥值，拒绝链接和读取期间变化。IV 仍按每个 GCM 模型独立随机生成写入文件头，不复用全局 env IV。
+- 安装器增量合并 package 脚本与 Git 忽略规则，Vite/package/已有 .gitignore 分别保留 .before-adui-models 原件，脚本冲突拒绝。新增 .env.local* 覆盖轮换备份，*.key.json 覆盖独立解锁文件；不覆盖已有其他脚本、正式首页、App/main 或旧快照。失败保留现场，不宣称事务回滚或抵御恶意并发文件系统替换。
+- 完整执行 examples/models.batch.json，生成 D:/Workspace/adui-studio/adui-models-create-demo：官方根及五个应用，四个启用保护成员覆盖 Vue TS / React JS 默认 embedded、Vue JS / React TS external，plain 显式 none。六个生成阶段成功，四份初始 KEY 各不相同；关闭成员确实无模型插件/env/模型页/KEY 脚本，官方 website/utils 保留。
+- 新工作区 ready 首次 12/12 全部执行成功，269 格式文件、187 lint/type 文件无警告错误，utils 一项测试通过。实际调用 vue-auto 的 models:keygen 时按预期拒绝覆盖；models:keyrotate 成功，Git check-ignore 确认 .env.local 与备份被忽略。react-auto 将本轮自建 env 重命名为受忽略测试备份后，models:keygen 实际创建新 KEY。轮换后 ready 再次 12/12 成功（7 缓存），Vite+ 明确因 .env.local 变化使构建缓存失效，新密文可用当前 KEY 解密；官方 TypeScript 7 API 实验性提醒保留。
+- 四组合完成 index + model-smoke 专项构建，临时配置移除，产物在各成员忽略的 dist/models-verify。专项启用 sourcemap 做泄漏检查，正式默认配置未改；引擎约 577 kB 默认 500 kB 提醒保留。四份产物各有一个 .adui，无原 GLB、完整明文/Base64 副本或原始 KEY 二进制/Base64/hex 字面量；用各自当前 KEY 解密后的 SHA-256 均与原 DamagedHelmet 的 a1e3b04de97b11de564ce6e53b95f02954a297f0008183ac63a4f5974f6b32d8 一致，四个 IV 不同，原件未修改。
+- Chrome 新创建器生成的 Vue TS 与 React JS 生产页面均自动加载完整头盔，model=ready/modelMeshes=1，最终控制台 warn/error 为空；已保存 Vue 截图。真实 Windows PTY 预填名称/框架/语言/UI/CSS 后，交互选择 Application/大屏/Three/默认 embedded，再选 N 取消，进程成功结束且目标目录不存在。
+- 最终 138/138 Node 测试、文档检查、根 vp check（101 格式文件、70 代码文件无 lint 警告错误）及真实 verify-model-build 回归通过。新增测试覆盖模式/错误类型/交互确认/批量隔离/dry-run无密钥、独立 KEY 与原件保护、脚本生成/备份轮换/多行 env 保留/链接拒绝。未改仓库依赖或锁文件，不增加流水线，不发布。按中文 emoji 分步提交推送。下一步：完善模型查看器的加载进度、旋转缩放与视角复位，继续保持模型保护和渲染边界分离。
