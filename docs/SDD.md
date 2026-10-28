@@ -166,3 +166,9 @@ project-key.mjs 同时是可导入的生成函数与生成项目中的 keygen.mj
 safe-paths.mjs 从目标逐级 lstat 到根，拒绝目标或任意祖先符号链接/junction，避免仅检查最终文件仍跟随父目录链接。CLI 创建目标、UI/CSS、UI Smoke、大屏和 Three 写入复用这一检查；新文件仍用 wx。UI/CSS 在安装依赖前及完成后检查新增输出占用、路径类型和入口/Vite 配置原文，变化时拒绝覆盖，保留安装现场。格式化只传本次修改文件及 package.json，不再格式化整个项目。受控回归及组合计划矩阵见 [GENERATOR_STATUS](GENERATOR_STATUS.md)。
 
 Ant Design Vue 当前依赖 core-js，pnpm 12 会拒绝未审查的安装脚本。已核对 core-js 3.51.0 postinstall 仅输出支持信息，因此安装前在最近的 pnpm-workspace.yaml 增量补充 allowBuilds/core-js: false，不执行脚本，也不关闭整体构建策略校验。保留 catalog、其他依赖策略及已有明确的 core-js true/false 选择；复杂映射、版本规则或重复键拒绝自动合并。Monorepo 写根策略，格式化只额外包含该 YAML。依据见 [pnpm 构建策略文档](https://github.com/pnpm/pnpm.io/blob/main/docs/settings/build.md)。
+
+## Cesium 首期生成设计
+
+engine.mjs 统一引擎计划供 CLI/批量调用；Cesium 对应独立增量安装器。四种框架/语言复用 lazy 与场景源码，组件只管理挂载/卸载并放入 AdScreen 原生像素引擎层。lazy 不导入引擎，点击前不创建 Viewer；异步导入晚于卸载时丢弃，失败可重试，销毁断开 ResizeObserver 并调用 Viewer.destroy。模块级缓存不宣称逐实例释放。
+
+固定 Cesium 1.146.0/static-copy 4.1.1，catalog: 只核对本应用已安装元数据，不执行入口。配置在安装前后复核并 wx 备份，增量插入 aduiCesium；不改 base 或正式构建入口。插件从应用依赖图定位四类资源，按 Cesium 资源根重建路径，避免静态复制插件 4 保留 node_modules 相对层级。资源冲突报错。运行时先计算部署 BASE_URL，再动态导入 Cesium 和样式；最小椭球关闭在线图层与地形，不需要 Token。Cesium 暂不接入 .adui，embedded/external 参数拒绝，避免生成无作用密钥。验证及限制见 [CESIUM](CESIUM.md)。

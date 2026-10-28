@@ -208,3 +208,18 @@
 - 本轮真实 verify-model-build 使用原 DamagedHelmet.glb 回归，两模式 build/decrypt、明文/密钥 HTTP 403、密文 200、模型变更加密及 env 轮换均通过，未修改用户模型或业务工程。
 - 最终 145/145 Node 测试、210 组合计划、文档校验、根 vp check（108 格式文件、76 代码文件，无警告错误）及 git diff --check 通过。仓库依赖版本/锁文件未修改，未增加流水线或发布；按中文 emoji 分步提交并推送。
 - 下一步：接入 FR-006 Cesium 生成预设，先完成逐应用依赖/资源路径/配置与最小场景，再验收 Vue、React 和工作区构建；之后推进 Babylon 和多引擎选择。仍保留官方基础模板，不把查看器体验作为下一阶段主线。
+
+## 2026-10-28 Cesium 逐应用生成预设
+
+- CLI --engine cesium、交互菜单及批量 JSON 已接入，engine.mjs 统一 Three/Cesium 的计划输出；新建要求 screen，已有当前框架/语言大屏应用支持 --apply-existing。Vue/React × TS/JS 仍由官方 vite:application 创建，工作区仍由 vite:monorepo 创建；默认不选引擎，不改正式首页/App/main。
+- 新增 packages/cesium 框架无关 lazy、场景、验收 DOM 入口及静态资源插件源码。依赖固定 cesium 1.146.0、vite-plugin-static-copy 4.1.1；最小蓝色椭球/黄色点使用本地椭球地形，关闭在线影像和地形，不需 Token。组件只管理挂载/卸载，放入 AdScreen 原生像素引擎层；点击前不导入引擎，晚到导入不创建已卸载 Viewer，失败可重试，卸载释放 Viewer 和实例 ResizeObserver。
+- Cesium 暂不接入模型或 .adui，默认无模型保护/KEY 脚本，embedded/external 明确拒绝；Three 默认 embedded 及原有模型流程不变。暂不实现 Babylon、多引擎多选、Cesium 全屏/DPR 专项或业务查看器体验。
+- 安装前后检查输出/祖先路径及配置快照，Vite 原配置 wx 备份后增量插入插件；保留 server/base/官方首页入口，定向格式化，重复/链接/版本冲突拒绝。官方 Monorepo 会将依赖写为 catalog:，已修复为按本应用解析的已安装元数据核对，不执行包入口；旧版直接比较字符串曾导致首个混合工作区中止，修复后补装保留现场，未跳过检查。
+- 专项构建发现 static-copy 4 保留 node_modules 目录层级，尽管构建返回成功，Workers 目录仍落点错误。已按 Cesium 资源根显式重建映射，资源冲突报错；新增 verify-cesium-build 真实双入口/四类目录/base 检查。运行时设置 BASE_URL 对应的 CESIUM_BASE_URL 后才动态导入场景与 CSS，不引入 CDN。
+- 独立官方样例 adui-cesium-vue-ts 与 adui-cesium-react-js，最终 check 分别 39/24、34/22 格式/代码文件无警告错误，正式首页构建通过。两者 index + cesium-smoke 双入口构建分别验证 /cesium-check/ 和 ./，四类资源目录完整，产物保留在 dist/cesium-verify。场景分块约 4.17 MB / gzip 1.12 MB，保留默认 500 kB 提醒；首页未引用引擎时仍复制资源，不宣称资源已按引用裁剪。
+- 首个官方工作区 adui-cesium-workspace 包含 Vue JS globe-vue、React TS globe-react 和官方 website/utils；root ready 最终 8/8 成功，88 格式/52 lint/type 文件无警告错误，utils 一项测试通过；官方 TypeScript 7 API 实验性提示保留。两成员另完成双入口专项构建，随后 root ready 默认构建会清空成员 dist，不将其称为持续保留的专项产物。一次将专项临时配置与 root check 并行导致格式失败，已在专项完成删除临时配置后顺序重跑通过，文档明确不能并行。
+- 再以最终生成器从头批量创建独立 adui-cesium-batch-final（示例仅改工作区名称），工作区+两应用三个阶段全部成功；新根 ready 0/8 缓存、8/8 成功，同为 88/52 文件和官方 utils 一项测试。证明完整批量流程已通过，不只依赖首个工作区的手工补装。
+- Chrome Vue 子路径生产页、React 相对 base 生产页均点击前 canvas=0，点击后 ready=true 并显示椭球/点；Vue 网络捕获确认场景分块点击后请求，Workers/Assets 走 /cesium-check/adui-cesium/，控制台 warn/error 为空。两框架卸载 canvas=0，重挂回到等待加载；React 重挂再加载成功，浏览器尺寸变化后画布尺寸更新，未称完整 DPR/全屏验收。React 截图保存 D:/Workspace/adui-studio/cesium-react-acceptance.jpg，未纳入 Git。
+- 开发服务另验证 HTML、Worker JS、Assets JSON、Widgets CSS 均 HTTP 200 且 MIME 正确；未声称开发浏览器渲染已实测。浏览器后续连接不可用，已有生产渲染证据保留；临时 viewport 已恢复，本轮三个预览/开发服务已停止。
+- 最终 153/153 Node 测试、252 个组合计划（新增 42 Cesium，实际构建数仍标 0）、文档校验、根 vp check（123 格式文件、88 代码文件，无警告错误）与 git diff --check 通过。未改仓库依赖版本或锁文件，未新增流水线或发布。按中文 emoji 分功能和验收文档提交并推送。
+- 下一步：接入 Babylon 逐应用生成预设，沿用官方模板、按需加载、原配置保护和 Vue/React/Monorepo 本地验收；之后再设计多引擎选择及各引擎模型适配。

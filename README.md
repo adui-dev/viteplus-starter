@@ -2,6 +2,8 @@
 
 项目定位、需求完成度和计划/构建/浏览器验收的区别见 [生成器能力与验收范围](docs/GENERATOR_STATUS.md)。
 
+Cesium 预设已接入 --engine cesium，提供本地椭球、按需加载与资源配置；创建和批量用法见 [Cesium 指南](docs/CESIUM.md)。
+
 ## JSON 批量新建 Monorepo
 
 一份配置可以按顺序创建官方工作区、不同框架的应用和可选 UI 验收页：

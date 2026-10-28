@@ -144,4 +144,8 @@ vp build
 
 ## 生成器主线验证
 
-先运行 node scripts/verify-generator-matrix.mjs，核对 210 个配置组合的官方命令、语言、文件冲突与依赖隔离；输出 actualBuilds=0，不能称为真实项目验收。再针对缺口创建代表官方项目并运行 check/build，组件真实效果需独立浏览器验收。文件保护回归使用受控 temp/junction，不向业务工程写入；UI/CSS 格式化应保持无关文档与兄弟文件原样。当前覆盖表见 [GENERATOR_STATUS](GENERATOR_STATUS.md)。
+先运行 node scripts/verify-generator-matrix.mjs，核对 252 个配置组合的官方命令、语言、文件冲突与依赖隔离；输出 actualBuilds=0，不能称为真实项目验收。再针对缺口创建代表官方项目并运行 check/build，组件真实效果需独立浏览器验收。文件保护回归使用受控 temp/junction，不向业务工程写入；UI/CSS 格式化应保持无关文档与兄弟文件原样。当前覆盖表见 [GENERATOR_STATUS](GENERATOR_STATUS.md)。
+
+## Cesium 本地验证
+
+按 [CESIUM](CESIUM.md) 生成独立应用和官方工作区，运行 check/build/ready 后，再单独执行 verify-cesium-build 双入口脚本，验证 /cesium-check/ 与 ./ 部署及四类资源。专项脚本暂存配置，不与同一工作区检查并行。生产浏览器验证点击前无 canvas/场景分块、点击后本地椭球和 Worker/Assets 请求成功、卸载无 canvas、重挂等待点击；开发服务器另核对资源 HTTP 状态和 MIME。Cesium 模型与全屏/DPR 专项不在本轮完成声明内。

@@ -42,10 +42,11 @@
 
 ### FR-006 3D 引擎
 
-- 状态：首期 Three.js 共享运行时和 --three-smoke 工具已实现，Vue/React TS/JS 检查构建及两框架真实渲染、DPR、拾取、卸载和全屏通过；CLI/批量应用已支持 engine=three 及点击后按需加载；Cesium/Babylon 与多选尚未实现；优先级：P1。
+- 状态：Three.js 共享运行时与模型能力已实测；Cesium 已接入 CLI/交互/批量逐应用预设、无 Token 场景、静态资源和按需加载，Vue/React × TS/JS 双入口构建及混合工作区检查通过。Babylon 与多选未实现；优先级：P1。
 - 目标：可多选 Three.js、CesiumJS、Babylon.js，按应用集成。
 - 验收：最小场景渲染、资源回收及相应构建成功。
 - 首期边界：已有 --screen 应用单独安装固定版本依赖、添加独立页面，详见 [THREE_SMOKE](THREE_SMOKE.md)。不把此工具视为完整的多引擎生成或模型安全能力。
+- Cesium 边界与命令见 [CESIUM](CESIUM.md)：保留正式首页与 Vite 其他字段，原配置备份；仅本地椭球，不接在线影像、模型保护或多引擎。
 
 ### FR-007 模型安全加载
 
