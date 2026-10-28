@@ -8,6 +8,7 @@ import { createInterface } from "node:readline/promises";
 import { parseCliArgs } from "../src/cli-args.mjs";
 import { buildVpCommand, validateProjectOptions } from "../src/options.mjs";
 import { collectProjectOptions } from "../src/prompts.mjs";
+import { inspectPath } from "../src/safe-paths.mjs";
 import {
   planModelProtection,
   preflightModelProtection,
@@ -130,6 +131,7 @@ async function main() {
   const workspace = options.workspace ? await resolveWorkspaceApplication(options) : null;
   const commandCwd = workspace?.root ?? process.cwd();
   const target = workspace?.target ?? resolve(process.cwd(), options.name);
+  await inspectPath(target);
   if (!args.dryRun && !args.applyExisting) await preflightModelProtection(target, options);
   async function finishWorkspaceIntegration() {
     if (!workspace) return;

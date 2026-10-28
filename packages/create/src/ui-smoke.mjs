@@ -1,7 +1,8 @@
-import { access, mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 import { validateProjectOptions } from "./options.mjs";
+import { inspectPath } from "./safe-paths.mjs";
 
 function htmlPage(mainFile) {
   return [
@@ -124,17 +125,12 @@ function formatNewFiles(directory) {
 }
 
 async function fileExists(path) {
-  try {
-    await access(path);
-    return true;
-  } catch (error) {
-    if (error.code === "ENOENT") return false;
-    throw error;
-  }
+  return Boolean(await inspectPath(path, "UI Smoke"));
 }
 
 export async function addUiSmoke(directory, options, formatter = formatNewFiles) {
   const plan = planUiSmoke(options);
+  await inspectPath(join(directory, "package.json"), "UI Smoke");
   const manifest = JSON.parse(await readFile(join(directory, "package.json"), "utf8"));
   const dependencies = { ...manifest.dependencies, ...manifest.devDependencies };
   const componentPackage = plan.framework === "vue" ? "tdesign-vue-next" : "antd";
@@ -175,6 +171,7 @@ export async function addUiSmoke(directory, options, formatter = formatNewFiles)
   }
   await mkdir(join(directory, "src", "ui-smoke"), { recursive: true });
   for (const [relative, content] of Object.entries(plan.files)) {
+    await inspectPath(join(directory, relative), "UI Smoke");
     await writeFile(join(directory, relative), content, { flag: "wx" });
   }
   formatter(directory);

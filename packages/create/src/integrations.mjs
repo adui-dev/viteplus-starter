@@ -1,6 +1,8 @@
 import { spawnSync } from "node:child_process";
-import { access, readFile, rename, writeFile } from "node:fs/promises";
-import { join } from "node:path";
+import { readFile, rename, writeFile } from "node:fs/promises";
+import { join, relative } from "node:path";
+import { inspectPath } from "./safe-paths.mjs";
+import { prepareUiBuildPolicy } from "./build-policy.mjs";
 import { injectStarterPlugins, repairLegacyStarterConfig } from "./vite-config.mjs";
 import { ignoreGeneratedVueComponentDeclarations } from "./format-config.mjs";
 
@@ -119,7 +121,7 @@ function runCommand(cwd, command, args) {
 }
 
 function format(cwd, target = ".") {
-  runCommand(cwd, "vp", ["fmt", target, "--write"]);
+  runCommand(cwd, "vp", ["fmt", ...(Array.isArray(target) ? target : [target]), "--write"]);
 }
 
 function install(cwd, list, dev) {
@@ -140,15 +142,12 @@ async function resolveApplicationPaths(directory, options) {
         ? "main.jsx"
         : "main.tsx";
   const mainPath = join(directory, "src", entry);
-  await access(mainPath);
+  if (!(await inspectPath(mainPath))?.isFile()) throw new Error("缺少对应语言的应用入口");
   const candidates = ["vite.config.ts", "vite.config.mts", "vite.config.js", "vite.config.mjs"];
   const existing = [];
   for (const filename of candidates) {
-    try {
-      await access(join(directory, filename));
+    if (await inspectPath(join(directory, filename))) {
       existing.push(join(directory, filename));
-    } catch (error) {
-      if (error.code !== "ENOENT") throw error;
     }
   }
   if (existing.length !== 1) {
@@ -171,24 +170,42 @@ export async function applyIntegrations(
     readFile(mainPath, "utf8"),
   ]);
   const generated = generateIntegration(options, config, entry);
-  for (const path of Object.keys(generated.files)) {
-    if (join(directory, path) === mainPath) continue;
-    try {
-      await access(join(directory, path));
-      throw new Error(`文件已存在，拒绝覆盖：${path}`);
-    } catch (error) {
-      if (error.code !== "ENOENT") throw error;
+  async function preflight() {
+    for (const path of [configPath, mainPath, join(directory, "package.json")])
+      await inspectPath(path);
+    if (
+      (await readFile(configPath, "utf8")) !== config ||
+      (await readFile(mainPath, "utf8")) !== entry
+    )
+      throw new Error("安装期间应用配置或入口已变化，拒绝覆盖");
+    for (const path of Object.keys(generated.files)) {
+      if (join(directory, path) === mainPath) continue;
+      if (await inspectPath(join(directory, path)))
+        throw new Error(`文件已存在，拒绝覆盖：${path}`);
     }
   }
-  installer(directory, plan.dependencies, false);
-  installer(directory, plan.devDependencies, true);
+  await preflight();
+  const policyPath = await prepareUiBuildPolicy(directory, options);
+  await installer(directory, plan.dependencies, false);
+  await installer(directory, plan.devDependencies, true);
+  await preflight();
   for (const [path, source] of Object.entries(generated.files)) {
+    await inspectPath(join(directory, path));
     await writeFile(join(directory, path), source, {
       flag: join(directory, path) === mainPath ? "w" : "wx",
     });
   }
-  if (generated.config !== config) await writeFile(configPath, generated.config);
-  formatter(directory);
+  if (generated.config !== config) {
+    await inspectPath(configPath);
+    await writeFile(configPath, generated.config);
+  }
+  const targets = [
+    ...Object.keys(generated.files),
+    ...(generated.config !== config ? [relative(directory, configPath)] : []),
+  ];
+  if (await inspectPath(join(directory, "package.json"))) targets.push("package.json");
+  if (policyPath) targets.push(relative(directory, policyPath));
+  await formatter(directory, targets);
   return true;
 }
 
@@ -203,12 +220,8 @@ export async function repairExistingIntegrations(directory, options, formatter =
   const configPath = join(directory, "vite.config.ts");
   const oldFile = join(directory, "starter.plugins.ts");
   const backupFile = join(directory, "starter.plugins.ts.bak");
-  try {
-    await access(backupFile);
-    throw new Error("旧插件备份已存在，请先人工检查，拒绝覆盖");
-  } catch (error) {
-    if (error.code !== "ENOENT") throw error;
-  }
+  for (const path of [configPath, oldFile]) await inspectPath(path);
+  if (await inspectPath(backupFile)) throw new Error("旧插件备份已存在，请先人工检查，拒绝覆盖");
   const [config, legacySource] = await Promise.all([
     readFile(configPath, "utf8"),
     readFile(oldFile, "utf8"),
@@ -217,6 +230,8 @@ export async function repairExistingIntegrations(directory, options, formatter =
     throw new Error("旧插件文件不是已知 Starter 生成格式，拒绝自动修改");
   }
   const generated = generateIntegration(options, config, "", { repair: true });
+  for (const path of [configPath, oldFile]) await inspectPath(path);
+  if (await inspectPath(backupFile)) throw new Error("旧插件备份已存在，拒绝覆盖");
   await writeFile(configPath, generated.config);
   await rename(oldFile, backupFile);
   formatter(directory, "vite.config.ts");

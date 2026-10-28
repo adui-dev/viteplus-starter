@@ -1,4 +1,5 @@
-import { lstat, mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { inspectPath } from "./safe-paths.mjs";
 import { dirname, join } from "node:path";
 import { validateProjectOptions } from "./options.mjs";
 import { runWorkspaceVp } from "./workspace.mjs";
@@ -154,14 +155,7 @@ export async function planThreeSmoke(input) {
   return { files, previewPath: "/three-smoke.html" };
 }
 async function inspect(path) {
-  try {
-    const stat = await lstat(path);
-    if (stat.isSymbolicLink()) throw new Error("Three 目标不允许链接或 junction：" + path);
-    return stat;
-  } catch (error) {
-    if (error.code === "ENOENT") return null;
-    throw error;
-  }
+  return inspectPath(path, "Three 目标");
 }
 export async function preflightThreeSmoke(directory, plan) {
   for (const path of ["", "src", "src/adui-screen", "src/adui-three", "src/three-smoke"]) {
@@ -218,6 +212,7 @@ export async function addThreeSmoke(directory, input, runner = runWorkspaceVp) {
   for (const [path, source] of Object.entries(plan.files)) {
     const target = join(directory, path);
     await mkdir(dirname(target), { recursive: true });
+    await inspect(target);
     await writeFile(target, source, { flag: "wx" });
   }
   runner(directory, [

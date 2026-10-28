@@ -1,4 +1,5 @@
-import { lstat, mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { inspectPath } from "./safe-paths.mjs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { validateProjectOptions } from "./options.mjs";
@@ -53,14 +54,7 @@ export async function planScreenPreset(input) {
 }
 
 async function inspect(path) {
-  try {
-    const result = await lstat(path);
-    if (result.isSymbolicLink()) throw new Error("大屏目标路径不允许符号链接或 junction：" + path);
-    return result;
-  } catch (error) {
-    if (error.code === "ENOENT") return null;
-    throw error;
-  }
+  return inspectPath(path, "大屏目标");
 }
 export async function preflightScreenPreset(directory, plan) {
   for (const relative of ["src", "src/adui-screen", "src/screen-smoke"]) {
@@ -74,6 +68,7 @@ export async function preflightScreenPreset(directory, plan) {
 export async function addScreenPreset(directory, input, formatter = runWorkspaceVp) {
   const options = validateProjectOptions(input);
   const plan = await planScreenPreset(options);
+  await inspect(join(directory, "package.json"));
   const manifest = JSON.parse(await readFile(join(directory, "package.json"), "utf8"));
   const dependencies = { ...manifest.dependencies, ...manifest.devDependencies };
   if (!dependencies["vite-plus"] || !dependencies[options.framework])
@@ -92,6 +87,7 @@ export async function addScreenPreset(directory, input, formatter = runWorkspace
   for (const [relative, content] of Object.entries(plan.files)) {
     const target = join(directory, relative);
     await mkdir(dirname(target), { recursive: true });
+    await inspect(target);
     await writeFile(target, content, { flag: "wx" });
   }
   formatter(directory, [
