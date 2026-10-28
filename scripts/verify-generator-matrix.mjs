@@ -7,6 +7,7 @@ import { planUiSmoke } from "../packages/create/src/ui-smoke.mjs";
 import { planScreenPreset } from "../packages/create/src/screen.mjs";
 import { planThreeSmoke } from "../packages/create/src/three-smoke.mjs";
 import { planCesium } from "../packages/create/src/cesium.mjs";
+import { planBabylon } from "../packages/create/src/babylon.mjs";
 import { planModelProtection } from "../packages/create/src/model-protection.mjs";
 export async function verifyGeneratorMatrix() {
   let cases = 0,
@@ -14,11 +15,13 @@ export async function verifyGeneratorMatrix() {
     screen = 0,
     three = 0,
     protectedModels = 0,
-    cesium = 0;
+    cesium = 0,
+    babylon = 0;
   const profiles = [
     {},
     { screen: true },
     { screen: true, engine: "cesium" },
+    { screen: true, engine: "babylon" },
     ...["none", "embedded", "external"].map((modelProtection) => ({
       screen: true,
       engine: "three",
@@ -91,6 +94,10 @@ export async function verifyGeneratorMatrix() {
               add(Object.keys((await planCesium(options)).files));
               cesium++;
             }
+            if (options.engine === "babylon") {
+              add(Object.keys((await planBabylon(options)).files));
+              babylon++;
+            }
             if (options.engine === "three") {
               add(Object.keys((await planThreeSmoke(options)).files));
               three++;
@@ -111,6 +118,7 @@ export async function verifyGeneratorMatrix() {
     screenPlans: screen,
     threePlans: three,
     cesiumPlans: cesium,
+    babylonPlans: babylon,
     modelProtectionPlans: protectedModels,
     actualBuilds: 0,
   };

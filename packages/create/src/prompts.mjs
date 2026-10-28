@@ -125,9 +125,18 @@ export async function collectProjectOptions(partial, ask, report = console.error
     if (options.screen && options.engine === undefined)
       options.engine = await askUntilValid(
         ask,
-        "3D 引擎 [1] None [2] Three.js [3] Cesium (默认 1): ",
+        "3D 引擎 [1] None [2] Three.js [3] Cesium [4] Babylon (默认 1): ",
         choiceValidator(
-          { 1: "none", 2: "three", 3: "cesium", none: "none", three: "three", cesium: "cesium" },
+          {
+            1: "none",
+            2: "three",
+            3: "cesium",
+            4: "babylon",
+            none: "none",
+            three: "three",
+            cesium: "cesium",
+            babylon: "babylon",
+          },
           "1",
         ),
         report,

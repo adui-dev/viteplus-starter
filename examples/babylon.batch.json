@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "name": "adui-babylon-workspace",
+  "apps": [
+    {
+      "name": "cube-vue",
+      "framework": "vue",
+      "language": "js",
+      "screen": true,
+      "engine": "babylon"
+    },
+    {
+      "name": "cube-react",
+      "framework": "react",
+      "language": "ts",
+      "screen": true,
+      "engine": "babylon"
+    }
+  ]
+}

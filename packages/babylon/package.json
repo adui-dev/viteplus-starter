@@ -1,0 +1,20 @@
+{
+  "name": "@adui/babylon",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./lazy": {
+      "types": "./src/lazy.d.mts",
+      "import": "./src/lazy.mjs"
+    }
+  },
+  "peerDependencies": {
+    "@babylonjs/core": "9.32.1"
+  },
+  "peerDependenciesMeta": {
+    "@babylonjs/core": {
+      "optional": true
+    }
+  }
+}
