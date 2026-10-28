@@ -92,3 +92,11 @@ UI/CSS 已在 `integrations.mjs` 实现；大屏核心见 `packages/screen`；Th
 - src/bundled.mjs、offline-keyring.mjs 与声明：同源限长获取及可选离线解锁。
 - test/vite.test.mjs、offline.test.mjs、setup.test.mjs：保护边界和安装/加载测试。
 - scripts/verify-model-build.mjs：真实 Vite+ 构建、HTTP 和加密回归；[MODEL_BUILD](MODEL_BUILD.md) 为使用指南。
+
+## 创建器模型保护与 KEY 管理
+
+- create/src/model-protection.mjs、test/model-protection.test.mjs：无密钥计划、预检、生成集成与模式/交互/批量验证。
+- create/options、cli-args、prompts、batch 与 CLI：按应用 modelProtection 默认与显式覆盖。
+- model-security/src/project-key.mjs、test/project-key.test.mjs：项目 KEY 生成/备份轮换及链接/覆盖保护，复制为 adui-model-build/keygen.mjs。
+- model-security/setup：追加 package 脚本和忽略规则，并备份原 package/Git 配置。
+- [models.batch.json](../examples/models.batch.json)：四种框架语言 + 关闭模式，详见 [MODEL_BUILD](MODEL_BUILD.md)。

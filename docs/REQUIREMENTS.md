@@ -16,7 +16,7 @@
 
 ### FR-002 交互式创建
 
-- 状态：已实现基础交互（Windows 实机待复验），扩展插件选项规划中；优先级：P0。
+- 状态：已实现框架/语言/UI/CSS/大屏/引擎/模型保护交互，Windows TTY 选择与取消已实测；优先级：P0。
 - 目标：交互选择名称、项目形态、框架、语言（默认 TypeScript）及确认/取消；非交互调用支持 `--language ts|js`。
 - 验收：非法名称、目录存在或未知参数时安全失败；交互与非交互创建均可用。
 
@@ -51,6 +51,7 @@
 - 状态：首期已实现 .adui v1 AES-256-GCM 本地封装、浏览器授权回调解密及 Three 适配；当前按用户要求实现无服务端 env 自动构建/加载、拆分密钥与可选域名限制；其他引擎格式仍进行中；优先级：P1。
 - 目标：选择 3D 引擎时默认提供可关闭的模型加解密能力；优先 GLB，FBX / OBJ 按引擎格式兼容。
 - 验收：AES-256-GCM 正确解密，拒绝错误密钥及篡改文件；embedded 模式提高直接复用门槛，不宣称密钥无法提取；external 模式密钥不进入网站包，授权回调保持可扩展。
+- 创建选项：Three 默认启用 embedded，CLI --model-protection 和逐应用 JSON modelProtection 支持 embedded/external/none；自动生成项目独立 KEY、package 的 models:keygen/models:keyrotate、忽略规则和备份。IV 每个模型独立随机生成，不配置固定共享 IV。
 - 当前：建模师交付 GLB，开发/构建自动扫描、只输出 .adui；默认 embedded 由 env 配置并自动加载，不要求服务端或手动解锁，详见 [MODEL_BUILD](MODEL_BUILD.md)。
 - 首期：后缀固定 .adui，32 MiB 自包含 GLB，随机 IV、完整头 AAD、密钥不随模型保存；到期/取消/晚到保护。格式与未实现范围见 [MODEL_SECURITY](MODEL_SECURITY.md)。
 

@@ -29,10 +29,15 @@ test("安装器增量配置、保留原件、拒绝重复与覆盖或链接", as
   assert.equal(await readFile(join(root, "vite.config.ts"), "utf8"), source);
   await writeFile(join(root, "vite.config.ts"), original);
   await assert.rejects(setupModelPlugin(root), /覆盖/);
+  await writeFile(
+    join(root, "package.json"),
+    await readFile(join(root, "package.json.before-adui-models"), "utf8"),
+  );
   await rm(join(root, "adui-model-build"), { recursive: true });
   await rm(join(root, "src"), { recursive: true });
   await rm(join(root, "vite.config.ts.before-adui-models"));
   await rm(join(root, "model-smoke.html"));
+  await rm(join(root, "package.json.before-adui-models"));
   const outside = await mkdtemp(join(tmpdir(), "adui-setup-out-"));
   t.after(() => rm(outside, { recursive: true, force: true }));
   await mkdir(join(root, "src/adui-three"), { recursive: true });

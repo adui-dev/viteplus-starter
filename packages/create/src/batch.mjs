@@ -7,6 +7,7 @@ import { planIntegrations } from "./integrations.mjs";
 import { planUiSmoke } from "./ui-smoke.mjs";
 import { planScreenPreset } from "./screen.mjs";
 import { planThreeSmoke } from "./three-smoke.mjs";
+import { planModelProtection } from "./model-protection.mjs";
 import { resolveWorkspaceApplication, runWorkspaceVp } from "./workspace.mjs";
 
 const cliPath = fileURLToPath(new URL("../bin/cli.mjs", import.meta.url));
@@ -40,13 +41,23 @@ export function validateBatchConfig(input) {
     const label = "apps[" + index + "]";
     fields(
       app,
-      ["name", "framework", "language", "ui", "css", "uiSmoke", "screen", "engine"],
+      [
+        "name",
+        "framework",
+        "language",
+        "ui",
+        "css",
+        "uiSmoke",
+        "screen",
+        "engine",
+        "modelProtection",
+      ],
       label,
     );
     portableName(app.name);
     if (names.has(app.name)) throw new Error("应用重名或与工作区/官方默认包冲突：" + app.name);
     names.add(app.name);
-    for (const key of ["framework", "language", "ui", "css", "engine"]) {
+    for (const key of ["framework", "language", "ui", "css", "engine", "modelProtection"]) {
       if (Object.hasOwn(app, key) && typeof app[key] !== "string")
         throw new Error(label + "." + key + " 必须是字符串");
     }
@@ -137,6 +148,7 @@ export async function createBatchPlan(input, cwd = process.cwd()) {
     ];
     const uiArgs = [...args];
     if (app.engine) args.push("--engine", app.engine);
+    if (app.modelProtection !== undefined) args.push("--model-protection", app.modelProtection);
     if (app.screen)
       args.push(
         "--screen",
@@ -157,6 +169,7 @@ export async function createBatchPlan(input, cwd = process.cwd()) {
       args,
       official: { ...buildVpCommand(options), cwd: workspaceRoot },
       integrations: planIntegrations(options),
+      ...(planModelProtection(options) ? { modelProtection: planModelProtection(options) } : {}),
       ...(app.engine
         ? {
             engine: {

@@ -56,7 +56,7 @@ node ./viteplus-starter/packages/create/bin/cli.mjs --config ./viteplus-starter/
 node ./viteplus-starter/packages/create/bin/cli.mjs --config ./viteplus-starter/examples/three.batch.json
 ```
 
---engine 只接受 none/three，省略等同 none，不引入 Three 依赖。新建 Three 应用必须同时显式 --screen，批量应用必须同时配置 screen=true 或尺寸/模式对象；根不能统一指定引擎。批量 JSON 应用增加 "engine":"three"，可与 uiSmoke 同用，UI 验收独立调用时去除 screen/engine 参数。CLI dry-run 展示引擎依赖、文件和页面，但不安装或写文件。交互菜单尚未增加引擎问题，通过显式参数或 JSON 选择。
+--engine 只接受 none/three，省略等同 none，不引入 Three 依赖。新建 Three 应用必须同时显式 --screen，批量应用必须同时配置 screen=true 或尺寸/模式对象；根不能统一指定引擎。批量 JSON 应用增加 "engine":"three"，可与 uiSmoke 同用，UI 验收独立调用时去除 screen/engine 参数。CLI dry-run 展示引擎依赖、文件和页面，但不安装或写文件。交互菜单已加入大屏、引擎和模型保护。Three 默认启用 embedded，可用 --model-protection none 关闭；模型配置见 [MODEL_BUILD](MODEL_BUILD.md)。
 
 组合补装在 UI 安装、大屏写入前检查 Three 输出占用、语言、已有依赖版本，不能借 --engine 升级或覆盖已生成的 Three 目录。已有旧版 --three-smoke 不会自动改成按需版；需人工对比源码快照或另建样例验证。生成源码及验收页属于集成结果，业务页面仍需自行导入使用，不替换 App/main/首页或正式 Vite 配置。
 

@@ -26,6 +26,18 @@ export function validateProjectOptions(options) {
   const engine = options.engine === undefined ? "none" : options.engine;
   if (!["none", "three"].includes(engine)) throw new Error("引擎仅支持 none 或 three");
   if (type === "monorepo" && engine !== "none") throw new Error("Monorepo 根不配置引擎");
+  if (options.modelProtection !== undefined && options["model-protection"] !== undefined)
+    throw new Error("模型保护参数不能重复");
+  const rawProtection =
+    options.modelProtection === undefined ? options["model-protection"] : options.modelProtection;
+  const modelProtection =
+    rawProtection === undefined ? (engine === "three" ? "embedded" : "none") : rawProtection;
+  if (!["none", "embedded", "external"].includes(modelProtection))
+    throw new Error("模型保护仅支持 none、embedded、external");
+  if (type === "monorepo" && rawProtection !== undefined)
+    throw new Error("Monorepo 根不配置模型保护");
+  if (modelProtection !== "none" && engine !== "three")
+    throw new Error("模型保护需要 engine=three");
   const language = options.language ?? "ts";
   const ui = options.ui ?? "none";
   const css = options.css ?? "none";
@@ -85,6 +97,7 @@ export function validateProjectOptions(options) {
     ...(options.css === undefined ? {} : { css }),
     ...(screen ? { screen } : {}),
     ...(engine === "three" ? { engine } : {}),
+    ...(engine === "three" || rawProtection !== undefined ? { modelProtection } : {}),
   };
 }
 

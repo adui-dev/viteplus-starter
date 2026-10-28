@@ -2,7 +2,30 @@
 
 按用户最终目标提供“防直接复用、提高提取成本”的无服务端方案：建模师交付自包含 GLB，源码保存在 src/models；开发/构建自动扫描并生成 .adui，浏览器自动解密。默认 embedded 模式把密钥做随机掩码拆分后放入运行时代码，不保存原始密钥字面量；可选域名限制。拆分、混淆与域名检查都可被逆向或修改，不宣称无法破解或 DRM。
 
-## 安装与运行
+## 创建器直接启用
+
+在仓库上级目录创建官方应用，Three 默认启用 embedded 模型保护：
+
+```powershell
+node ./viteplus-starter/packages/create/bin/cli.mjs --name my-three-app --type application --framework vue --screen --engine three
+# 改用外置密钥：追加 --model-protection external
+# 关闭模型保护：追加 --model-protection none
+```
+
+生成器自动添加模型插件、独立验收页、src/models 空目录、MODEL_GUIDE.md 和项目专属 .env.local，并增量维护 Git 忽略规则。默认只在选 Three 时启用；无引擎的普通项目不生成这些配置，Monorepo 根不能统一设置。交互创建会询问大屏/引擎/模型保护，完整非交互参数不额外询问。
+
+package.json 自动提供：
+
+```powershell
+vp run models:keygen
+vp run models:keyrotate
+```
+
+models:keygen 在 KEY 缺失时生成 256 位 KEY；已有 KEY 会拒绝覆盖。models:keyrotate 先备份 .env.local 再轮换 KEY/标识，保留其他 env 配置与注释，随后须重新构建和部署匹配的 JS/.adui。密钥和 .env.local.before-* 备份由 .env.local* 规则忽略，不回显 KEY。IV 在每个模型加密时独立随机生成并写入 .adui 头，不提供或复用全局固定 IV；这两条命令不向 env 写固定 IV。
+
+批量 JSON 每应用可设 modelProtection=embedded/external/none；省略时 Three 默认 embedded，其他应用默认关闭。示例 [models.batch.json](../examples/models.batch.json) 覆盖四种框架语言及关闭模式。dry-run 只列文件、模式和脚本，不生成密钥或项目文件。已有输出、env、脚本或链接占用在修改前拒绝，不自动覆盖旧快照。
+
+## 已有当前版本应用单独安装
 
 应用须由当前生成器的 `--screen --engine three` 创建，支持 Vue/React × TS/JS、独立应用和 Monorepo 成员。先在仓库根执行：
 
@@ -14,13 +37,13 @@ node packages/model-security/bin/setup.mjs --project ../my-three-app
 node packages/model-security/bin/cli.mjs keygen-env --out ../my-three-app/.env.local --key-id project-v1
 ```
 
-安装器只增量添加 adui-model-build、虚拟模块声明、独立 model-smoke 页面，并向官方 Vite 插件列表追加 aduiModels。Vite 原文件保存在同目录的 `.before-adui-models` 备份，其他原配置保留；正式首页、App/main、大屏和已有 Three 源码不覆盖。已有输出/备份、链接路径或旧运行时不匹配时拒绝。不会安装依赖或自动迁移旧快照；失败保留现场，不自动回滚。
+安装器增量添加 adui-model-build、虚拟模块声明、独立 model-smoke 页面、密钥脚本与 Git 忽略规则，并向官方 Vite 插件列表追加 aduiModels。已有 Vite、package.json 和 .gitignore 原件保存在相应 `.before-adui-models` 备份，其他配置保留；正式首页、App/main、大屏和已有 Three 源码不覆盖。已有输出/备份、链接路径或旧运行时不匹配时拒绝。不会安装依赖或自动迁移旧快照；失败保留现场，不自动回滚。
 
 在 `.env.local` 中配置：
 
 ```dotenv
 ADUI_MODEL_KEY_ID=project-v1
-ADUI_MODEL_KEY=<keygen-env生成的32字节Base64密钥>
+ADUI_MODEL_KEY=<生成的32字节Base64密钥>
 # 可选，逗号分隔的 hostname；不含协议、端口或通配符
 ADUI_MODEL_ALLOWED_HOSTS=your-site.example,www.your-site.example
 ```

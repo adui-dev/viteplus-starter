@@ -152,3 +152,11 @@ lazy 适配先授权/认证解密再走原 GLB Loader；模型请求代次、Abo
 模型构建插件默认 embedded：buildStart 扫描全部 GLB（即使首页未引用虚拟目录仍输出 .adui），虚拟模块只暴露目录及哈希资源 URL，AES-GCM 使用随机 IV。密钥由 env 提供，授权模块以随机掩码拆分重建 non-extractable decrypt CryptoKey；配置的 hostname 限制在生产授权时执行。源密钥可被逆向重建，这是提高复用门槛的明确边界。
 
 开发 middleware 禁止原模型/env 直接访问，内存提供密文；文件变更与新增删除失效目录并全页刷新。generateBundle 与 writeBundle 检查已知明文/密钥泄漏，public 预检拒绝原模型和密钥。外置模式独立 keyring 和同源流式限长下载共享原生命周期。安装器增量配置并 wx 备份，不覆盖旧快照；JS 无独立配置时生成 jsconfig 以隔离虚拟模块声明，不禁用类型检查。详见 [MODEL_BUILD](MODEL_BUILD.md)。
+
+## 模型保护创建选项与密钥脚本
+
+新增 CLI --model-protection 与 JSON modelProtection，严格枚举 none/embedded/external，Three 默认 embedded；非 Three 不能启用，Monorepo 根拒绝统一设置。交互流程在 UI/CSS 后加入大屏、引擎、保护模式，最终摘要含选择；非交互完整参数不询问。批量 UI Smoke 阶段去除引擎和保护参数，避免重复补装。
+
+planModelProtection 只列模式/文件/脚本/执行时生成标记；执行前检查 env、模型脚本、目录/链接及配置形态。新增模型集成在官方模板、UI/大屏/Three 就绪后运行安全安装器，生成项目独有 .env.local、空 src/models 与 MODEL_GUIDE，再定向格式化。Vite、package 和已有 Git 忽略文件分别备份；保留已有脚本，冲突拒绝。
+
+project-key.mjs 同时是可导入的生成函数与生成项目中的 keygen.mjs 脚本；models:keygen 禁止覆盖已有 KEY，models:keyrotate 先 wx 备份再更新 KEY/标识，保留其他 env 配置，输出不含密钥值。新增 .env.local* 忽略规则覆盖轮换备份。IV 仍由 encryptAdui 对每个模型随机生成，不在 env 生成固定 IV。

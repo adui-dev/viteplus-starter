@@ -137,3 +137,7 @@ vp build
 ## 模型构建插件验收
 
 按 [MODEL_BUILD](MODEL_BUILD.md) 安装到当前版本 Three 应用；使用独立生成的测试 env，不复制业务工程生产密钥。执行 verify-model-build 真实双模式构建与 HTTP 检查；四组合额外以 model-smoke.html 为输入构建（包含 sourcemap 检查）。浏览器确认 embedded 自动加载、external 锁定/解锁、配置域名允许与拒绝；检查无原 GLB、已知明文副本或原始密钥字面量。不将掩码拆分称为无法提取。
+
+## 创建器模型保护验收
+
+执行 examples/models.batch.json 并运行根 ready，确认四个启用保护的成员各自 KEY 不同，关闭成员无 Node 模型插件/env/模型页/KEY 脚本。Git check-ignore 验证 .env.local 和轮换备份。用 vp run models:keygen 验证拒绝覆盖及缺失时生成，用 models:keyrotate 验证备份和其他 env 保留；轮换后构建必须对新 KEY 输出新密文，不能重放旧缓存。四组合专项 model-smoke 页面构建并检查原 GLB/密钥字面量缺失，浏览器验证默认自动加载。TTY 交互选完保护后取消，确认无目录写入。

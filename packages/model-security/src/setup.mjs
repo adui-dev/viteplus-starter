@@ -26,8 +26,15 @@ export async function setupModelPlugin(project, keyMode = "embedded") {
     }
   }
   await inspect(root);
-  const manifest = JSON.parse(await readFile(join(root, "package.json"), "utf8")),
+  await inspect(join(root, "package.json"));
+  const manifestSource = await readFile(join(root, "package.json"), "utf8");
+  const manifest = JSON.parse(manifestSource),
     deps = { ...manifest.dependencies, ...manifest.devDependencies };
+  if (
+    manifest.scripts !== undefined &&
+    (!manifest.scripts || typeof manifest.scripts !== "object" || Array.isArray(manifest.scripts))
+  )
+    throw new Error("package.json scripts 必须是对象");
   if (!deps["vite-plus"] || (!deps.vue && !deps.react))
     throw new Error("仅支持已有官方 Vue/React Vite+ Application");
   const framework = deps.vue ? "vue" : "react";
@@ -49,6 +56,24 @@ export async function setupModelPlugin(project, keyMode = "embedded") {
     plugins: ["aduiModels({keyMode:" + JSON.stringify(keyMode) + "})"],
   });
   const files = modelSmoke(framework, language, keyMode);
+  const scripts = {
+    "models:keygen": "node adui-model-build/keygen.mjs",
+    "models:keyrotate": "node adui-model-build/keygen.mjs --rotate",
+  };
+  for (const name of Object.keys(scripts))
+    if (Object.hasOwn(manifest.scripts ?? {}, name))
+      throw new Error("package.json 已有模型脚本，拒绝覆盖：" + name);
+  files["package.json.before-adui-models"] = manifestSource;
+  files["adui-model-build/keygen.mjs"] = await readFile(
+    new URL("project-key.mjs", import.meta.url),
+    "utf8",
+  );
+  const ignorePath = join(root, ".gitignore"),
+    ignoreExists = await inspect(ignorePath);
+  const ignore = ignoreExists ? await readFile(ignorePath, "utf8") : null;
+  const ignoreRules = "\n# ADui model secrets\n.env.local*\n*.key.json\n";
+  if (ignore !== null) files[".gitignore.before-adui-models"] = ignore;
+  else files[".gitignore"] = ignoreRules.trimStart();
   if (
     language === "js" &&
     !(await inspect(join(root, "tsconfig.json"))) &&
@@ -96,6 +121,16 @@ export async function setupModelPlugin(project, keyMode = "embedded") {
   await inspect(configPath);
   if ((await readFile(configPath, "utf8")) !== original)
     throw new Error("Vite 配置在写入前变化，已保留备份");
+  if ((await readFile(join(root, "package.json"), "utf8")) !== manifestSource)
+    throw new Error("package.json 在预检后变化");
+  await inspect(join(root, "package.json"));
+  if (ignore !== null && (await readFile(ignorePath, "utf8")) !== ignore)
+    throw new Error("Git 忽略配置在预检后变化");
+  if (ignore !== null) await writeFile(ignorePath, ignore + ignoreRules);
+  await writeFile(
+    join(root, "package.json"),
+    JSON.stringify({ ...manifest, scripts: { ...manifest.scripts, ...scripts } }, null, 2) + "\n",
+  );
   await writeFile(configPath, updated);
   return { root, keyMode, files: Object.keys(files), config: configs[0] };
 }

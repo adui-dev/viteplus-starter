@@ -18,7 +18,8 @@ function choiceValidator(choices, defaultValue) {
   return (answer) => {
     const value = answer || defaultValue;
     const choice = choices[value];
-    if (!choice) throw new Error(`无效选项: ${value}，请按提示输入数字或选项名称`);
+    if (!Object.hasOwn(choices, value))
+      throw new Error(`无效选项: ${value}，请按提示输入数字或选项名称`);
     return choice;
   };
 }
@@ -107,12 +108,55 @@ export async function collectProjectOptions(partial, ask, report = console.error
       );
     }
   }
+  if (options.type === "application") {
+    if (options.screen === undefined) {
+      options.screen = await askUntilValid(
+        ask,
+        "大屏适配 [1] 不启用 [2] 启用 (默认 " + (options.engine === "three" ? "2" : "1") + "): ",
+        choiceValidator(
+          { 1: false, 2: true, no: false, yes: true },
+          options.engine === "three" ? "2" : "1",
+        ),
+        report,
+      );
+    }
+    if (options.screen && options.engine === undefined)
+      options.engine = await askUntilValid(
+        ask,
+        "3D 引擎 [1] None [2] Three.js (默认 1): ",
+        choiceValidator({ 1: "none", 2: "three", none: "none", three: "three" }, "1"),
+        report,
+      );
+    if (
+      options.engine === "three" &&
+      options.modelProtection === undefined &&
+      options["model-protection"] === undefined
+    )
+      options.modelProtection = await askUntilValid(
+        ask,
+        "模型保护 [1] 自动加密加载 [2] 外置密钥 [3] 关闭 (默认 1): ",
+        choiceValidator(
+          {
+            1: "embedded",
+            2: "external",
+            3: "none",
+            embedded: "embedded",
+            external: "external",
+            none: "none",
+          },
+          "1",
+        ),
+        report,
+      );
+  }
   const selected = validateProjectOptions(options);
+  if (selected.engine && !selected.screen && !partial.applyExisting)
+    throw new Error("新建 Three 应用须同时启用大屏");
   if (!prompted) return selected;
 
   const description =
     selected.type === "application"
-      ? `Application / ${selected.framework === "vue" ? "Vue 3" : "React"} / ${selected.language === "js" ? "JavaScript" : "TypeScript"} / UI: ${selected.ui ?? "none"} / CSS: ${selected.css ?? "none"}`
+      ? `Application / ${selected.framework === "vue" ? "Vue 3" : "React"} / ${selected.language === "js" ? "JavaScript" : "TypeScript"} / UI: ${selected.ui ?? "none"} / CSS: ${selected.css ?? "none"} / 大屏: ${selected.screen ? "启用" : "关闭"} / 引擎: ${selected.engine ?? "none"} / 模型保护: ${selected.modelProtection ?? "none"}`
       : "Monorepo (各子应用后续独立选择框架)";
   const destination = selected.workspace
     ? `${selected.workspace}/apps/${selected.name}`

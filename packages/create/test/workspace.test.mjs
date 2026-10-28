@@ -68,7 +68,7 @@ test("peer 修复在预检后显式写入，拒绝期间变化的配置", async 
 });
 
 test("交互式工作区应用保留路径，确认中展示实际成员目标", async () => {
-  const answers = ["console", "1", "2", "2", "2", "3", "y"];
+  const answers = ["console", "1", "2", "2", "2", "3", "1", "y"];
   const questions = [];
   const selected = await collectProjectOptions({ workspace: "../mixed" }, async (prompt) => {
     questions.push(prompt);

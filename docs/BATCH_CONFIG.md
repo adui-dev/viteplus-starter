@@ -36,6 +36,8 @@
 | apps[].css       | 否   | none / unocss / tailwindcss，默认 none                                     |
 | apps[].uiSmoke   | 否   | 布尔值，默认 false；true 仅支持 Vue/TDesign、React/Ant Design              |
 
+apps[].screen 支持大屏预设，apps[].engine 支持 three，apps[].modelProtection 支持 embedded/external/none；Three 默认 embedded，非 Three 默认关闭。根不能统一设置模型保护。示例见 [模型五应用配置](../examples/models.batch.json)。
+
 未知字段、null/错误类型会报错，不忽略拼错的选项。根不允许设置 framework/language/UI/CSS。名称不允许路径或 Windows 保留设备名称；根也不能与默认 website/utils 包重名。仅支持最大 1 MiB 的 JSON，接受 UTF-8 BOM。
 
 ## 预览与执行

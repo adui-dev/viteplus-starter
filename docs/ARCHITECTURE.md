@@ -65,3 +65,7 @@ packages/model-security 独立于 Three/Vue/React，分离 Node 封装工具、�
 ## 无服务端模型构建
 
 按用户最终要求以防直接复用为目标，新增 Vite 插件在 Node 读取 env、扫描 GLB、生成 .adui；虚拟目录与运行时 key 模块分离。embedded 默认自动解密，采用每次构建随机掩码拆分和可选域名限制；external 才要求独立解锁文件。原始密钥字面量与模型明文均做产物检查，不把客户端混淆视为不可破解。详情见 [MODEL_BUILD](MODEL_BUILD.md)。
+
+## 创建器模型集成
+
+model-protection.mjs 将按应用的 modelProtection 选项映射到已有安全安装器和密钥生成器，不再通过用户手动分两步安装。Three 默认 embedded，明确 none 关闭，external 保留离线解锁。先预检 env/脚本/输出占用，再执行官方模板及增量集成；密钥只在执行阶段生成，dry-run 不含密钥。package 的 KEY 生成/备份轮换与按文件 IV 生成各自负责，不配置共享 IV。

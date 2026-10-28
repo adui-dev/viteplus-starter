@@ -9,6 +9,11 @@ import { parseCliArgs } from "../src/cli-args.mjs";
 import { buildVpCommand, validateProjectOptions } from "../src/options.mjs";
 import { collectProjectOptions } from "../src/prompts.mjs";
 import {
+  planModelProtection,
+  preflightModelProtection,
+  addModelProtection,
+} from "../src/model-protection.mjs";
+import {
   applyIntegrations,
   planIntegrations,
   repairExistingIntegrations,
@@ -55,11 +60,13 @@ const usage = `ADui Vite+ Starter（Application / Monorepo）
   --screen-mode contain|cover|stretch|none：默认 contain；已有项目配合 --apply-existing。
   --three-smoke：向已有 --screen 应用安装 Three.js 并生成 /three-smoke.html。
   --engine none|three：按应用集成 Three.js；新建时同时指定 --screen。
+  --model-protection embedded|external|none：Three 默认 embedded；可选择外置密钥或关闭。
+  启用模型保护时自动生成项目 .env.local 与 models:keygen / models:keyrotate 脚本，IV 按模型随机生成。
   --config <JSON 文件>：批量新建官方 Monorepo 和应用，仅可与 --dry-run 同用。
   --workspace <已有工作区路径>：在官方 pnpm Monorepo 的 apps/<name> 中添加 Application。
   例：--workspace ../my-workspace --name admin --type application --framework vue --ui tdesign --css unocss
   Monorepo 使用官方 vite:monorepo；子应用的框架需分别选择。
-  无参数时交互选择名称、形态、框架、语言（默认 TypeScript）、UI/CSS，并二次确认。
+  无参数时交互选择名称、形态、框架、语言、UI/CSS、大屏、引擎和模型保护，并二次确认。
   --dry-run 只输出命令；必须提供全部必需参数，且不创建文件。
   UI/CSS 集成支持 None、Element Plus、Ant Design、TDesign、UnoCSS、Tailwind CSS。
   --apply-existing 用于首次补装；--repair-existing 用于修复旧版 starter.plugins 跨文件引用。
@@ -123,6 +130,7 @@ async function main() {
   const workspace = options.workspace ? await resolveWorkspaceApplication(options) : null;
   const commandCwd = workspace?.root ?? process.cwd();
   const target = workspace?.target ?? resolve(process.cwd(), options.name);
+  if (!args.dryRun && !args.applyExisting) await preflightModelProtection(target, options);
   async function finishWorkspaceIntegration() {
     if (!workspace) return;
     if (await updateWorkspaceDeclarationIgnore(workspace)) {
@@ -196,10 +204,12 @@ async function main() {
       await preflightThreeSmoke(target, await planThreeSmoke(options));
       await validateThreeTarget(target, options, !options.screen);
     }
+    await preflightModelProtection(target, options);
     if (workspace) await prepareWorkspacePeerExtensions(workspace);
     await applyIntegrations(target, options);
     if (options.screen) await addScreenPreset(target, options);
     if (options.engine) await addThreeSmoke(target, options);
+    await addModelProtection(target, options);
     await finishWorkspaceIntegration();
     console.log("补装完成，请在项目中执行 vp check 和 vp build");
     return;
@@ -216,6 +226,9 @@ async function main() {
           args: vpArgs,
           ...(workspace ? { cwd: commandCwd, target } : {}),
           integrations,
+          ...(planModelProtection(options)
+            ? { modelProtection: planModelProtection(options) }
+            : {}),
           ...(options.engine
             ? {
                 engine: {
@@ -283,6 +296,13 @@ async function main() {
     await addThreeSmoke(target, options);
     await finishWorkspaceIntegration();
     console.log("Three.js 按需场景已生成：/three-smoke.html");
+  }
+  if (result.status === 0 && planModelProtection(options)) {
+    await addModelProtection(target, options);
+    console.log(
+      "模型保护已配置：/model-smoke.html；KEY 已写入被忽略的 .env.local，IV 按模型自动随机生成。",
+    );
+    console.log("运行 vp run models:keygen 或 vp run models:keyrotate 管理 KEY；轮换后重新构建。");
   }
   if (result.signal) {
     process.exitCode = 1;

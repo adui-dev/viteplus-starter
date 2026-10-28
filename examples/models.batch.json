@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "name": "adui-models-create-demo",
+  "apps": [
+    { "name": "vue-auto", "framework": "vue", "language": "ts", "screen": true, "engine": "three" },
+    {
+      "name": "react-auto",
+      "framework": "react",
+      "language": "js",
+      "screen": true,
+      "engine": "three"
+    },
+    {
+      "name": "vue-offline",
+      "framework": "vue",
+      "language": "js",
+      "screen": true,
+      "engine": "three",
+      "modelProtection": "external"
+    },
+    {
+      "name": "react-offline",
+      "framework": "react",
+      "language": "ts",
+      "screen": true,
+      "engine": "three",
+      "modelProtection": "external"
+    },
+    {
+      "name": "plain",
+      "framework": "react",
+      "language": "js",
+      "screen": true,
+      "engine": "three",
+      "modelProtection": "none"
+    }
+  ]
+}

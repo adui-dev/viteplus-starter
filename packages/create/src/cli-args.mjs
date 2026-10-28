@@ -1,5 +1,6 @@
 const VALUE_OPTIONS = new Set([
   "--engine",
+  "--model-protection",
   "--name",
   "--type",
   "--framework",
