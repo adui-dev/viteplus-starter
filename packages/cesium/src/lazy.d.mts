@@ -4,6 +4,13 @@ export interface GlobeState {
   disposed: boolean;
 }
 export interface GlobeHandle {
+  loadBundledModel(
+    asset: import("../../model-security/src/bundled.mjs").BundledModel,
+    options?: {
+      authorize?: import("../../model-security/src/adui.mjs").DecryptOptions["authorize"];
+      signal?: AbortSignal;
+    },
+  ): Promise<boolean>;
   loadModel(
     buffer: ArrayBuffer,
     options?: {
@@ -18,8 +25,8 @@ export interface GlobeHandle {
 }
 export function createLazyGlobe(
   host: HTMLElement,
-  options: {
-    load(): Promise<{
+  options?: {
+    load?(): Promise<{
       createGlobe(
         host: HTMLElement,
         onModelState?: (value: { state: string; message: string }) => void,

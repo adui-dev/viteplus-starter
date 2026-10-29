@@ -14,8 +14,8 @@ const base = {
   screen: true,
   engine: "cesium",
 };
-test("交互选择 Cesium 后确认，不询问 Three 模型密钥策略", async () => {
-  const answers = ["1", "3", "y"],
+test("交互选择 Cesium 后询问模型保护，默认自动加密", async () => {
+  const answers = ["1", "3", "", "y"],
     questions = [];
   const selected = await collectProjectOptions(
     { name: "globe", framework: "vue", language: "ts", ui: "none", css: "none", screen: true },
@@ -25,16 +25,16 @@ test("交互选择 Cesium 后确认，不询问 Three 模型密钥策略", async
     },
   );
   assert.equal(selected.engine, "cesium");
-  assert.equal(selected.modelProtection, undefined);
+  assert.equal(selected.modelProtection, "embedded");
   assert.ok(questions.some((question) => question.includes("[3] Cesium")));
-  assert.ok(!questions.some((question) => question.startsWith("模型保护")));
+  assert.ok(questions.some((question) => question.startsWith("模型保护")));
   assert.equal(answers.length, 0);
 });
-test("Cesium 四种框架语言计划隔离，默认无模型保护与密钥", async () => {
+test("Cesium 四种框架语言计划隔离，默认保护但引擎计划不含密钥", async () => {
   for (const framework of ["vue", "react"])
     for (const language of ["ts", "js"]) {
       const options = validateProjectOptions({ ...base, framework, language });
-      assert.equal(options.modelProtection, undefined);
+      assert.equal(options.modelProtection, "embedded");
       const plan = await planCesium(options);
       assert.equal(plan.previewPath, "/cesium-smoke.html");
       assert.ok(plan.files["adui-cesium-build/vite.mjs"]);
@@ -53,9 +53,9 @@ test("Cesium 四种框架语言计划隔离，默认无模型保护与密钥", a
         ),
       );
     }
-  assert.throws(
-    () => validateProjectOptions({ ...base, modelProtection: "embedded" }),
-    /需要 engine=three/,
+  assert.equal(
+    validateProjectOptions({ ...base, modelProtection: "external" }).modelProtection,
+    "external",
   );
 });
 async function fixture(t) {
@@ -156,7 +156,7 @@ test("批量 Cesium 与 Three 按应用隔离依赖及模型策略", async (t) =
     cwd,
   );
   assert.deepEqual(plan.steps[1].engine.dependencies, ["cesium@1.146.0"]);
-  assert.equal(plan.steps[1].modelProtection, undefined);
+  assert.equal(plan.steps[1].modelProtection.engine, "cesium");
   assert.deepEqual(plan.steps[2].engine.dependencies, ["three@0.186.1"]);
   assert.equal(plan.steps[2].modelProtection.mode, "embedded");
 });

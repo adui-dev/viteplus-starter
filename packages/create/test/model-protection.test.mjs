@@ -15,6 +15,44 @@ import {
   addModelProtection,
 } from "../src/model-protection.mjs";
 const base = { name: "demo", type: "application", framework: "vue", engine: "three", screen: true };
+test("Cesium 保护安装保留资源插件与配置备份，关闭不写入，旧快照拒绝", async (t) => {
+  for (const modelProtection of ["embedded", "external"]) {
+    const root = await fixture(t, "cesium"),
+      options = { ...base, engine: "cesium", modelProtection };
+    const config =
+      'import {defineConfig} from "vite-plus";import {aduiCesium} from "./adui-cesium-build/vite.mjs";export default defineConfig({server:{port:4321},plugins:[...aduiCesium()]})';
+    await writeFile(join(root, "vite.config.ts"), config);
+    await addModelProtection(root, options, async () => {});
+    const page = await readFile(join(root, "src/model-smoke/ModelView.vue"), "utf8");
+    assert.ok(page.includes("createLazyGlobe as createLazyScene"));
+    assert.ok(page.includes("../adui-cesium/lazy.mjs"));
+    assert.ok(!page.includes("adui-three") && !page.includes("adui-babylon"));
+    const result = await readFile(join(root, "vite.config.ts"), "utf8");
+    assert.ok(
+      result.includes("...aduiCesium()") &&
+        result.includes("aduiModels(") &&
+        result.includes("4321"),
+    );
+    assert.equal(await readFile(join(root, "vite.config.ts.before-adui-models"), "utf8"), config);
+    assert.equal(planModelProtection(options).engine, "cesium");
+    await assert.rejects(
+      addModelProtection(root, options, () => assert.fail()),
+      /拒绝覆盖/,
+    );
+  }
+  const off = await fixture(t, "cesium");
+  await addModelProtection(off, { ...base, engine: "cesium", modelProtection: "none" }, () =>
+    assert.fail(),
+  );
+  assert.ok(!(await readdir(off)).includes(".env.local"));
+  const old = await fixture(t, "cesium");
+  await writeFile(join(old, "src/adui-cesium/lazy.mjs"), "export const oldSnapshot=true");
+  await assert.rejects(
+    addModelProtection(old, { ...base, engine: "cesium" }, () => assert.fail()),
+    /旧快照/,
+  );
+  assert.ok(!(await readdir(old)).includes(".env.local"));
+});
 test("Babylon 两种保护模式生成专属适配页面、密钥与备份，关闭模式不写入", async (t) => {
   for (const modelProtection of ["embedded", "external"]) {
     const root = await fixture(t, "babylon");

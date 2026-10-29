@@ -14,13 +14,13 @@ test("完整选项矩阵保留官方命令、按框架隔离、输出无冲突�
   const result = spawnSync(process.execPath, [script], { cwd: root, encoding: "utf8" });
   assert.equal(result.status, 0, result.stderr);
   assert.deepEqual(JSON.parse(result.stdout), {
-    planningCases: 378,
-    uiSmokePlans: 108,
-    screenPlans: 336,
+    planningCases: 462,
+    uiSmokePlans: 132,
+    screenPlans: 420,
     threePlans: 126,
-    cesiumPlans: 42,
+    cesiumPlans: 126,
     babylonPlans: 126,
-    modelProtectionPlans: 168,
+    modelProtectionPlans: 252,
     actualBuilds: 0,
   });
   assert.deepEqual(await readdir(root), []);

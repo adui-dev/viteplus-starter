@@ -66,7 +66,7 @@ const usage = `ADui Vite+ Starter（Application / Monorepo）
   --three-smoke：向已有 --screen 应用安装 Three.js 并生成 /three-smoke.html。
   --engines three,cesium,babylon：多选，不能与 --engine 混用。
   --engine none|three|cesium|babylon：按应用集成引擎；新建时同时指定 --screen。
-  --model-protection embedded|external|none：Three/Babylon 默认 embedded；可选择外置密钥或关闭。
+  --model-protection embedded|external|none：三种引擎默认 embedded；可选择外置密钥或关闭。
   启用模型保护时自动生成项目 .env.local 与 models:keygen / models:keyrotate 脚本，IV 按模型随机生成。
   --config <JSON 文件>：批量新建官方 Monorepo 和应用，仅可与 --dry-run 同用。
   --workspace <已有工作区路径>：在官方 pnpm Monorepo 的 apps/<name> 中添加 Application。

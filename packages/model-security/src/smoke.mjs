@@ -1,5 +1,5 @@
 export function modelSmoke(framework, language, keyMode, engine = "three") {
-  if (!["three", "babylon"].includes(engine)) throw new Error("不支持的模型引擎");
+  if (!["three", "babylon", "cesium"].includes(engine)) throw new Error("不支持的模型引擎");
   const ts = language === "ts",
     vue = framework === "vue",
     embedded = keyMode === "embedded",
@@ -103,11 +103,15 @@ export function modelSmoke(framework, language, keyMode, engine = "three") {
     '<!doctype html><html lang="zh-CN"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>ADui Model</title></head><body><div id="model-root"></div><script type="module" src="/src/model-smoke/main.' +
     ext +
     '"></script></body></html>';
-  if (engine === "babylon")
+  if (engine === "babylon" || engine === "cesium")
     for (const path of Object.keys(files))
       files[path] = files[path]
-        .replaceAll("../adui-three/", "../adui-babylon/")
-        .replaceAll("LazySceneHandle", "SceneHandle")
+        .replaceAll("../adui-three/", "../adui-" + engine + "/")
+        .replaceAll("LazySceneHandle", engine === "cesium" ? "GlobeHandle" : "SceneHandle")
+        .replaceAll(
+          "{createLazyScene}",
+          engine === "cesium" ? "{createLazyGlobe as createLazyScene}" : "{createLazyScene}",
+        )
         .replaceAll("onStatus:", "onModelState:")
         .replaceAll("error.message", "error");
   if (engine === "babylon")

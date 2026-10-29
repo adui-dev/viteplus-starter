@@ -19,11 +19,16 @@ test("多引擎只向一个模型适配阶段传递保护，Cesium/Babylon 组�
   for (const engines of [
     ["cesium", "babylon"],
     ["three", "babylon"],
+    ["cesium"],
+    ["three", "cesium", "babylon"],
   ]) {
     const calls = [];
     const options = { ...base, engines };
     const plan = await runMultiEngine({ ...options, dryRun: true });
-    assert.equal(plan.modelProtection.engine, engines.includes("three") ? "three" : "babylon");
+    assert.equal(
+      plan.modelProtection.engine,
+      engines.includes("three") ? "three" : engines.includes("babylon") ? "babylon" : "cesium",
+    );
     await runMultiEngine(options, async (argv) => calls.push(argv));
     const protectedCalls = calls.filter(
       (argv) => argv[argv.indexOf("--model-protection") + 1] === "embedded",

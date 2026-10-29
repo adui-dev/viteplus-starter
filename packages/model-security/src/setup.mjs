@@ -3,7 +3,7 @@ import { resolve, dirname, join } from "node:path";
 import { injectStarterPlugins } from "../../create/src/vite-config.mjs";
 import { modelSmoke } from "./smoke.mjs";
 export async function setupModelPlugin(project, keyMode = "embedded", engine = "three") {
-  if (!["three", "babylon"].includes(engine)) throw new Error("不支持的模型引擎");
+  if (!["three", "babylon", "cesium"].includes(engine)) throw new Error("不支持的模型引擎");
   if (!["external", "embedded"].includes(keyMode))
     throw new Error("keyMode 仅支持 external 或 embedded");
   const root = resolve(project);

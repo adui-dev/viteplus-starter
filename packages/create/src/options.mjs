@@ -6,7 +6,7 @@ const FRAMEWORK_TEMPLATES = Object.freeze({
 });
 export function modelEngine(options) {
   const engines = options.engines ?? [options.engine];
-  return engines.includes("three") ? "three" : engines.includes("babylon") ? "babylon" : undefined;
+  return ["three", "babylon", "cesium"].find((engine) => engines.includes(engine));
 }
 
 export function validateProjectName(name) {
@@ -62,7 +62,7 @@ export function validateProjectOptions(options) {
   if (type === "monorepo" && rawProtection !== undefined)
     throw new Error("Monorepo 根不配置模型保护");
   if (modelProtection !== "none" && !modelEngine({ engine }))
-    throw new Error("模型保护需要 engine=three 或 babylon");
+    throw new Error("模型保护需要 engine=three、babylon 或 cesium");
   const language = options.language ?? "ts";
   const ui = options.ui ?? "none";
   const css = options.css ?? "none";

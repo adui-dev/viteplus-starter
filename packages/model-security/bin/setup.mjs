@@ -9,7 +9,7 @@ try {
       options[args[i]]
     )
       throw new Error(
-        "用法：--project <官方应用> [--key-mode external|embedded] [--engine three|babylon]",
+        "用法：--project <官方应用> [--key-mode external|embedded] [--engine three|babylon|cesium]",
       );
     options[args[i]] = args[i + 1];
   }

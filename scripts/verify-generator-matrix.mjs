@@ -20,8 +20,7 @@ export async function verifyGeneratorMatrix() {
   const profiles = [
     {},
     { screen: true },
-    { screen: true, engine: "cesium" },
-    ...["three", "babylon"].flatMap((engine) =>
+    ...["three", "babylon", "cesium"].flatMap((engine) =>
       ["none", "embedded", "external"].map((modelProtection) => ({
         screen: true,
         engine,
