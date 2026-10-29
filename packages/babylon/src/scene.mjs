@@ -9,7 +9,7 @@ import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial.js"
 import { createRuntime } from "./runtime.mjs";
 import { createModelController } from "./model.mjs";
 import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight.js";
-export function createScene(canvas, onError) {
+export function createScene(canvas, onError, onModelState = () => {}) {
   return createRuntime(canvas, {
     createEngine: (target) => new Engine(target, true),
     createScene: (engine) => new Scene(engine),
@@ -50,6 +50,7 @@ export function createScene(canvas, onError) {
           canvas.dataset.modelError = message;
           if (state === "ready") box.setEnabled(false);
           if (state === "empty") box.setEnabled(true);
+          onModelState({ state, message });
         },
       });
       return {

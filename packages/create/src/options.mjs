@@ -4,6 +4,10 @@ const FRAMEWORK_TEMPLATES = Object.freeze({
   vue: Object.freeze({ ts: "vue-ts", js: "vue" }),
   react: Object.freeze({ ts: "react-ts", js: "react" }),
 });
+export function modelEngine(options) {
+  const engines = options.engines ?? [options.engine];
+  return engines.includes("three") ? "three" : engines.includes("babylon") ? "babylon" : undefined;
+}
 
 export function validateProjectName(name) {
   if (
@@ -38,7 +42,7 @@ export function validateProjectOptions(options) {
     const { engines: _engines, ...rest } = options;
     const { engine: _engine, ...normalized } = validateProjectOptions({
       ...rest,
-      engine: engines[0],
+      engine: modelEngine({ engines }) ?? engines[0],
     });
     return { ...normalized, engines };
   }
@@ -52,13 +56,13 @@ export function validateProjectOptions(options) {
   const rawProtection =
     options.modelProtection === undefined ? options["model-protection"] : options.modelProtection;
   const modelProtection =
-    rawProtection === undefined ? (engine === "three" ? "embedded" : "none") : rawProtection;
+    rawProtection === undefined ? (modelEngine({ engine }) ? "embedded" : "none") : rawProtection;
   if (!["none", "embedded", "external"].includes(modelProtection))
     throw new Error("模型保护仅支持 none、embedded、external");
   if (type === "monorepo" && rawProtection !== undefined)
     throw new Error("Monorepo 根不配置模型保护");
-  if (modelProtection !== "none" && engine !== "three")
-    throw new Error("模型保护需要 engine=three");
+  if (modelProtection !== "none" && !modelEngine({ engine }))
+    throw new Error("模型保护需要 engine=three 或 babylon");
   const language = options.language ?? "ts";
   const ui = options.ui ?? "none";
   const css = options.css ?? "none";
@@ -118,7 +122,7 @@ export function validateProjectOptions(options) {
     ...(options.css === undefined ? {} : { css }),
     ...(screen ? { screen } : {}),
     ...(engine !== "none" ? { engine } : {}),
-    ...(engine === "three" || rawProtection !== undefined ? { modelProtection } : {}),
+    ...(modelEngine({ engine }) || rawProtection !== undefined ? { modelProtection } : {}),
   };
 }
 

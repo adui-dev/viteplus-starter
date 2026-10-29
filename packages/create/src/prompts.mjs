@@ -157,7 +157,8 @@ export async function collectProjectOptions(partial, ask, report = console.error
       else options.engine = selection;
     }
     if (
-      (options.engine === "three" || options.engines?.includes("three")) &&
+      (["three", "babylon"].includes(options.engine) ||
+        options.engines?.some((engine) => ["three", "babylon"].includes(engine))) &&
       options.modelProtection === undefined &&
       options["model-protection"] === undefined
     )

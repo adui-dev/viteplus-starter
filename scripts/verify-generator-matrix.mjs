@@ -21,12 +21,13 @@ export async function verifyGeneratorMatrix() {
     {},
     { screen: true },
     { screen: true, engine: "cesium" },
-    { screen: true, engine: "babylon" },
-    ...["none", "embedded", "external"].map((modelProtection) => ({
-      screen: true,
-      engine: "three",
-      modelProtection,
-    })),
+    ...["three", "babylon"].flatMap((engine) =>
+      ["none", "embedded", "external"].map((modelProtection) => ({
+        screen: true,
+        engine,
+        modelProtection,
+      })),
+    ),
   ];
   for (const framework of ["vue", "react"])
     for (const language of ["ts", "js"])

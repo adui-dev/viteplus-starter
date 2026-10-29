@@ -15,6 +15,26 @@ const base = {
   screen: true,
   engines: ["babylon", "three", "cesium"],
 };
+test("多引擎只向一个模型适配阶段传递保护，Cesium/Babylon 组合选择 Babylon", async () => {
+  for (const engines of [
+    ["cesium", "babylon"],
+    ["three", "babylon"],
+  ]) {
+    const calls = [];
+    const options = { ...base, engines };
+    const plan = await runMultiEngine({ ...options, dryRun: true });
+    assert.equal(plan.modelProtection.engine, engines.includes("three") ? "three" : "babylon");
+    await runMultiEngine(options, async (argv) => calls.push(argv));
+    const protectedCalls = calls.filter(
+      (argv) => argv[argv.indexOf("--model-protection") + 1] === "embedded",
+    );
+    assert.equal(protectedCalls.length, 1);
+    assert.equal(
+      protectedCalls[0][protectedCalls[0].indexOf("--engine") + 1],
+      plan.modelProtection.engine,
+    );
+  }
+});
 test("七种非空引擎子集覆盖四种框架语言，计划文件无冲突", async () => {
   for (let mask = 1; mask < 8; mask++)
     for (const framework of ["vue", "react"])

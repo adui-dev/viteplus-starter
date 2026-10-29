@@ -4,6 +4,13 @@ export interface SceneState {
   disposed: boolean;
 }
 export interface SceneHandle {
+  loadBundledModel(
+    asset: import("../../model-security/src/bundled.mjs").BundledModel,
+    options?: {
+      authorize?: import("../../model-security/src/adui.mjs").DecryptOptions["authorize"];
+      signal?: AbortSignal;
+    },
+  ): Promise<boolean>;
   loadModel(
     buffer: ArrayBuffer,
     options?: {
@@ -18,11 +25,12 @@ export interface SceneHandle {
 }
 export function createLazyScene(
   host: HTMLElement,
-  options: {
-    load(): Promise<{
+  options?: {
+    load?(): Promise<{
       createScene(
         canvas: HTMLCanvasElement,
         onError: (message: string) => void,
+        onModelState?: (value: { state: string; message: string }) => void,
       ): {
         resize(): void;
         destroy(): void;
@@ -33,5 +41,6 @@ export function createLazyScene(
     }>;
     onState?(state: SceneState): void;
     onError?(message: string): void;
+    onModelState?(value: { state: string; message: string }): void;
   },
 ): SceneHandle;

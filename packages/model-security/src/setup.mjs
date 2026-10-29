@@ -2,7 +2,8 @@ import { lstat, readFile, writeFile, mkdir } from "node:fs/promises";
 import { resolve, dirname, join } from "node:path";
 import { injectStarterPlugins } from "../../create/src/vite-config.mjs";
 import { modelSmoke } from "./smoke.mjs";
-export async function setupModelPlugin(project, keyMode = "embedded") {
+export async function setupModelPlugin(project, keyMode = "embedded", engine = "three") {
+  if (!["three", "babylon"].includes(engine)) throw new Error("不支持的模型引擎");
   if (!["external", "embedded"].includes(keyMode))
     throw new Error("keyMode 仅支持 external 或 embedded");
   const root = resolve(project);
@@ -41,8 +42,12 @@ export async function setupModelPlugin(project, keyMode = "embedded") {
   const language = (await inspect(join(root, "src", framework === "vue" ? "main.ts" : "main.tsx")))
     ? "ts"
     : "js";
-  if (!(await readFile(join(root, "src/adui-three/lazy.mjs"), "utf8")).includes("loadBundledModel"))
-    throw new Error("需要当前版本 --engine three 生成的应用，旧快照不自动覆盖升级");
+  if (
+    !(await readFile(join(root, "src/adui-" + engine + "/lazy.mjs"), "utf8")).includes(
+      "loadBundledModel",
+    )
+  )
+    throw new Error("需要当前版本 --engine " + engine + " 生成的应用，旧快照不自动覆盖升级");
   const configs = [];
   for (const name of ["vite.config.ts", "vite.config.js", "vite.config.mts", "vite.config.mjs"])
     if ((await inspect(join(root, name)))?.isFile()) configs.push(name);
@@ -55,7 +60,7 @@ export async function setupModelPlugin(project, keyMode = "embedded") {
     imports: ["import { aduiModels } from './adui-model-build/vite.mjs'"],
     plugins: ["aduiModels({keyMode:" + JSON.stringify(keyMode) + "})"],
   });
-  const files = modelSmoke(framework, language, keyMode);
+  const files = modelSmoke(framework, language, keyMode, engine);
   const scripts = {
     "models:keygen": "node adui-model-build/keygen.mjs",
     "models:keyrotate": "node adui-model-build/keygen.mjs --rotate",

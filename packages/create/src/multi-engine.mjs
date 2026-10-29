@@ -1,7 +1,7 @@
 import { spawnSync } from "node:child_process";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { validateProjectOptions, buildVpCommand } from "./options.mjs";
+import { validateProjectOptions, buildVpCommand, modelEngine } from "./options.mjs";
 import { planEngine } from "./engine.mjs";
 import { resolveWorkspaceApplication } from "./workspace.mjs";
 import { inspectPath } from "./safe-paths.mjs";
@@ -25,14 +25,14 @@ export async function runMultiEngine(args, runner = run) {
     ...options,
     engines: undefined,
     engine,
-    modelProtection: engine === "three" ? options.modelProtection : "none",
+    modelProtection: engine === modelEngine(options) ? options.modelProtection : "none",
   }));
   if (args.applyExisting) {
+    await preflightModelProtection(target, options);
     for (const selection of selections) {
       if (selection.engine === "three") {
         await preflightThreeSmoke(target, await planThreeSmoke(selection));
         await validateThreeTarget(target, selection, !options.screen);
-        await preflightModelProtection(target, selection);
       }
       if (selection.engine === "cesium") await preflightCesium(target, selection, !options.screen);
       if (selection.engine === "babylon")

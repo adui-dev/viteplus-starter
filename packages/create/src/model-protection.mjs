@@ -1,7 +1,7 @@
 import { lstat, mkdir, writeFile, readFile } from "node:fs/promises";
 import { injectStarterPlugins } from "./vite-config.mjs";
 import { dirname, join, resolve } from "node:path";
-import { validateProjectOptions } from "./options.mjs";
+import { validateProjectOptions, modelEngine } from "./options.mjs";
 import { modelSmoke } from "../../model-security/src/smoke.mjs";
 import { setupModelPlugin } from "../../model-security/src/setup.mjs";
 import { generateProjectKey } from "../../model-security/src/project-key.mjs";
@@ -11,9 +11,15 @@ export function planModelProtection(input) {
   if (!options.modelProtection || options.modelProtection === "none") return null;
   return {
     mode: options.modelProtection,
+    engine: modelEngine(options),
     files: [
       ...Object.keys(
-        modelSmoke(options.framework, options.language ?? "ts", options.modelProtection),
+        modelSmoke(
+          options.framework,
+          options.language ?? "ts",
+          options.modelProtection,
+          modelEngine(options),
+        ),
       ),
       ...["vite.mjs", "vite.d.mts", "adui.mjs", "glb.mjs", "model.mjs", "keygen.mjs"].map(
         (name) => "adui-model-build/" + name,
@@ -93,7 +99,7 @@ export async function addModelProtection(directory, input, runner = runWorkspace
     plan = planModelProtection(options);
   if (!plan) return;
   await preflightModelProtection(directory, options);
-  const result = await setupModelPlugin(directory, options.modelProtection);
+  const result = await setupModelPlugin(directory, options.modelProtection, modelEngine(options));
   await inspect(join(directory, "src/models"));
   await mkdir(join(directory, "src/models"), { recursive: true });
   await generateProjectKey(directory, { keyId: options.name + "-v1" });
@@ -104,7 +110,7 @@ export async function addModelProtection(directory, input, runner = runWorkspace
       "。密钥保存在被 Git 忽略的 .env.local，原 GLB 不进入构建产物。\n\n- vp run models:keygen：缺失时生成项目 KEY；已有 KEY 时拒绝覆盖。\n- vp run models:keyrotate：备份后轮换 KEY，保留其他 env 配置；随后重新构建全部模型。\n- IV 每个模型独立随机生成，保存在 .adui 文件头，不配置固定 IV。\n- 可在 .env.local 配置 ADUI_MODEL_ALLOWED_HOSTS（逗号分隔 hostname）限制生产域名。\n- embedded 自动加载与拆分密钥只能提高复用门槛；external 模式需独立解锁文件。\n\n官方首页保持不变。独立验收页生产构建时需将 model-smoke.html 加入 HTML 输入；插件在普通构建中仍输出全部 .adui。\n",
     { flag: "wx" },
   );
-  runner(directory, [
+  await runner(directory, [
     "fmt",
     "adui-model-build",
     "src/model-smoke",

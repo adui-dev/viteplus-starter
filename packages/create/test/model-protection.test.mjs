@@ -15,6 +15,34 @@ import {
   addModelProtection,
 } from "../src/model-protection.mjs";
 const base = { name: "demo", type: "application", framework: "vue", engine: "three", screen: true };
+test("Babylon 两种保护模式生成专属适配页面、密钥与备份，关闭模式不写入", async (t) => {
+  for (const modelProtection of ["embedded", "external"]) {
+    const root = await fixture(t, "babylon");
+    const options = { ...base, engine: "babylon", modelProtection };
+    assert.equal(planModelProtection(options).engine, "babylon");
+    await addModelProtection(root, options, async () => {});
+    const page = await readFile(join(root, "src/model-smoke/ModelView.vue"), "utf8");
+    assert.ok(page.includes("../adui-babylon/lazy.mjs"));
+    assert.ok(!page.includes("adui-three"));
+    assert.ok(page.includes("onModelState:"));
+    assert.ok(
+      page.includes(
+        modelProtection === "embedded" ? "virtual:adui-model-key" : "createOfflineKeyring",
+      ),
+    );
+    assert.ok((await readFile(join(root, ".env.local"), "utf8")).includes("ADUI_MODEL_KEY="));
+    assert.equal(await readFile(join(root, "src/main.ts"), "utf8"), "original entry");
+    await assert.rejects(
+      addModelProtection(root, options, () => assert.fail()),
+      /拒绝覆盖/,
+    );
+  }
+  const root = await fixture(t, "babylon");
+  await addModelProtection(root, { ...base, engine: "babylon", modelProtection: "none" }, () =>
+    assert.fail(),
+  );
+  assert.ok(!(await readdir(root)).includes(".env.local"));
+});
 test("Three 默认保护、显式关闭和外置；类型、根、依赖与重复参数严格校验", () => {
   assert.equal(validateProjectOptions(base).modelProtection, "embedded");
   assert.equal(
@@ -121,10 +149,10 @@ test("批量按应用保护及 UI 阶段隔离，真实 dry-run 不生成 KEY �
   assert.equal(JSON.parse(result.stdout).modelProtection.secret.generatedAtExecution, true);
   assert.deepEqual(await readdir(root), []);
 });
-async function fixture(t) {
+async function fixture(t, engine = "three") {
   const root = await mkdtemp(join(tmpdir(), "model-create-"));
   t.after(() => rm(root, { recursive: true, force: true }));
-  await mkdir(join(root, "src/adui-three"), { recursive: true });
+  await mkdir(join(root, "src/adui-" + engine), { recursive: true });
   await writeFile(
     join(root, "package.json"),
     JSON.stringify({
@@ -133,7 +161,10 @@ async function fixture(t) {
     }),
   );
   await writeFile(join(root, "src/main.ts"), "original entry");
-  await writeFile(join(root, "src/adui-three/lazy.mjs"), "export const loadBundledModel=true");
+  await writeFile(
+    join(root, "src/adui-" + engine + "/lazy.mjs"),
+    "export const loadBundledModel=true",
+  );
   await writeFile(
     join(root, "vite.config.ts"),
     'import {defineConfig} from "vite-plus";export default defineConfig({})',

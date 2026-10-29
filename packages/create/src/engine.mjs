@@ -1,6 +1,7 @@
 import { planThreeSmoke } from "./three-smoke.mjs";
 import { planCesium, cesiumDependencies, cesiumDevDependencies } from "./cesium.mjs";
 import { planBabylon, babylonVersion } from "./babylon.mjs";
+import { modelEngine } from "./options.mjs";
 export async function planEngine(options) {
   if (options.engines) {
     const plans = await Promise.all(
@@ -9,7 +10,7 @@ export async function planEngine(options) {
           ...options,
           engines: undefined,
           engine,
-          modelProtection: engine === "three" ? options.modelProtection : "none",
+          modelProtection: engine === modelEngine(options) ? options.modelProtection : "none",
         }),
       ),
     );

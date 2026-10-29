@@ -3,12 +3,22 @@ const args = process.argv.slice(2),
   options = {};
 try {
   for (let i = 0; i < args.length; i += 2) {
-    if (!["--project", "--key-mode"].includes(args[i]) || !args[i + 1] || options[args[i]])
-      throw new Error("用法：--project <官方应用> [--key-mode external|embedded]");
+    if (
+      !["--project", "--key-mode", "--engine"].includes(args[i]) ||
+      !args[i + 1] ||
+      options[args[i]]
+    )
+      throw new Error(
+        "用法：--project <官方应用> [--key-mode external|embedded] [--engine three|babylon]",
+      );
     options[args[i]] = args[i + 1];
   }
   if (!options["--project"]) throw new Error("缺少 --project");
-  const result = await setupModelPlugin(options["--project"], options["--key-mode"]);
+  const result = await setupModelPlugin(
+    options["--project"],
+    options["--key-mode"],
+    options["--engine"],
+  );
   console.log(
     "模型插件已安装（" +
       result.keyMode +

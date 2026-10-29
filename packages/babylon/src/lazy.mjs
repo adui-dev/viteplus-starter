@@ -1,8 +1,25 @@
-export function createLazyScene(host, { load, onState = () => {}, onError = () => {} }) {
+import { fetchBundledAdui } from "../../model-security/src/bundled.mjs";
+export function createLazyScene(
+  host,
+  {
+    load = () => import("./scene.mjs"),
+    onState = () => {},
+    onError = () => {},
+    onModelState = () => {},
+  } = {},
+) {
   let disposed = false,
     scene,
     pending,
-    canvas;
+    canvas,
+    modelVersion = 0,
+    modelAbort;
+  function invalidate() {
+    ++modelVersion;
+    modelAbort?.abort();
+    modelAbort = undefined;
+    scene?.cancelModelLoad?.();
+  }
   const observer = new ResizeObserver(() => scene?.resize());
   observer.observe(host);
   function state(loading) {
@@ -18,22 +35,50 @@ export function createLazyScene(host, { load, onState = () => {}, onError = () =
     }
   }
   function failed(message) {
+    invalidate();
     clear();
     if (!disposed) {
       state(false);
       onError(String(message));
     }
   }
-  return {
+  const handle = {
     async loadModel(buffer, options) {
+      invalidate();
       if (!scene || disposed) throw new Error("请先加载 Babylon 场景");
       return scene.loadModel(buffer, options);
     },
     clearModel() {
+      invalidate();
       scene?.clearModel?.();
     },
     cancelModelLoad() {
-      scene?.cancelModelLoad?.();
+      invalidate();
+    },
+    async loadBundledModel(asset, options = {}) {
+      if (disposed) return false;
+      invalidate();
+      const request = modelVersion,
+        abort = new AbortController();
+      modelAbort = abort;
+      const cancel = () => {
+        if (request === modelVersion) invalidate();
+      };
+      options.signal?.addEventListener("abort", cancel, { once: true });
+      if (options.signal?.aborted) cancel();
+      try {
+        const buffer = await fetchBundledAdui(asset, { signal: abort.signal });
+        if (disposed || request !== modelVersion || abort.signal.aborted) return false;
+        await handle.load();
+        if (disposed || request !== modelVersion || abort.signal.aborted || !scene) return false;
+        return await scene.loadModel(buffer, { encrypted: true, authorize: options.authorize });
+      } catch (error) {
+        if (!disposed && request === modelVersion && !abort.signal.aborted) onError(String(error));
+        return false;
+      } finally {
+        options.signal?.removeEventListener("abort", cancel);
+        if (modelAbort === abort) modelAbort = undefined;
+      }
     },
     load() {
       if (disposed || scene) return Promise.resolve();
@@ -49,10 +94,19 @@ export function createLazyScene(host, { load, onState = () => {}, onError = () =
           host.append(canvas);
           let initializing = true,
             failure;
-          const created = module.createScene(canvas, (message) => {
-            if (initializing) failure = message;
-            else failed(message);
-          });
+          const created = module.createScene(
+            canvas,
+            (message) => {
+              if (initializing) failure = message;
+              else failed(message);
+            },
+            (value) => {
+              if (!disposed) {
+                onModelState(value);
+                if (value.state === "error") onError(value.message);
+              }
+            },
+          );
           initializing = false;
           if (failure) {
             created.destroy();
@@ -78,9 +132,11 @@ export function createLazyScene(host, { load, onState = () => {}, onError = () =
     destroy() {
       if (disposed) return;
       disposed = true;
+      invalidate();
       observer.disconnect();
       clear();
       state(false);
     },
   };
+  return handle;
 }

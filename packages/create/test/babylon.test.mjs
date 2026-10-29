@@ -33,7 +33,7 @@ test("Babylon 四种框架语言只计划本引擎，无密钥或配置覆盖", 
     for (const language of ["ts", "js"]) {
       const options = validateProjectOptions({ ...base, framework, language }),
         plan = await planBabylon(options);
-      assert.equal(options.modelProtection, undefined);
+      assert.equal(options.modelProtection, "embedded");
       assert.equal(plan.previewPath, "/babylon-smoke.html");
       assert.ok(plan.files["src/adui-babylon/scene.mjs"]);
       assert.ok(
@@ -43,9 +43,9 @@ test("Babylon 四种框架语言只计划本引擎，无密钥或配置覆盖", 
         ),
       );
     }
-  assert.throws(
-    () => validateProjectOptions({ ...base, modelProtection: "embedded" }),
-    /需要 engine=three/,
+  assert.equal(
+    validateProjectOptions({ ...base, modelProtection: "external" }).modelProtection,
+    "external",
   );
 });
 test("Babylon 增量安装保留官方入口与配置，重复和安装期间输出冲突拒绝", async (t) => {
@@ -96,8 +96,8 @@ test("Babylon 版本冲突和输出祖先链接在安装前拒绝，catalog 校�
   await symlink(outside, join(linked, "src/adui-babylon"), "junction");
   await assert.rejects(preflightBabylon(linked, base), /junction/);
 });
-test("Babylon 交互与批量计划按应用隔离，不询问 Three 保护策略", async (t) => {
-  const answers = ["1", "4", "y"],
+test("Babylon 交互与批量计划按应用隔离，默认启用模型保护", async (t) => {
+  const answers = ["1", "4", "", "y"],
     questions = [];
   const selected = await collectProjectOptions(
     { name: "cube", framework: "vue", language: "ts", ui: "none", css: "none", screen: true },
@@ -107,7 +107,8 @@ test("Babylon 交互与批量计划按应用隔离，不询问 Three 保护策�
     },
   );
   assert.equal(selected.engine, "babylon");
-  assert.ok(!questions.some((question) => question.startsWith("模型保护")));
+  assert.ok(questions.some((question) => question.startsWith("模型保护")));
+  assert.equal(selected.modelProtection, "embedded");
   const root = await mkdtemp(join(tmpdir(), "babylon-batch-"));
   t.after(() => rm(root, { recursive: true, force: true }));
   const plan = await createBatchPlan(
@@ -125,6 +126,6 @@ test("Babylon 交互与批量计划按应用隔离，不询问 Three 保护策�
     "@babylonjs/core@9.32.1",
     "@babylonjs/loaders@9.32.1",
   ]);
-  assert.equal(plan.steps[1].modelProtection, undefined);
+  assert.equal(plan.steps[1].modelProtection.engine, "babylon");
   assert.equal(plan.steps[2].modelProtection.mode, "embedded");
 });

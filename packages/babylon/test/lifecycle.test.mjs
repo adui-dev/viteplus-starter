@@ -2,6 +2,70 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createLazyScene } from "../src/lazy.mjs";
 import { createRuntime } from "../src/runtime.mjs";
+import { encryptAdui } from "../../model-security/src/adui.mjs";
+test("Babylon 构建目录下载后才初始化，旧下载和外部取消不提交场景", async (t) => {
+  const f = fixture(t),
+    originalFetch = globalThis.fetch,
+    originalLocation = globalThis.location;
+  globalThis.location = { href: "http://localhost/model-smoke.html" };
+  t.after(() => {
+    globalThis.fetch = originalFetch;
+    globalThis.location = originalLocation;
+  });
+  const key = await crypto.subtle.generateKey({ name: "AES-GCM", length: 256 }, false, ["encrypt"]);
+  const encrypted = await encryptAdui(new ArrayBuffer(20), key, {
+    format: "glb",
+    keyId: "key",
+    modelId: "model",
+  });
+  const asset = { url: "/models/model.adui", keyId: "key", modelId: "model" };
+  let finish,
+    signal,
+    creates = 0,
+    loads = 0;
+  const authorize = () => {};
+  globalThis.fetch = async (_url, options) => {
+    signal = options.signal;
+    return new Promise((done) => {
+      finish = done;
+    });
+  };
+  const lazy = createLazyScene(f.host, {
+    load: async () => ({
+      createScene() {
+        creates++;
+        return {
+          resize() {},
+          destroy() {},
+          clearModel() {},
+          cancelModelLoad() {},
+          async loadModel(_buffer, options) {
+            loads++;
+            assert.equal(options.encrypted, true);
+            assert.equal(options.authorize, authorize);
+            return true;
+          },
+        };
+      },
+    }),
+  });
+  const stale = lazy.loadBundledModel(asset, { authorize });
+  lazy.clearModel();
+  assert.equal(signal.aborted, true);
+  finish(new Response(encrypted));
+  assert.equal(await stale, false);
+  assert.equal(creates, 0);
+  globalThis.fetch = async () => new Response(encrypted);
+  assert.equal(await lazy.loadBundledModel(asset, { authorize }), true);
+  assert.equal(creates, 1);
+  assert.equal(loads, 1);
+  const abort = new AbortController();
+  abort.abort();
+  assert.equal(await lazy.loadBundledModel(asset, { authorize, signal: abort.signal }), false);
+  assert.equal(loads, 1);
+  lazy.destroy();
+  assert.equal(await lazy.loadBundledModel(asset, { authorize }), false);
+});
 function fixture(t) {
   const previous = globalThis.ResizeObserver;
   let resized,

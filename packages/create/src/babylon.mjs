@@ -26,7 +26,17 @@ export async function planBabylon(input) {
     files["src/adui-babylon/" + name] = (
       await readFile(new URL("../../babylon/src/" + name, import.meta.url), "utf8")
     ).replaceAll("../../model-security/src/", "./");
-  for (const name of ["glb.mjs", "adui.mjs", "adui.d.mts", "local-grant.mjs", "local-grant.d.mts"])
+  for (const name of [
+    "glb.mjs",
+    "adui.mjs",
+    "adui.d.mts",
+    "local-grant.mjs",
+    "local-grant.d.mts",
+    "bundled.mjs",
+    "bundled.d.mts",
+    "offline-keyring.mjs",
+    "offline-keyring.d.mts",
+  ])
     files["src/adui-babylon/" + name] = await readFile(
       new URL("../../model-security/src/" + name, import.meta.url),
       "utf8",
