@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { inspectWorkspace } from "../src/workspace-inspect.mjs";
 import { createStageRunner } from "../src/recovery.mjs";
 import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
@@ -59,6 +60,7 @@ const usage = `ADui Vite+ Starter（Application / Monorepo）
   node packages/create/bin/cli.mjs --name my-vue-app --type application --framework vue --dry-run
 
 说明：
+  --inspect-workspace <路径>：只读检查已有工作区；可配 --config <原批量 JSON> 预检应用结构。
   Application 委托 Vite+ 官方 vite:application，按框架和语言选择 vue/vue-ts/react/react-ts。
   --language ts|js（默认 ts）；Monorepo 根不指定语言。
   --screen：生成 AdScreen 大屏插件及 /screen-smoke.html，保留正式首页。
@@ -86,6 +88,15 @@ async function main() {
   const args = parseCliArgs(process.argv.slice(2));
   if (args.help) {
     console.log(usage);
+    return;
+  }
+  if (args["inspect-workspace"] !== undefined) {
+    for (const [key, value] of Object.entries(args))
+      if (!["inspect-workspace", "config"].includes(key) && value !== undefined && value !== false)
+        throw new Error("--inspect-workspace 仅能与 --config 同用");
+    const result = await inspectWorkspace(args["inspect-workspace"], args.config);
+    console.log(JSON.stringify(result, null, 2));
+    if (!result.ok) process.exitCode = 1;
     return;
   }
   if (args.config !== undefined) {
