@@ -36,6 +36,7 @@ node .\viteplus-starter\packages\create\bin\cli.mjs --name react-js-check --type
 
 ## 环境
 
+- 本阶段交付与验收平台：Windows，使用 PowerShell；Linux/macOS 不属于当前要求，也不列为验收阻塞项。
 - Node.js `^22.18.0 || ^24.11.0 || >=26.0.0`（与锁定的 Vite+ 1.4.0 一致，Node 22 最低为 22.18.0）
 - pnpm
 - Vite+ CLI（`vp`）
