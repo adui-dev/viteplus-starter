@@ -121,3 +121,5 @@ UI/CSS 已在 `integrations.mjs` 实现；大屏核心见 `packages/screen`；Th
 - scene/demo：本地立方体与点击入口；scripts/verify-babylon-build.mjs：[双入口专项](BABYLON.md)，[批量示例](../examples/babylon.batch.json)。
 
 create/src/multi-engine.mjs、test/multi-engine.test.mjs：多选校验、规范顺序、失败停止、应用隔离；scripts/verify-multi-build.mjs：联合构建，见 [说明](MULTI_ENGINE.md)。
+
+engine-prompts.test.mjs：多选解析、摘要/取消、Three 保护提示；verify-multi-build.mjs 新增静态依赖遍历，拒绝首屏依赖引擎分块。

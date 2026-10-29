@@ -180,3 +180,5 @@ create/babylon 增量安装固定 @babylonjs/core 9.32.1，只新增源码快照
 runtime 管理 Engine、Scene 与渲染循环；初始化异常和帧异常停止循环并释放已返回对象。lazy 管理异步导入、画布与 ResizeObserver，点击前不导入场景，晚到结果丢弃、失败可重试、销毁幂等。组件只处理框架挂载/卸载，场景放入 AdScreen 引擎层；ES 深路径引入本地立方体所需模块，不引入在线资产或静态资源插件。模型/加密保持独立，当前 Babylon 拒绝 embedded/external。见 [BABYLON](BABYLON.md)。
 
 多引擎通过规范排序和单引擎子阶段复用实现；统一输出冲突/版本预检，基础工程、大屏仅首阶段创建，保护只传 Three。失败保留现场。设计与限制见 [MULTI_ENGINE](MULTI_ENGINE.md)。
+
+交互多选解析数字/名称列表，保持单选返回 engine，多选返回规范 engines；确认后 CLI 分派到同一多引擎编排器。联合验收构建使用显式引擎分组、includeDependenciesRecursively=false 和 strictExecutionOrder=true，避免共享辅助模块导致跨引擎加载；普通项目配置不自动修改。

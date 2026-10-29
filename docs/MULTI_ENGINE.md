@@ -2,7 +2,7 @@
 
 完整批量样例见 [multi-engine.batch.json](../examples/multi-engine.batch.json)。
 
-CLI 新增 --engines three,cesium,babylon；JSON 应用新增 engines 字符串数组，与旧 engine 互斥。只允许三个已支持引擎的非空、不重复子集，不允许 none。旧 --engine/JSON engine 和交互单选保持兼容，交互多选尚未接入。
+CLI 新增 --engines three,cesium,babylon；JSON 应用新增 engines 字符串数组，与旧 engine 互斥。只允许三个已支持引擎的非空、不重复子集，不允许 none。旧 --engine/JSON engine 和交互单选保持兼容，交互多选已接入。
 
 ```powershell
 node ./viteplus-starter/packages/create/bin/cli.mjs --name multi-app --type application --framework vue --screen --engines three,cesium,babylon
@@ -13,3 +13,5 @@ node ./viteplus-starter/packages/create/bin/cli.mjs --name multi-app --type appl
 批量 JSON 示例应用：{"name":"viewer","framework":"react","screen":true,"engines":["three","babylon"],"modelProtection":"none"}。根仍委托官方 vite:monorepo，成员委托 vite:application。dry-run 列出合并依赖、文件、各验收地址及模型保护生成标记，不生成 KEY。每阶段失败停止，保留已生成内容，不回滚、覆盖续跑或跳过冲突。
 
 执行 node scripts/verify-multi-build.mjs <应用路径> 联合构建官方首页及已有引擎/模型验收页；临时配置结束删除，产物在 dist/multi-verify，不与同一工作区的 check/ready 并行。联合构建不等同全部引擎同页运行，浏览器组合渲染仍需独立验收。具体执行结果见 [状态](PROJECT_CONTEXT.md)。
+
+交互菜单支持 2,3,4 或 three,cesium,babylon；None 不能混入，重复选择拒绝，仅包含 Three 时询问模型保护。联合验收脚本的分块设置与静态入口检查用于避免跨引擎提前加载。自定义联合入口构建请采用相同的 output.codeSplitting 分组、includeDependenciesRecursively=false、strictExecutionOrder=true；这不是对任意业务构建配置的自动修复。

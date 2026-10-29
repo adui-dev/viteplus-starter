@@ -250,3 +250,14 @@
 - 两应用通过 verify-multi-build 联合构建：Vue 为 index/three/cesium/babylon/model 五入口，React 为四入口；Cesium 四类资源目录完整，临时配置移除，产物保留各自 dist/multi-verify，部署 base=/multi-check/。保留默认 500 kB 提醒。未执行本轮组合产物浏览器渲染，不用历史单引擎截图替代；新 JSON 组合有计划验证，未从头执行整个批量样例。
 - 最终 166/166 Node 测试、文档校验、根 vp check（141 格式文件/101 代码文件）与 git diff --check 通过。未添加流水线或发布。中文 emoji 分功能与验收文档提交推送。
 - 下一步：接入交互多选，并对组合产物做浏览器隔离/按需加载验收；之后推进 Cesium/Babylon 模型适配。
+
+## 2026-10-29 交互多选与联合产物浏览器验收
+
+- 交互菜单支持数字/名称逗号多选，单选继续返回 engine，多选返回规范 engines；None 混用、别名重复和未知值拒绝，包含 Three 才询问保护。确认摘要列出全部引擎；确认后 CLI 分派同一多引擎编排器。显式参数完整时仍不额外询问。
+- 新增两项测试覆盖默认、单选、多选顺序、非法值、摘要、Three 提示与取消。Windows 真 PTY 输入 4,2,3、关闭保护、N 取消，摘要 three,cesium,babylon 正确，目标 interactive-multi-cancel 不存在；未通过真实创建验证这次 TTY 的 Y 分支。
+- 实测上轮两份联合产物发现 Babylon 点击会牵连 Cesium 分块：共享辅助模块归属和分块捕获使默认自动分块不能保证引擎隔离。专项工具改用按库显式分组、includeDependenciesRecursively=false、strictExecutionOrder=true；增加 HTML 初始静态依赖递归检查，禁止首屏静态依赖引擎分块。普通生成配置不自动改写，业务自定义联合入口需采用同样策略。分组增加包装与单块体积，不宣称体积优化。
+- 两应用重新联合构建通过，Vue index/three/cesium/babylon/model 五入口，React 四入口，Cesium 四类资源保留，临时配置移除。保留默认体积提醒；产物仍在 dist/multi-verify，本轮未重新安装依赖或修改仓库锁文件。
+- Chrome 对 Vue TS、React JS 各三种引擎页面检查：初始 canvas=0，点击后初始化成功且只请求本引擎命名分块，控制台 warn/error 为空，卸载 canvas=0。Vue Babylon 点击前网络无引擎分块、点击后仅 Babylon 分块；静态图检查补充覆盖所有入口。React Three 在加载中卸载后重挂再次加载成功，截图可见实际线框场景；不扩大为模型加载、全屏/DPR 专项或同页多引擎运行验收。
+- 截图 D:/Workspace/adui-studio/multi-engine-react-acceptance.jpg 未纳入 Git。临时标签页和 4301/4302 预览服务已关闭。没有修改业务文件、模型或生产 KEY。
+- 最终 168/168 Node 测试、文档校验、vp check（142 格式文件/102 代码文件无警告错误）和 diff 检查通过。按中文 emoji 分步提交推送，无流水线或发布。
+- 下一步：接入 Babylon GLB 与 .adui 模型适配，复用共享解密和取消/晚到边界，再推进 Cesium 模型适配；继续围绕生成器预设开发。
