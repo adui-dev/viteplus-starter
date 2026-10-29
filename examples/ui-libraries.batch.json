@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "name": "adui-ui-libraries",
+  "apps": [
+    {
+      "name": "element",
+      "framework": "vue",
+      "language": "js",
+      "ui": "element-plus",
+      "css": "tailwindcss",
+      "uiSmoke": true
+    },
+    {
+      "name": "ant-vue",
+      "framework": "vue",
+      "language": "ts",
+      "ui": "antd",
+      "css": "unocss",
+      "uiSmoke": true
+    },
+    {
+      "name": "td-react",
+      "framework": "react",
+      "language": "js",
+      "ui": "tdesign",
+      "css": "unocss",
+      "uiSmoke": true
+    }
+  ]
+}
