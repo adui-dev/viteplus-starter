@@ -319,3 +319,14 @@
 - 共用 verify-model-build 以同一原模型回归：external/embedded build/decrypt、明文/KEY 403、密文 200、模型变更重新加密及 env 轮换均通过。最终 184/184 Node 测试、文档校验、根 vp check（149 格式/109 代码文件）和 diff 检查通过，仓库锁文件未改，不发布 npm/Release，按中文 emoji 分功能、验收工具、文档提交推送。
 - KEY 轮换后 Vue 截图 D:/Workspace/adui-studio/cesium-auto-model-acceptance.png 不纳入 Git；原 GLB SHA256 仍为 a1e3b04de97b11de564ce6e53b95f02954a297f0008183ac63a4f5974f6b32d8。临时标签页、自建 4361/4362 预览与 4363 开发服务已清理。
 - 下一步：补齐 Cesium/Babylon 在 AdScreen 中的窗口缩放、DPR 与全屏专项验收，继续完善生成器跨组合覆盖，不扩展业务查看器工具。
+
+## 2026-10-29：Cesium/Babylon 大屏适配与部分实机验收
+
+- 两引擎统一最高 2 倍 DPR / 最长边 8192 绘图策略；增加容器、窗口、全屏、DPR 变化监听与无事件 DPR 逐帧兜底，卸载清理。独立验收页新增四模式、半宽、原生全屏控件，正式 App/main 保留。
+- 新官方独立样例 screen-engines-vue-ts（Vue TS）：vp check 75 文件格式、58 文件无警告/类型错误，官方 build 及 index/cesium/babylon 联合构建通过。
+- 新官方 Monorepo 子应用 adui-cesium-workspace/apps/screen-engines-react-js（React JS）：vp check 68 文件格式、56 文件无警告/类型错误，官方 build 及 index/cesium/babylon 联合构建通过；最初 4 处 unbound-method 警告已用闭包修复并复验。
+- Vue Babylon 浏览器确认半宽和 contain/cover/stretch/none；CSS 1250×703 不变时 DPR 1→2→3，对应缓冲区 1250×703→2500×1406→2500×1406，engine 无 transform。发现 Chrome 仿真不发 DPR 事件后补了逐帧兜底并验证。
+- 限制：全屏请求 TypeError: not granted；前台操作被电脑工具因无法确认页面地址终止。本轮新 Cesium/React 交互及全屏尚未实测，不能称该专项全部验收完成。
+- 下一步优先完成 Vue/React 两引擎原生全屏、Cesium DPR 和卸载/重挂的浏览器补验，然后再推进其余兼容矩阵。
+
+本轮最终本地检查：node --test 189/189；文档静态校验通过；根 vp check 格式 155 文件、lint 115 文件通过。只读生成矩阵 462 个计划（actualBuilds=0，不等同于真实构建）；上述两套新样例单独执行真实构建。Monorepo 根 vp run ready 16/16 成功，随后 vp check 格式 449 文件、lint/类型 329 文件通过。临时预览服务已关闭。

@@ -122,3 +122,9 @@
 - 边界：GLB 核心无远端 URL、压缩解码器或动画播放；授权/加解密由 FR-007 前置模块负责。Three 的贴图/视角/拾取与 Babylon/Cesium 的本地 GLB/.adui 加载分别验收，不互相扩大覆盖范围，详见 [THREE_SMOKE](THREE_SMOKE.md)、[BABYLON](BABYLON.md)、[CESIUM](CESIUM.md)。
 
 FR-006：CLI --engines、JSON engines 与交互多选均已接入，保留 engine 单选。范围见 [多引擎](MULTI_ENGINE.md)。
+
+## 2026-10-29：Cesium/Babylon 大屏像素策略
+
+- 已实现：两引擎按容器 CSS 尺寸及 DPR 更新缓冲区，比例上限 2、最长边上限 8192；Babylon 考虑硬件纹理上限，隐藏容器跳过尺寸分配。独立验收页新增模式、半宽、全屏控件，不修改正式入口。
+- 本地验证：共享观察器覆盖 DPR 无事件变化、媒体查询重订阅、窗口/全屏/容器变化与卸载清理；四种框架语言生成计划均测试。Vue TS 独立应用与 React JS Monorepo 应用检查及双引擎多入口构建通过。
+- 部分浏览器验收：Vue Babylon 已验证模式、容器与 DPR；原生全屏被浏览器拒绝，电脑操作工具随后停止。Cesium 新策略及 React 真实交互、全屏仍待补验，不能标记整项验收完成。

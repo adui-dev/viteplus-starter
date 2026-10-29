@@ -36,7 +36,7 @@ CLI 支持 `--screen`、`--screen-width 1920`、`--screen-height 1080`、`--scre
 
 父容器必须有实际宽高；组件填满父容器，默认隐藏溢出。不要在 shell 或其祖先加 transform、zoom，不要覆盖 HUD 的定位与变换。隐藏/零尺寸时布局标记 visible=false，坐标返回 null。引擎视口先按设计单位内缩，再与容器求交集，尺寸不会为负。
 
-引擎层保持物理 CSS 像素、`transform: none`；HUD 按设计单位缩放。覆盖层默认不拦截鼠标，交互控件加 `ad-screen-interactive`。不要把需要原生尺寸的 canvas 放进 HUD。引擎的 ResizeObserver、drawing buffer、DPR、拾取和资源释放由后续引擎适配器管理，本期只有网格占位，未集成真实 3D 引擎。
+引擎层保持物理 CSS 像素、`transform: none`；HUD 按设计单位缩放。覆盖层默认不拦截鼠标，交互控件加 `ad-screen-interactive`。不要把需要原生尺寸的 canvas 放进 HUD。引擎的 ResizeObserver、drawing buffer、DPR、拾取和资源释放由各引擎适配器管理。目前可选 Three、Cesium、Babylon，独立 screen-smoke 页面保留网格验收。
 
 Vue 导入 `{ AdScreen, AdScreenPlugin, useAdScreen }`，可局部注册或 `app.use(AdScreenPlugin)`；slots 为 engine、hud（或 default）、overlayScaled、overlayUnscaled。`useAdScreen()` 只在组件后代调用，使用独立 Symbol 注入。暴露的 layout、scaledRoot、unscaledRoot 是只读 ref；模板组件 ref 会解包它们。
 
@@ -57,4 +57,14 @@ React 导入 `{ AdScreen, useAdScreen }`；engine、hud/children、overlayScaled
 
 ## Three.js 补充验收
 
-已有大屏应用可按 [THREE_SMOKE](THREE_SMOKE.md) 增加真实 WebGL 场景。本轮 Vue/React 代表组合已经验证前台原生全屏进入/退出、实际 canvas DPR、拾取与卸载重挂；此结果补充前述 P5 首期的待验收项。其他引擎仍待实现。
+已有大屏应用可按 [THREE_SMOKE](THREE_SMOKE.md) 增加真实 WebGL 场景。本轮 Vue/React 代表组合已经验证前台原生全屏进入/退出、实际 canvas DPR、拾取与卸载重挂；此结果补充前述 P5 首期的待验收项。Cesium/Babylon 已接入；其专项记录见下文。
+
+## Cesium / Babylon 大屏专项（2026-10-29）
+
+新生成的 cesium-smoke.html、babylon-smoke.html 提供四种模式切换、半宽/恢复容器、进入/退出全屏。模式控件放在 overlayUnscaled 内并开启指针事件；HUD 标记按设计坐标缩放，canvas 始终位于不缩放的 engine 层。全屏错误显示在页面，不视为成功。
+
+两种引擎有效绘图比例为 min(DPR, 2, 8192 / 最长 CSS 边)，Babylon 另受硬件最大纹理尺寸约束。零尺寸不分配新缓冲区。Babylon 使用硬件缩放倒数，Cesium 关闭浏览器推荐分辨率并用 resolutionScale 补偿原生 DPR。容器、窗口、全屏与媒体查询变化触发刷新；另在逐帧回调中只比较 DPR 数值，解决部分浏览器仿真不发事件的情况。卸载清理观察器、监听和待执行帧。
+
+浏览器实测：Vue TS + Babylon 在相同 CSS 尺寸 1250×703 下，DPR 1 为 1250×703、DPR 2 为 2500×1406、DPR 3 仍为 2500×1406；半宽容器、contain/cover/stretch/none 及 engine transform=none 已核对。Cesium 原版基线确认按 1 倍 CSS 像素渲染；新 Cesium 和 React 页面已构建及静态检查，本轮其真实交互尚未验证。全屏请求被浏览器拒绝，切到前台时电脑操作工具无法确认页面地址并终止；不能计为通过。
+
+旧生成项目的源码快照仍拒绝覆盖。本次使用全新官方样例验证，未自动升级已有项目。下一次应优先补齐两个框架、两个引擎的全屏及 Cesium DPR 浏览器实测。

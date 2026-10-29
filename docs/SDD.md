@@ -212,3 +212,11 @@ createGlobe 返回包含原场景生命周期及模型方法的最小 handle，l
 Cesium 复用原模型安装器、env 插件与 KEY 工具，setup/smoke 的 engine 参数扩展为三引擎。模型页使用 createLazyGlobe 和 GlobeHandle；默认 loader 先设置 BASE_URL 对应资源根再导入场景，不要求业务调用者重复配置。loadBundledModel 下载同源密文后才初始化并进入原模型控制器，清除/后发请求/卸载和外部 AbortSignal 统一取消旧下载与模型请求。
 
 模型适配器优先级固定 Three → Babylon → Cesium，保持旧组合行为。每应用只创建一套模型目录、虚拟模块、密钥脚本和 model-smoke 页面；安装前统一预检输出/env/脚本，旧快照不覆盖。Cesium 资源插件与模型插件分别备份并增量合并，验收工具对模型解密和四类资源同时检查；多引擎另执行显式分组的联合构建。
+
+## 2026-10-29：引擎视口与大屏验收页
+
+共享 screen/src/viewport.mjs 提供有效比例及视口观察，生成时分别复制到 adui-cesium / adui-babylon，避免新增引擎依赖旧 AdScreen 快照里的新文件。尺寸由引擎适配器读取 CSS 像素，HUD 变换不参与缓冲区计算。Babylon resolution 使用 hardwareScalingLevel=1/ratio；Cesium resolution 使用 useBrowserRecommendedResolution=false、resolutionScale=ratio/nativeDpr，resize 后请求渲染。
+
+观察器监听 ResizeObserver、window.resize、document.fullscreenchange 和动态 resolution 查询，并持有一个可取消的 requestAnimationFrame 检查 DPR 数值；仅数值改变才读取布局和调整缓冲区。关闭引擎时清理全部来源，异步已排队通知通过 disposed 守卫忽略。Babylon 初始化也调整尺寸，异常仍进入原资源清理路径。
+
+engine-screen-smoke 生成两引擎共用的 Vue/React 验收 App：保留独立入口及原引擎 Demo，新增 HUD 标记、模式循环、半宽容器、非缩放覆盖层内全屏控件。回调以闭包保留方法上下文，失败反馈到 status。该控件仅用于独立验收页。

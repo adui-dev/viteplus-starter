@@ -129,3 +129,10 @@ UI/CSS 已在 `integrations.mjs` 实现；大屏核心见 `packages/screen`；Th
 create/src/multi-engine.mjs、test/multi-engine.test.mjs：多选校验、规范顺序、失败停止、应用隔离；scripts/verify-multi-build.mjs：联合构建，见 [说明](MULTI_ENGINE.md)。
 
 engine-prompts.test.mjs：多选解析、摘要/取消、Three 保护提示；verify-multi-build.mjs 新增静态依赖遍历，拒绝首屏依赖引擎分块。
+
+## 2026-10-29：引擎大屏专项
+
+- packages/screen/src/viewport.mjs：有效 DPR 限制，容器/窗口/全屏/媒体查询监听与 DPR 逐帧兜底、卸载清理。
+- packages/babylon/src/resolution.mjs、packages/cesium/src/resolution.mjs：各引擎公开分辨率 API 适配；lazy 模块持有观察器清理函数。
+- packages/create/src/engine-screen-smoke.mjs：Vue/React 两引擎独立验收页的模式、容器和全屏控件。
+- packages/screen/test/viewport.test.mjs、packages/create/test/engine-screen-smoke.test.mjs：比例/隐藏/硬件边界、DPR 无事件兜底及清理、四种框架语言计划的回归验证。
