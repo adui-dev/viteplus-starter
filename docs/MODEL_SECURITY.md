@@ -62,7 +62,9 @@ authorize 接收只读 `{modelId,keyId,format:'glb'}` 及可选 AbortSignal，�
 - 失败：401 未登录、403 无权或已撤销、404 资源不存在、429 限流；不返回密钥。网络/解析/授权错误均失败关闭。服务端应按业务需要避免模型存在性泄漏，并审计授权事件，禁止记录密钥。
 - 到期检查约束后续解密请求，不能收回已加载的明文/GPU 数据。业务如需实时撤销，应主动 cancel/clear/destroy；客户端到期时间不代替服务端鉴权。
 
-浏览器获得合法解密能力后，用户仍可能提取明文；不可导出 CryptoKey 与 `.adui` 封装均不等于 DRM。当前未实现生产授权服务、远端模型下载、压缩解码器、FBX/OBJ、其他引擎或自动迁移旧源码快照。
+浏览器获得合法解密能力后，用户仍可能提取明文；不可导出 CryptoKey 与 `.adui` 封装均不等于 DRM。当前未实现生产授权服务、远端模型下载、压缩解码器、FBX/OBJ、Cesium 模型或自动迁移旧源码快照。
+
+2026-10-29：Babylon 复用共享授权与 GLB 校验，createLazyScene 的 loadModel(buffer, {encrypted: true, authorize}) 在认证后调用按需 glTF AssetContainer loader。独立验收页可导入同一格式本地密钥；替换失败保留旧模型，清除授权同时清除模型并使晚到请求失效。加载器拥有独立字节副本，临时解密缓冲清零不等同抹除加载器副本。Babylon env 自动构建集成尚未实现，详见 [BABYLON](BABYLON.md)。
 
 ## 本地验证
 

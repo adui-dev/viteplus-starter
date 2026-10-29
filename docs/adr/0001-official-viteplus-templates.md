@@ -81,3 +81,7 @@ Babylon 首期采用固定版本 @babylonjs/core 的 ES 深路径模块，按需
 2026-10-29：多选采用规范顺序复用现有单引擎阶段，保持官方模板、旧参数与独立验收页；模型保护限定 Three，不引入同页多引擎运行时。
 
 2026-10-29：联合构建实测 Babylon 动态加载会牵连 Cesium 分块，选择显式引擎分组且禁用递归捕获依赖、保持严格执行顺序；仅修改专项构建工具，普通生成配置保留。依据 [Rolldown 官方说明](https://rolldown.rs/in-depth/manual-code-splitting)。
+
+## 2026-10-29：Babylon 模型与共享校验
+
+采用与 core 同版的 @babylonjs/loaders 9.32.1，动态导入 glTF 并用官方 LoadAssetContainerAsync 接收内存字节。授权解密、GLB 格式检查和引擎容器生命周期分离；共享校验移入 model-security，Three 的公开导出不变。只接受自包含 GLB，避免隐式远端资源及解码器下载。加载器可能保留原字节视图，因此提交独立副本，仅清零临时解密缓冲。先验收本地 GLB/.adui，env 自动构建另行接入，避免把未验证的保护选项开放给 Babylon。依据 [Babylon 官方加载文档](https://github.com/BabylonJS/Documentation/blob/master/content/features/featuresDeepDive/importers/loadingFileTypes.md)。

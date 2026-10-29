@@ -182,3 +182,11 @@ runtime 管理 Engine、Scene 与渲染循环；初始化异常和帧异常停�
 多引擎通过规范排序和单引擎子阶段复用实现；统一输出冲突/版本预检，基础工程、大屏仅首阶段创建，保护只传 Three。失败保留现场。设计与限制见 [MULTI_ENGINE](MULTI_ENGINE.md)。
 
 交互多选解析数字/名称列表，保持单选返回 engine，多选返回规范 engines；确认后 CLI 分派到同一多引擎编排器。联合验收构建使用显式引擎分组、includeDependenciesRecursively=false 和 strictExecutionOrder=true，避免共享辅助模块导致跨引擎加载；普通项目配置不自动修改。
+
+## Babylon 模型适配
+
+共享 GLB 校验从 Three 移至 model-security/src/glb.mjs，Three 保留 re-export，生成器与自动模型构建快照同步复制。Babylon 使用同版本 core/loaders，独立 loader 动态导入官方 glTF 模块，以 Uint8Array 和 pluginExtension=.glb 加载 AssetContainer，不从文件头构造远端 URL。
+
+model 控制器快照输入，授权认证后检查格式/扩展，再传独立副本给加载器；原临时明文最终清零，加载器副本随资产管理。request 版本与 AbortController 使旧请求失效；晚到容器移出场景并 dispose，成功 prepare/add 后才释放旧资产，失败保留旧资产。scene 负责有限包围边界、归一化、占位网格显隐；runtime 先销毁模型控制器再销毁 Scene/Engine。对加载器拒绝前未返回的内部对象不作全部回收承诺。
+
+Vue/React TS/JS 使用同一模型控制器与本地验收 provider，文件读取后复查组件代次，清除授权/卸载同时取消加载。Babylon embedded/external 自动构建仍拒绝，避免把本地验收入口误称为 env 自动保护已完成。

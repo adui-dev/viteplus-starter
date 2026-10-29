@@ -1,12 +1,12 @@
 # 项目上下文
 
-更新日期：2026-10-27。
+更新日期：2026-10-29。最新进度见文末各轮记录。
 
 ## 项目定位与约束
 
 - 仓库：`adui-dev/viteplus-starter`。Vite+ 官方 `vite:application` / `vite:monorepo` 是唯一基础工程来源，Vue/React Application 按语言选 `vue` / `vue-ts` / `react` / `react-ts`。
 - 已实现：基础 CLI 交互与参数模式、Application UI/CSS 集成、旧项目补装及 `--repair-existing`、UI Smoke、通过 `--workspace` 逐个添加及通过 JSON 批量新建 Monorepo 应用、本地单元测试与文档检查。
-- 规划中：Monorepo 自定义布局与显式恢复、其余 UI/CSS 兼容矩阵、大屏、Three.js/CesiumJS/Babylon.js、3D 模型安全加载。
+- 进行中：Monorepo 自定义布局与显式恢复、其余 UI/CSS 兼容矩阵、Cesium/Babylon 的大屏专项、Babylon 自动模型构建及 Cesium 模型适配；已实现范围见文末及 GENERATOR_STATUS。
 - 严格要求：**不得添加任何 CI/CD、自动发布或部署工作流**；仅人工本地测试。
 
 ## 用户 Windows 实机验收（已确认）
@@ -261,3 +261,17 @@
 - 截图 D:/Workspace/adui-studio/multi-engine-react-acceptance.jpg 未纳入 Git。临时标签页和 4301/4302 预览服务已关闭。没有修改业务文件、模型或生产 KEY。
 - 最终 168/168 Node 测试、文档校验、vp check（142 格式文件/102 代码文件无警告错误）和 diff 检查通过。按中文 emoji 分步提交推送，无流水线或发布。
 - 下一步：接入 Babylon GLB 与 .adui 模型适配，复用共享解密和取消/晚到边界，再推进 Cesium 模型适配；继续围绕生成器预设开发。
+
+## 2026-10-29 Babylon GLB/.adui 模型适配
+
+- Babylon 生成预设新增同版 @babylonjs/loaders 9.32.1，仍只增强官方应用并保留 App/main/正式首页及 Vite 配置。生成器按应用核对 core/loaders 的固定版本及 catalog 已安装元数据；不更新未知依赖，不覆盖旧源码快照。
+- GLB 纯校验移入 model-security/src/glb.mjs，Three 保留原导出，Three 生成器及自动构建源码一并复制。Babylon 先授权/认证和校验，再动态导入官方 glTF loader，以内存 Uint8Array 加载 AssetContainer；32 MiB、自包含资源及扩展限制保持明确，不请求远端解码器。
+- 模型控制器处理替换失败保留旧资产、成功释放旧资产、取消与卸载丢弃/释放晚到容器。加载器获得独立字节副本，临时解密缓冲最终清零，不声称清除加载器或 GPU 全部副本。scene 只做包围边界、归一化及占位网格显隐，没有增加旋转缩放、视角复位等查看器工具。
+- 验收入口支持本地 .glb/.adui、独立验收密钥及清除授权；文件不上传，provider 有效期 10 分钟。清除授权清除模型，异步文件读取/密钥导入状态按请求代次隔离。Babylon 仍拒绝 embedded/external，不生成 KEY 脚本；本轮没有完成 Babylon env 自动构建保护。
+- 对已有官方 audit-element-vue-js（Vue JS）与 audit-preserve-react-ts（React TS）补装大屏/Babylon；最终 vp check 分别 43/30、44/28 格式/代码文件无警告错误，正式首页构建通过。只更新本轮新建 Babylon 快照，不修改原业务/首页文件。
+- 在官方 adui-babylon-workspace 新增 model-vue（Vue TS）与 model-react（React JS），保留原成员。根 ready 首次 0/12 缓存、12/12 成功；最终复验 9/12 缓存、12/12 成功，229 格式、156 lint/type 文件无警告错误，官方 utils 测试通过，保留 TypeScript API 实验性提示。
+- 四应用均通过 index + babylon-smoke 双入口专项构建：Vue 子路径 /babylon-check/、React 相对 ./，产物保留各 dist/babylon-verify，临时配置清除；未与同一工作区检查并行。场景主块约 417–447 kB、loader 主块约 745–748 kB，另有共享/着色器块，保留默认 500 kB 提醒，不称为引擎总大小。
+- Chrome Vue JS/React TS 生产页均加载原 DamagedHelmet.glb 与已有 .adui：Vue 无密钥拒绝、导入匹配验收密钥后成功；两框架均显示模型已加载，warn/error 为空。清除授权时模型状态 empty，卸载 canvas=0；React 重挂可再次初始化，最终构建重新加载 GLB/.adui 通过。未扩展为其他框架语言的浏览器验收或 Babylon 全屏/DPR 专项。
+- 最终 React 加密模型截图 D:/Workspace/adui-studio/babylon-model-react-final.png，Vue 初次截图 D:/Workspace/adui-studio/babylon-helmet-acceptance.jpg，均不纳入 Git。原 GLB SHA256 仍为 a1e3b04de97b11de564ce6e53b95f02954a297f0008183ac63a4f5974f6b32d8；未修改用户模型或生产密钥。两个临时标签页及 4311/4312 预览服务已清理。
+- Three 自动构建专项使用同一原模型回归，external/embedded 构建与解密、明文/密钥 HTTP 403、密文 200、模型变更重新加密及 env 轮换通过。最终 173/173 Node 测试、294 组合只读计划（实际构建计数仍为 0）、文档校验、根 vp check（146 格式/106 代码文件）与 diff 检查通过。仓库依赖锁文件未改，无流水线或发布，按中文 emoji 分步提交推送。
+- 下一步：接入 Babylon 的 env 自动加密与构建目录加载，复用逐应用 KEY/轮换和仅输出 .adui 的产物校验；之后推进 Cesium 模型适配。继续以生成器预设为主线。
