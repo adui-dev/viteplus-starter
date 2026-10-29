@@ -51,6 +51,14 @@ try {
   if (build.error) throw build.error;
   assert.equal(build.status, 0, "模型应用构建失败");
   const output = join(root, "dist/model-verify");
+  if ((await readdir(root)).includes("adui-cesium-build")) {
+    for (const name of ["Workers", "ThirdParty", "Assets", "Widgets"])
+      assert.ok(
+        (await readdir(join(output, "adui-cesium", name))).length > 0,
+        "Cesium 静态资源缺失：" + name,
+      );
+    console.log("Cesium 四类静态资源检查通过");
+  }
   const html = await readFile(join(output, "model-smoke.html"), "utf8");
   assert.ok(
     html.includes(base === "./" ? "./assets/" : "/model-check/assets/"),
