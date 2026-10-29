@@ -1,6 +1,6 @@
 import { spawnSync } from "node:child_process";
 import { readFile, rename, writeFile } from "node:fs/promises";
-import { join, relative } from "node:path";
+import { join, relative, dirname, basename } from "node:path";
 import { inspectPath } from "./safe-paths.mjs";
 import { prepareUiBuildPolicy } from "./build-policy.mjs";
 import { injectStarterPlugins, repairLegacyStarterConfig } from "./vite-config.mjs";
@@ -204,8 +204,11 @@ export async function applyIntegrations(
     ...(generated.config !== config ? [relative(directory, configPath)] : []),
   ];
   if (await inspectPath(join(directory, "package.json"))) targets.push("package.json");
-  if (policyPath) targets.push(relative(directory, policyPath));
   await formatter(directory, targets);
+  if (policyPath) {
+    await inspectPath(policyPath);
+    await formatter(dirname(policyPath), [basename(policyPath)]);
+  }
   return true;
 }
 

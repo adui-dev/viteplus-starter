@@ -43,3 +43,32 @@ test("Monorepo 只写根策略，非 Ant Design Vue 不修改", async (t) => {
   assert.match(await readFile(file, "utf8"), /core-js: false/);
   await assert.rejects(readFile(join(app, "pnpm-workspace.yaml")), { code: "ENOENT" });
 });
+
+test("应用与根策略分别定向格式化，不向 Vite+ 传递 .. 路径", async (t) => {
+  const { applyIntegrations } = await import("../src/integrations.mjs");
+  const root = await mkdtemp(join(tmpdir(), "ui-policy-format-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  const app = join(root, "apps/viewer");
+  await mkdir(join(app, "src"), { recursive: true });
+  await writeFile(join(root, "pnpm-workspace.yaml"), "packages:\n  - apps/*\n");
+  await writeFile(join(app, "package.json"), "{}");
+  await writeFile(join(app, "src/main.ts"), "original entry");
+  await writeFile(join(app, "src/App.vue"), "original app");
+  await writeFile(join(app, "vite.config.ts"), "export default defineConfig({plugins:[]})");
+  const calls = [];
+  await applyIntegrations(
+    app,
+    { type: "application", framework: "vue", ui: "antd", css: "unocss", workspace: root },
+    () => {},
+    (cwd, targets) => {
+      assert.ok(targets.every((path) => !path.split(/[\\/]/).includes("..")));
+      calls.push({ cwd, targets });
+    },
+  );
+  assert.equal(calls.length, 2);
+  assert.equal(calls[0].cwd, app);
+  assert.deepEqual(calls[1], { cwd: root, targets: ["pnpm-workspace.yaml"] });
+  assert.ok(!calls[0].targets.includes("pnpm-workspace.yaml"));
+  assert.equal(await readFile(join(app, "src/App.vue"), "utf8"), "original app");
+  assert.match(await readFile(join(root, "pnpm-workspace.yaml"), "utf8"), /core-js: false/);
+});
