@@ -102,7 +102,7 @@ async function main() {
   }
 
   const incomplete = !args.name || !args.type || (args.type === "application" && !args.framework);
-  if (args.engines !== undefined) {
+  if (args.engines !== undefined && !incomplete) {
     console.log(JSON.stringify(await runMultiEngine(args), null, 2));
     return;
   }
@@ -127,6 +127,10 @@ async function main() {
     options = validateProjectOptions(args);
   }
 
+  if (options.engines) {
+    console.log(JSON.stringify(await runMultiEngine({ ...args, ...options }), null, 2));
+    return;
+  }
   const { command, args: vpArgs } = buildVpCommand(options);
   if (options.engine && (args.uiSmoke || args.threeSmoke || args.repairExisting))
     throw new Error("--engine 不能与独立验收/旧版修复模式混用");
