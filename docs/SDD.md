@@ -155,7 +155,7 @@ lazy 适配先授权/认证解密再走原 GLB Loader；模型请求代次、Abo
 
 ## 模型保护创建选项与密钥脚本
 
-新增 CLI --model-protection 与 JSON modelProtection，严格枚举 none/embedded/external，Three/Babylon 默认 embedded；未选两者时不能启用，Monorepo 根拒绝统一设置。交互流程在 UI/CSS 后加入大屏、引擎、保护模式，最终摘要含选择；非交互完整参数不询问。批量 UI Smoke 阶段去除引擎和保护参数，避免重复补装。
+新增 CLI --model-protection 与 JSON modelProtection，严格枚举 none/embedded/external，三引擎默认 embedded；无引擎时不能启用，Monorepo 根拒绝统一设置。交互流程在 UI/CSS 后加入大屏、引擎、保护模式，最终摘要含选择；非交互完整参数不询问。批量 UI Smoke 阶段去除引擎和保护参数，避免重复补装。
 
 planModelProtection 只列模式/文件/脚本/执行时生成标记；执行前检查 env、模型脚本、目录/链接及配置形态。新增模型集成在官方模板、UI/大屏/Three 就绪后运行安全安装器，生成项目独有 .env.local、空 src/models 与 MODEL_GUIDE，再定向格式化。Vite、package 和已有 Git 忽略文件分别备份；保留已有脚本，冲突拒绝。
 
@@ -171,7 +171,7 @@ Ant Design Vue 当前依赖 core-js，pnpm 12 会拒绝未审查的安装脚本�
 
 engine.mjs 统一引擎计划供 CLI/批量调用；Cesium 对应独立增量安装器。四种框架/语言复用 lazy 与场景源码，组件只管理挂载/卸载并放入 AdScreen 原生像素引擎层。lazy 不导入引擎，点击前不创建 Viewer；异步导入晚于卸载时丢弃，失败可重试，销毁断开 ResizeObserver 并调用 Viewer.destroy。模块级缓存不宣称逐实例释放。
 
-固定 Cesium 1.146.0/static-copy 4.1.1，catalog: 只核对本应用已安装元数据，不执行入口。配置在安装前后复核并 wx 备份，增量插入 aduiCesium；不改 base 或正式构建入口。插件从应用依赖图定位四类资源，按 Cesium 资源根重建路径，避免静态复制插件 4 保留 node_modules 相对层级。资源冲突报错。运行时先计算部署 BASE_URL，再动态导入 Cesium 和样式；最小椭球关闭在线图层与地形，不需要 Token。Cesium 暂不接入 .adui，embedded/external 参数拒绝，避免生成无作用密钥。验证及限制见 [CESIUM](CESIUM.md)。
+固定 Cesium 1.146.0/static-copy 4.1.1，catalog: 只核对本应用已安装元数据，不执行入口。配置在安装前后复核并 wx 备份，增量插入 aduiCesium；不改 base 或正式构建入口。插件从应用依赖图定位四类资源，按 Cesium 资源根重建路径，避免静态复制插件 4 保留 node_modules 相对层级。资源冲突报错。运行时先计算部署 BASE_URL，再动态导入 Cesium 和样式；最小椭球关闭在线图层与地形，不需要 Token。Cesium 已支持 .adui 与 embedded/external 自动构建，设计见下文。验证及限制见 [CESIUM](CESIUM.md)。
 
 ## Babylon 首期生成设计
 
@@ -179,7 +179,7 @@ create/babylon 增量安装固定 @babylonjs/core 9.32.1，只新增源码快照
 
 runtime 管理 Engine、Scene 与渲染循环；初始化异常和帧异常停止循环并释放已返回对象。lazy 管理异步导入、画布与 ResizeObserver，点击前不导入场景，晚到结果丢弃、失败可重试、销毁幂等。组件只处理框架挂载/卸载，场景放入 AdScreen 引擎层；ES 深路径引入本地立方体所需模块，不引入在线资产或静态资源插件。模型/加密保持独立，Babylon embedded/external 的共用构建接入见下文。见 [BABYLON](BABYLON.md)。
 
-多引擎通过规范排序和单引擎子阶段复用实现；统一输出冲突/版本预检，基础工程、大屏仅首阶段创建，保护只传选定的模型适配阶段（优先 Three，否则 Babylon）。失败保留现场。设计与限制见 [MULTI_ENGINE](MULTI_ENGINE.md)。
+多引擎通过规范排序和单引擎子阶段复用实现；统一输出冲突/版本预检，基础工程、大屏仅首阶段创建，保护只传选定的模型适配阶段（优先 Three，其次 Babylon，最后 Cesium）。失败保留现场。设计与限制见 [MULTI_ENGINE](MULTI_ENGINE.md)。
 
 交互多选解析数字/名称列表，保持单选返回 engine，多选返回规范 engines；确认后 CLI 分派到同一多引擎编排器。联合验收构建使用显式引擎分组、includeDependenciesRecursively=false 和 strictExecutionOrder=true，避免共享辅助模块导致跨引擎加载；普通项目配置不自动修改。
 
@@ -193,7 +193,7 @@ Vue/React TS/JS 使用同一模型控制器与本地验收 provider，文件读�
 
 ## Babylon 自动构建接入
 
-modelEngine 统一选择可保护引擎：优先 Three，否则 Babylon。单选、多选、CLI/交互和批量 JSON 共用默认 embedded；Cesium 单选仍不启用。多引擎只有模型适配器所属阶段安装保护，统一预检一套输出/env/脚本，后续阶段使用 none，避免配置、密钥和独立页面重复。
+modelEngine 统一选择可保护引擎：优先 Three，其次 Babylon，最后 Cesium。单选、多选、CLI/交互和批量 JSON 共用默认 embedded；Cesium 单选也启用。多引擎只有模型适配器所属阶段安装保护，统一预检一套输出/env/脚本，后续阶段使用 none，避免配置、密钥和独立页面重复。
 
 setupModelPlugin 增加显式 engine（默认 Three），验证对应当前 lazy 快照具备 loadBundledModel。模型插件、KEY 生成/轮换、备份与忽略规则保持共用；modelSmoke 按引擎选择模块、类型和状态回调，不复制另一套加密算法。Babylon lazy 负责同源密文下载和独立取消代次，下载后再初始化并交给模型控制器认证；清除、卸载、后发请求与外部 AbortSignal 均使旧下载/模型失效，晚到结果不提交。
 
@@ -205,4 +205,10 @@ Cesium 模型控制器复用 glb/adui/local-grant，与 Viewer/框架分离。�
 
 创建返回后将候选模型隐藏加入 primitives，使用 readyEvent/errorEvent 和加载期间 postRender 请求帧等待资源就绪，30 秒超时退出。就绪后检查包围球并聚焦，显示新模型后释放旧模型；错误保留旧资产。代次与 AbortController 防止晚到结果安装，取消即解除等待监听并回收候选；异步创建本身不承诺可强制中断，晚到返回后销毁并撤销 URL。Viewer 销毁前先清理模型控制器。
 
-createGlobe 返回包含原场景生命周期及模型方法的最小 handle，lazy 负责框架外的状态和晚到导入；Vue/React TS/JS 仅管理挂载与卸载。独立验收页提供本地 GLB/.adui 与验收密钥，不上传文件。固定示例地理锚点与包围球聚焦只用于集成验收，不等于业务模型配准或操作工具；Cesium embedded/external 和自动构建仍留待下一阶段。
+createGlobe 返回包含原场景生命周期及模型方法的最小 handle，lazy 负责框架外的状态和晚到导入；Vue/React TS/JS 仅管理挂载与卸载。独立验收页提供本地 GLB/.adui 与验收密钥，不上传文件。固定示例地理锚点与包围球聚焦只用于集成验收，不等于业务模型配准或操作工具；Cesium 自动构建接入见下文。
+
+## Cesium 自动构建接入
+
+Cesium 复用原模型安装器、env 插件与 KEY 工具，setup/smoke 的 engine 参数扩展为三引擎。模型页使用 createLazyGlobe 和 GlobeHandle；默认 loader 先设置 BASE_URL 对应资源根再导入场景，不要求业务调用者重复配置。loadBundledModel 下载同源密文后才初始化并进入原模型控制器，清除/后发请求/卸载和外部 AbortSignal 统一取消旧下载与模型请求。
+
+模型适配器优先级固定 Three → Babylon → Cesium，保持旧组合行为。每应用只创建一套模型目录、虚拟模块、密钥脚本和 model-smoke 页面；安装前统一预检输出/env/脚本，旧快照不覆盖。Cesium 资源插件与模型插件分别备份并增量合并，验收工具对模型解密和四类资源同时检查；多引擎另执行显式分组的联合构建。

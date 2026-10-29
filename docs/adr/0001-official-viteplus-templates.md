@@ -91,3 +91,5 @@ Babylon 首期采用固定版本 @babylonjs/core 的 ES 深路径模块，按需
 ## 2026-10-29：Cesium 模型就绪与 Blob 生命周期
 
 Cesium 使用公开 Model.fromGltfAsync({url}) 接收受控 Blob URL，复用共享授权/GLB 核心。按固定版本实现，创建结果仍须加入场景处理资源，因此使用隐藏候选、readyEvent/errorEvent、限时请求帧完成就绪判断，再替换旧模型；取消/失败回收候选、监听与 URL。Blob 的明文副本随资产持有，不能宣称清零全部内存。先完成本地文件与授权适配，再单独验收 env 自动构建。依据 [官方 Model 文档](https://cesium.com/learn/cesiumjs/ref-doc/Model.html)。
+
+2026-10-29 后续：Cesium 接入原 env 构建插件、密钥脚本与同源限长下载，不引入第二套密码格式。模型适配优先级固定为 Three → Babylon → Cesium，以保留既有组合入口；多引擎只安装一套 KEY/插件/模型页。默认 loader 在场景导入前设置资源 base，模型应用验收同步检查四类 Cesium 资源。关闭保护及旧快照拒绝覆盖的行为保持明确。

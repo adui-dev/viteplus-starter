@@ -25,7 +25,7 @@ node ./viteplus-starter/packages/create/bin/cli.mjs --config ./viteplus-starter/
 node ./viteplus-starter/packages/create/bin/cli.mjs --config ./viteplus-starter/examples/cesium.batch.json
 ```
 
-已有工作区用 --workspace <路径> 添加应用。官方 catalog: 引用通过本应用解析到的已安装包元数据核对版本，不执行包入口或覆盖 catalog；每个应用只增加自身所选引擎。支持 [多引擎组合](MULTI_ENGINE.md) 和本地 GLB/.adui 加载。Cesium env 自动构建保护尚未接入，embedded/external 仍拒绝，不生成无作用的 KEY 脚本；Three/Babylon 的自动保护保持原有行为。
+已有工作区用 --workspace <路径> 添加应用。官方 catalog: 引用通过本应用解析到的已安装包元数据核对版本，不执行包入口或覆盖 catalog；每个应用只增加自身所选引擎。支持 [多引擎组合](MULTI_ENGINE.md)、本地 GLB/.adui 与 env 自动构建保护。默认 embedded，可选 external 或 none，自动生成项目 KEY 与轮换脚本；多引擎只配置一套，适配器优先级为 Three → Babylon → Cesium。
 
 ## 资源与构建
 
@@ -59,3 +59,18 @@ node scripts/verify-cesium-build.mjs D:/Workspace/adui-studio/globe ./
 Blob 保存独立明文副本供加载器使用，URL 存活至对应资产释放。临时解密缓冲最终清零不等于清除 Blob、引擎缓存或 GPU 的所有副本；浏览器合法解密仍可提取模型。旧源码快照不会覆盖升级。
 
 API 依据 [Cesium 官方 Model 文档](https://cesium.com/learn/cesiumjs/ref-doc/Model.html) 和本项目固定版本 [1.146 的加载实现](https://github.com/CesiumGS/cesium/blob/1.146/packages/engine/Source/Scene/Model/Model.js)，就绪判定使用事件，不把创建 Promise 当作全部资源就绪。
+
+## env 自动构建与目录加载
+
+新建 Cesium 应用默认增加 src/models、被忽略的 .env.local、models:keygen/models:keyrotate 和 /model-smoke.html。将自包含 GLB 放入 src/models 后，开发/构建自动扫描并生成 .adui。普通构建保留官方首页入口，仍输出密文；独立模型页需显式加入 HTML 输入。
+
+embedded 模型页自动下载同源密文并解密，无需手动选择密钥。external 初始锁定，选择独立解锁 JSON 后加载；锁定清除模型并取消未完成请求。none 不生成模型构建插件、env、KEY 脚本或模型目录页，本地文件验收继续可用。操作与密钥边界见 [MODEL_BUILD](MODEL_BUILD.md)。
+
+createLazyGlobe 默认 loader 在导入场景前设置部署 base 对应的 CESIUM_BASE_URL；loadBundledModel(asset,{authorize,signal}) 先通过共用限长下载器获取 .adui，再初始化 Viewer 并进入原授权/GLB/就绪流程。clear/cancel/destroy 和外部 signal 使旧下载失效，晚到结果不提交。
+
+```powershell
+node scripts/verify-model-app.mjs D:/Workspace/adui-studio/globe /model-check/
+node scripts/verify-model-app.mjs D:/Workspace/adui-studio/globe ./
+```
+
+需 src/models 至少一个 GLB；工具检查双入口/base、密文数量与解密一致性、无原 GLB/明文/KEY 字面量，同时检查 Cesium 四类静态资源。产物保留 dist/model-verify，临时配置结束删除，不与同一工作区检查并行。旧快照缺少 loadBundledModel 时拒绝安装保护，不自动覆盖旧源码。

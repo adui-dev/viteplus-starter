@@ -68,6 +68,6 @@ authorize 接收只读 `{modelId,keyId,format:'glb'}` 及可选 AbortSignal，�
 
 ## 本地验证
 
-Cesium 通过 createLazyGlobe.loadModel(buffer, {encrypted: true, authorize}) 复用授权与认证解密。自包含 GLB 经校验后才创建 Blob URL，模型在 GPU/纹理就绪后替换旧资产，取消/卸载回收候选、监听和 URL。Blob 保存独立明文副本，释放与清零不构成防提取保证。Cesium env 自动构建仍待接入，见 [CESIUM](CESIUM.md)。
+Cesium 通过 createLazyGlobe.loadModel(buffer, {encrypted: true, authorize}) 复用授权与认证解密。自包含 GLB 经校验后才创建 Blob URL，模型在 GPU/纹理就绪后替换旧资产，取消/卸载回收候选、监听和 URL。loadBundledModel 已接入 env 构建目录、同源限长下载和 embedded/external 授权，复用同一套密文与 KEY 脚本。Blob 保存独立明文副本，释放与清零不构成防提取保证，见 [CESIUM](CESIUM.md)。
 
 运行 node --test、node scripts/validate-docs.mjs、vp check；测试包括真实 CLI、原生 Node crypto 互操作、头/密文/tag 篡改、错误密钥、到期/拒绝/取消、授权文件快照、晚到解密、替换清理与本地 provider。浏览器实际模型与四组合构建记录见 [PROJECT_CONTEXT](PROJECT_CONTEXT.md)。

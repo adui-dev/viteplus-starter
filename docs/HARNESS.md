@@ -152,6 +152,8 @@ vp build
 
 Cesium 模型另选择原 GLB 和匹配 .adui/验收密钥，确认资源就绪后显示贴图、无授权拒绝、清除授权移除模型、卸载画布为 0。受控测试验证 ready/error/超时监听、取消与晚到创建、替换失败保留旧资产及 Blob URL 回收；不将其扩大为全部 GPU 缓存回收或 env 自动构建完成。
 
+Cesium 自动构建使用 verify-model-app，检查双入口/base、密文与原 GLB 一致性、无原模型/KEY 字面量及四类资源。分别检查 embedded 自动加载、external 初始锁定/解锁/清除；开发服务检查原模型/env 403 与密文 200。KEY 轮换后重新构建与刷新验收。混合应用另确认模型插件/KEY 只有一套，模型入口符合 Three → Babylon → Cesium 优先级，再运行 verify-multi-build；每项专项与工作区全局检查串行。
+
 ## Babylon 本地验证
 
 按 [BABYLON](BABYLON.md) 创建 Vue/React、TS/JS 与官方工作区，执行 check/build/ready。之后单独运行 verify-babylon-build，确认首页+验收页双入口、场景分块及 /babylon-check/、./ 部署。浏览器检查点击前无 canvas/引擎场景请求、加载后立方体、卸载画布清除、重挂等待再次点击、控制台无错误。受控测试验证初始化和帧错误后的循环/场景/引擎清理，不将其等同 GPU 堆测量或模型支持。

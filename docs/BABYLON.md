@@ -47,7 +47,7 @@ API 与模块导入依据见 [Babylon 官方 ES 模块说明](https://doc.babylo
 
 新应用默认生成 src/models、被忽略的 .env.local、models:keygen/models:keyrotate 脚本、独立 /model-smoke.html。将 GLB 放入 src/models 后运行 vp dev，模型验收页通过同源 .adui 目录自动下载、解密并加载；生产构建只输出密文。普通 vp run build 保留官方首页入口；专项页面构建需显式加入 model-smoke.html，详见 [MODEL_BUILD](MODEL_BUILD.md)。
 
-external 模式先选择独立解锁 JSON，再加载构建目录；锁定清除当前模型与待处理请求。none 模式保留本地文件验收，不生成模型插件、env 或 KEY 脚本。多引擎共用一个模型目录与插件，同时包含 Three 时模型验收页沿用 Three，否则使用 Babylon。
+external 模式先选择独立解锁 JSON，再加载构建目录；锁定清除当前模型与待处理请求。none 模式保留本地文件验收，不生成模型插件、env 或 KEY 脚本。多引擎共用一个模型目录与插件，同时包含 Three 时模型验收页沿用 Three；没有 Three 的 Babylon/Cesium 组合继续使用 Babylon。
 
 ```powershell
 node scripts/verify-model-app.mjs D:/Workspace/adui-studio/cube /model-check/

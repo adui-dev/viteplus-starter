@@ -6,7 +6,7 @@
 
 - 仓库：`adui-dev/viteplus-starter`。Vite+ 官方 `vite:application` / `vite:monorepo` 是唯一基础工程来源，Vue/React Application 按语言选 `vue` / `vue-ts` / `react` / `react-ts`。
 - 已实现：基础 CLI 交互与参数模式、Application UI/CSS 集成、旧项目补装及 `--repair-existing`、UI Smoke、通过 `--workspace` 逐个添加及通过 JSON 批量新建 Monorepo 应用、本地单元测试与文档检查。
-- 进行中：Monorepo 自定义布局与显式恢复、其余 UI/CSS 兼容矩阵、Cesium/Babylon 的大屏专项及 Cesium 自动模型构建；已实现范围见文末及 GENERATOR_STATUS。
+- 进行中：Monorepo 自定义布局与显式恢复、其余 UI/CSS 兼容矩阵及 Cesium/Babylon 的大屏专项；已实现范围见文末及 GENERATOR_STATUS。
 - 严格要求：**不得添加任何 CI/CD、自动发布或部署工作流**；仅人工本地测试。
 
 ## 用户 Windows 实机验收（已确认）
@@ -304,3 +304,18 @@
 - Vue 加密头盔截图保存 D:/Workspace/adui-studio/cesium-helmet-acceptance.png，不纳入 Git；原 GLB SHA256 仍为 a1e3b04de97b11de564ce6e53b95f02954a297f0008183ac63a4f5974f6b32d8，没有修改用户模型、既有 .adui 或验收密钥。临时浏览器标签页与 4341/4342 预览服务已清理。
 - 本轮未开放 Cesium embedded/external，也未生成 env/KEY 脚本，Three/Babylon 自动保护行为不变。最终 182/182 Node 测试、378 只读组合计划（实际创建/构建计数仍为 0）、文档校验、根 vp check（149 格式/109 代码文件）与 diff 检查通过；仓库依赖/锁文件未改，不创建流水线或发布，按中文 emoji 分步提交推送。
 - 下一步：将 Cesium 模型适配接入共用 env 自动加密与构建目录加载，复用 KEY/轮换及仅输出 .adui 的产物检查，再验收多引擎下的一套模型配置。
+
+## 2026-10-29 Cesium env 自动模型打包
+
+- Cesium 默认启用 embedded，CLI/交互/逐应用 JSON 同步支持 external/none。复用原 env 加密插件、KEY/轮换、忽略与备份，setup CLI 可 --engine cesium；模型页面导入 createLazyGlobe/GlobeHandle。三引擎仍由官方 Application/Monorepo 入口创建，没有新增框架模板、依赖版本或流水线。
+- lazy 新增同源限长目录下载与外部取消，下载后初始化再进入原认证/GLB/就绪流程；默认 loader 在导入 Cesium 前设置部署 base。清除、后发请求、卸载及外部 signal 失效旧下载和模型。none 不生成 env、模型构建插件或 KEY 脚本，旧快照缺少 loadBundledModel 时拒绝保护安装；原 Three/Babylon 行为保留。
+- 模型适配器优先级固定 Three → Babylon → Cesium，多引擎只向一个阶段传递保护。两项新增测试覆盖 Cesium 插件/配置备份保留、两模式/关闭/旧快照，以及目录下载取消/初始化/卸载；已有交互、批量、多引擎阶段测试更新。只读矩阵扩展至 462 组合：132 UI Smoke、420 大屏、三引擎各 126、252 模型保护；实际创建/构建计数仍为 0。
+- 官方入口新建 cesium-auto-vue-ts（Vue TS / embedded）、cesium-auto-react-js（React JS / external）。vp check 分别 61/43、57/41 格式/代码文件无警告错误，正式首页构建通过。各将原 DamagedHelmet.glb 以 wx 新文件复制到本轮 src/models，没有修改原件或旧项目快照。
+- 在既有官方 adui-cesium-workspace 新增 auto-model-vue（Vue JS / external）、auto-model-react（React TS / embedded）及 mixed-models（React JS / Three+Cesium+Babylon 默认保护）。根 ready 0/15 缓存、15/15 成功，381 格式、273 lint/type 文件无警告错误，官方 utils 测试通过，保留官方 TypeScript API 实验性提示。混合应用完整创建成功，原成员保留。
+- mixed-models 的 Vite 模型插件调用与 env KEY 字段分别只有一处，model-smoke 保留 Three 入口；Cesium/Babylon 源码与页面各自独立。混合应用额外完成 index/three/cesium/babylon/model 五入口联合构建，显式分组检查通过；本轮没有声称三引擎同页运行或新增混合页浏览器验收。
+- 四个 Cesium 组合及混合应用均通过 verify-model-app，核对双入口/base、密文数量、解密等于原 GLB、无原模型/明文/KEY 字面量。工具新增 Cesium 四类资源检查，五应用均通过。Vue 使用 /model-check/，React 使用 ./，产物保留各 dist/model-verify；混合另有 dist/multi-verify，临时配置均删除。专项与工作区检查串行，保留默认 500 kB 提醒。
+- Chrome Vue TS embedded 页面无需手工解锁即显示原头盔并 ready，warn/error 为空；React JS external 初始 canvas=0、加载禁用，选择网站目录外的临时解锁 JSON 后显示头盔并 ready，warn/error 为空；锁定后模型状态 empty、加载禁用。临时解锁文件结束移除，未使用生产密钥。
+- 真实 Vue 开发服务确认原 GLB/env HTTP 403、模型页/Widgets CSS/密文 HTTP 200。models:keygen 拒绝覆盖，models:keyrotate 更新 KEY 并备份，env/备份由 Git 忽略。轮换后重新执行普通首页与专项构建，浏览器刷新自动 ready；五应用普通首页构建的 dist/models 密文均能用当前项目 KEY 解密为原 GLB。
+- 共用 verify-model-build 以同一原模型回归：external/embedded build/decrypt、明文/KEY 403、密文 200、模型变更重新加密及 env 轮换均通过。最终 184/184 Node 测试、文档校验、根 vp check（149 格式/109 代码文件）和 diff 检查通过，仓库锁文件未改，不发布 npm/Release，按中文 emoji 分功能、验收工具、文档提交推送。
+- KEY 轮换后 Vue 截图 D:/Workspace/adui-studio/cesium-auto-model-acceptance.png 不纳入 Git；原 GLB SHA256 仍为 a1e3b04de97b11de564ce6e53b95f02954a297f0008183ac63a4f5974f6b32d8。临时标签页、自建 4361/4362 预览与 4363 开发服务已清理。
+- 下一步：补齐 Cesium/Babylon 在 AdScreen 中的窗口缩放、DPR 与全屏专项验收，继续完善生成器跨组合覆盖，不扩展业务查看器工具。
