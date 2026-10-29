@@ -180,13 +180,17 @@ Cesium 自动构建使用 verify-model-app，检查双入口/base、密文与原
 
 根与 create 包的 engines.node 使用锁定 Vite+ 1.4.0 的范围：`^22.18.0 || ^24.11.0 || >=26.0.0`。依据是已安装 vite-plus/package.json 的 engines 字段及随包 guide/vitest-v5.md；不是泛指任意 Node 22。依赖更新后需重新核对范围和实测结果。
 
-用官方环境管理器安装指定运行时，再在当前 PowerShell 进程临时选择。仅给最外层 node 指定 --node，不能作为后续 vp 子进程也使用该版本的证据；VP_NODE_VERSION 应同时传给子进程。以下步骤不修改全局默认、项目 pin、系统 Node 或依赖版本：
+用官方环境管理器安装指定运行时，再在当前 PowerShell 进程临时选择。仅给最外层 node 指定 --node，不能作为后续 vp 子进程也使用该版本的证据；VP_NODE_VERSION 应同时传给子进程。还需把 vp 所在的官方 shim 目录放在 PATH 首位，并核对 pnpm 的解析来源；本机系统 Corepack 的 pnpm.cmd 会优先调用同目录的 Node 24，仅设置 VP_NODE_VERSION 无法约束该转发器。以下步骤不修改全局默认、项目 pin、系统 Node 或依赖版本：
 
 ```powershell
 vp env install 22.18.0
 $node22Previous = [Environment]::GetEnvironmentVariable('VP_NODE_VERSION', 'Process')
+$node22PreviousPath = $env:PATH
 try {
   $env:VP_NODE_VERSION = '22.18.0'
+  $node22ShimDirectory = Split-Path (Get-Command vp -CommandType Application).Source
+  $env:PATH = $node22ShimDirectory + [IO.Path]::PathSeparator + $node22PreviousPath
+  Get-Command node,pnpm | Select-Object Name,Source
   vp env current --json
   vp env exec node -p "process.version + ' ' + process.execPath"
   vp env exec node --test
@@ -196,9 +200,10 @@ try {
   vp check
 } finally {
   [Environment]::SetEnvironmentVariable('VP_NODE_VERSION', $node22Previous, 'Process')
+  $env:PATH = $node22PreviousPath
 }
 ```
 
-真实生成和构建需在同样的临时环境选择下另行执行：先用仓库外 JSON 指定一个不存在的官方工作区及 Vue/React × TS/JS 四个应用，运行原 CLI --config；随后在新工作区核对 vp env current --json，再运行 vp run ready --no-cache、vp check，以及 UI 应用的 verify-ui-build。保留官方根和应用的运行时声明，不通过修改模板来强行兼容。所有命令都需检查退出码，前一步失败应先处理现场，不将后续命令的成功代替前一步结果。
+真实生成和构建需在同样的临时环境选择下另行执行：先用仓库外 JSON 指定一个不存在的官方工作区及 Vue/React × TS/JS 四个应用，运行原 CLI --config；随后在新工作区核对 vp env current --json，再运行 vp run --no-cache ready、vp check，以及 UI 应用的 verify-ui-build。Vite+ run 的选项放在任务名之前，任务名之后的参数会转发给脚本；不能写成 vp run ready --no-cache。保留官方根和应用的运行时声明，不通过修改模板来强行兼容。所有命令都需检查退出码，前一步失败应先处理现场，不将后续命令的成功代替前一步结果。
 
 示例和组合验证仍为 actualBuilds=0；真实生成、完整类型/构建、UI 双入口构建与浏览器验收分别记录，不把运行时兼容验证扩大成新增浏览器验收。

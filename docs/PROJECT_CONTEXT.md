@@ -407,3 +407,16 @@
 - 下一步验证声明的 Node 22 最低版本兼容性，按 V1 剩余清单处理实测阻塞；不增加演示功能或发布流程。
 
 本轮最终仓库检查：node --test 210/210，文档静态校验通过，vp check 格式 170 文件、lint 127 文件通过。没有修改仓库依赖声明或锁文件；实际验证工程的安装变化仅保留于仓库外的测试工作区。
+
+## 2026-10-30：Node 22 最低版本兼容复验
+
+- 本轮仅处理 V1 运行时兼容性，没有新增预设、查看器功能或恢复模式。发现原 >=22 声明比锁定 Vite+ 1.4.0 的范围宽，根与 create 包改为 ^22.18.0 || ^24.11.0 || >=26.0.0；README、Harness、模型工具说明、需求与设计同步。依赖版本和锁文件未升级。
+- 使用 vp env install 22.18.0 安装独立托管缓存，不更改系统 Node、全局默认或项目 pin。Node 22.18.0 与系统 Node 24.18.0 分别通过 210/210 测试；Node 22 的文档检查、8 个 JSON/20 个应用预览、462 个组合计划及根 vp check 通过。计划 actualBuilds 仍为 0。
+- 实际创建 D:/Workspace/adui-studio/adui-node22-acceptance：官方根、Vue TS/Ant Design Vue/UnoCSS、React JS/Ant Design/Tailwind、Vue JS/none、React TS/none 与两个 UI Smoke，共七阶段成功。官方日志及 CLI/工具进程路径确认 22.18.0，pnpm 12.16.1；保留 website/utils 结构。
+- 首轮 UI 安装发现系统 pnpm.cmd 用 Node 24 的 Corepack 转发，不将其误记为全链路 Node 22。后续临时 PATH 前置官方 shim，确认 node/pnpm 来源与实际 22.18.0 路径后完成离线冻结安装，锁文件哈希一致；另显式以 Node 22 执行同一 Corepack 分发器，冻结安装也通过。已在 Harness 补充进程环境和 PATH 恢复方法。
+- 验收命令首轮将 --no-cache 放在任务名后，被转发给构建器并报错；改为 vp run --no-cache ready 后 11/11 无缓存通过。包含 utils 测试、四应用完整构建、Vue/React TS 类型检查和官方默认成员构建，未改源码或检查规则来规避错误。
+- Vue 使用 /ui-check/、React 使用 ./ 完成两个 UI 双入口构建，临时配置移除，产物保留 dist/ui-verify。最终工作区 vp check 69 格式/28 代码文件通过；保留 TypeScript 7 API 实验性、UnoCSS 多入口与性能提示。没有重复声明浏览器渲染通过。
+- Node 22 真实 inspect 识别六成员、四应用 present；plan 全部 validate-existing；execute completed=[]、skipped=4。入口执行前后 48 项根/应用源文件哈希一致，官方 website/utils 的 19 项原文件从添加应用前到验证结束保持一致。根无框架/UI/CSS 直接依赖，未修改业务工程。
+- 以用户原 DamagedHelmet 运行共享 verify-model-build，Node 22 两模式构建/解密、明文/密钥 HTTP 403、密文 HTTP 200、模型变更重加密和 env 轮换均通过。原 GLB SHA256 仍为 a1e3b04de97b11de564ce6e53b95f02954a297f0008183ac63a4f5974f6b32d8；工具临时目录与测试密钥清理，不把此项称为全部引擎/浏览器已验收。
+- 临时批量 JSON、默认成员哈希记录清理；验证工作区保留。未改变系统默认运行时，未新增依赖、CI/CD 或发布操作。
+- 下一步检测可用 Linux 验证环境，按同一 V1 清单补齐跨平台证据；不扩大预设或查看器功能。没有 Linux 实测前仍保留平台未覆盖声明。
