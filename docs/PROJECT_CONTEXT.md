@@ -367,3 +367,12 @@
 - 真实 CLI 对既有 adui-cesium-workspace 检查出 11 个成员；使用临时预期 JSON 检查 ui-tdesign-react-ts（React TS/TDesign/UnoCSS/UI Smoke），退出 0、应用 present、无结构问题。检查前后根清单/YAML/锁/Vite 配置与应用清单/入口/配置共 33 项 SHA256 一致。临时 JSON 在工作区外创建并已移除。
 - 受控测试覆盖只读清单、未执行配置及秘密不输出、预设缺失与新增预设后状态变化、未创建应用、重复包名/损坏清单、语言/配置冲突、junction/遍历、CLI JSON/退出码及禁止写入参数。Node 测试 200/200，根 vp check 格式 160 文件、lint 120 文件通过，文档校验通过。
 - 下一步：在此只读预检基础上生成逐应用恢复操作计划，明确哪些步骤需要人工处理、哪些仅允许新建；继续保持原有拒绝覆盖策略，不直接实现自动续跑或自定义工作区布局。
+
+## 2026-10-29：只读逐应用恢复操作计划
+
+- 新增 --plan-recovery <已有根> --config <原 JSON>，只读返回 manual-plan；不混用创建或写入模式。缺失且预检通过的应用为 create-missing，已有结构完整应用为 validate-existing，部分完成/冲突为 manual-review。存在根或成员清单问题时全局阻塞；局部预设缺失只阻塞对应应用。
+- 缺失应用再次检查目录、作用域包名、peer 和声明合并条件后生成条件新建 argv；UI Smoke 步骤要求前一步完成并重新检查冲突。已有应用只建议 vp check 与 vp run build，不生成 --apply-existing 或覆盖命令。计划完全不执行；ok=true 不表示已恢复或构建通过。
+- 原 batch 的应用 argv 构造抽入共用 application-invocations，保持参数与官方入口不变。恢复计划仅读取原配置一次，使用同一份校验数据进行检查及规划；不创建恢复状态文件或存储密钥。
+- 真实 CLI 在既有 adui-cesium-workspace 上检查 ui-tdesign-react-ts，并仅规划 recovery-planned-vue（Vue TS/TDesign/UnoCSS）、recovery-planned-react（React JS/Ant Design/Tailwind）。已有应用给出两项验证步骤，两个未创建应用各给出新建和 UI 验收步骤。退出 0；33 项文件 SHA256 和应用目录清单一致，没有实际创建应用、安装或运行验证命令。临时配置已移除。
+- 本轮 204/204 Node 测试通过，文档校验通过，根 vp check 格式 163 文件、lint 123 文件通过；受控用例覆盖局部/全局阻塞、作用域包冲突、参数完整转发、禁止混写与无配置、junction 及无目标写入。未修改 UI/大屏/引擎预设或新增浏览器验收声明。
+- 下一步：显式执行计划中允许新建的缺失应用，每一步执行前重新预检、遇阻即停；已有和部分完成应用继续人工处理。自动覆盖式续跑与自定义布局仍不在本阶段范围。

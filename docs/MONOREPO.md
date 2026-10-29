@@ -77,3 +77,19 @@ JSON 报告包含 root、readOnly、ok、issues、members、apps 和 limitations
 无 --config 时只是成员清单及根结构检查，不推断每个应用原本应有哪些预设。发现问题或预期应用缺失时退出 1，检查无问题时退出 0；不安全路径、损坏根或无效 JSON 参数会报错并退出 1。该模式只能配合 --config，不能混用创建、补装、dry-run 等选项。
 
 不会执行 Vite 配置或清单脚本，不扫描 node_modules，不读取 env 内容，也不会安装、格式化、生成或恢复文件。声明存在不等于依赖已安装；文件存在不证明配置有效或版本兼容。旧生成项目源码快照与当前计划可能不同，缺失文件只提示人工核对，不自动补写。若需继续操作，先修复现场，再用已有逐应用命令重新预检。
+
+## 逐应用恢复操作计划（只读）
+
+```powershell
+node packages/create/bin/cli.mjs --plan-recovery D:/Workspace/adui-studio/adui-cesium-workspace --config ./expected-apps.json
+```
+
+必须提供原批量 JSON；不能混用 --inspect-workspace、--dry-run、--apply-existing 或创建参数。报告是人工操作计划，包含 root、readOnly=true、mode=manual-plan、ok、apps 和 limitations；每个应用按原 JSON 顺序归入：
+
+- create-missing：目录不存在，且工作区和同名包、peer/声明配置预检通过。列出独立新建命令；如选择 uiSmoke，追加应用创建和检查后才可执行的验收页命令。
+- validate-existing：预期结构存在，只列 vp check 和 vp run build；不生成重新创建或补装命令。构建可能执行现有项目脚本，必须由开发者自行审阅后运行。
+- manual-review：基础工作区问题、包名冲突或部分完成的应用等情况，列出原因，steps 为空；不建议删除、覆盖或盲目补装。
+
+存在根问题、重复包名或成员清单问题时，所有应用先进入人工处理；单个应用只是预设/入口缺失时，该应用单独阻塞。发现 manual-review 退出 1，其余计划退出 0；ok=true 仅表示本次计划没有人工阻塞，不表示应用已恢复、依赖已安装或构建通过。
+
+每个步骤给出 cwd、command、args、PowerShell 显示文本；新建步骤另有 requires 条件。生成和消费计划均不在检查命令中执行。运行输出的新建命令仍走原官方模板 CLI，执行时再次拒绝已存在目标；新建后的 UI 验收页也必须重检输出冲突。计划不会写状态文件或自动断点续跑。

@@ -156,3 +156,10 @@ engine-prompts.test.mjs：多选解析、摘要/取消、Three 保护提示；ve
 - packages/create/src/workspace-inspect.mjs：只读成员清单、预期应用的声明/文件检查与 JSON 状态；复用现有校验和生成计划。
 - packages/create/src/cli-args.mjs、bin/cli.mjs：--inspect-workspace 参数及隔离的只读 CLI 分支。
 - packages/create/test/workspace-inspect.test.mjs：清单/预设缺失、语言与配置歧义、重复包名、junction、路径遍历、秘密内容不输出、CLI 退出码及写入选项拒绝。
+
+## 逐应用恢复计划
+
+- packages/create/src/workspace-recovery.mjs：只读计划、全局/应用阻塞分类、缺失应用再次预检及条件新建步骤。
+- packages/create/src/application-invocations.mjs：批量生成和恢复指引共用的逐应用 argv 构造。
+- packages/create/src/workspace-inspect.mjs：共用预期 JSON 读取与同配置检查入口，不回显配置内容。
+- packages/create/test/workspace-recovery.test.mjs：混合状态、全局/作用域冲突、多引擎和大屏参数、CLI 只读及参数隔离、链接拒绝。

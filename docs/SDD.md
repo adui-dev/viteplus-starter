@@ -236,3 +236,9 @@ createStageRunner 只包裹执行动作，不接管原有路径/选项预检。�
 workspace-inspect 复用 safe-paths 的逐祖先链接拒绝、现有官方 YAML 列表校验和批量 JSON 校验，不调用 loadBatchPlan 的新建目标校验。成员按 apps/packages/tools 一层枚举，跳过隐藏目录和 node_modules；JSON/YAML 最大 1 MiB。不执行 Vite 配置、不返回清单脚本或环境文件内容。
 
 携带预期配置时复用 UI/CSS、screen、engine、modelProtection 的计划，检查对应声明及输出文件存在性；生成计划只在内存中执行，模型 env 文件仅检查元数据。输出 not-created / blocked / present，最后一个状态不表示依赖已安装或配置内容兼容。CLI 分支位于创建/批量生成之前，严格限制参数组合；不启动子进程或写入恢复状态。
+
+## 逐应用恢复计划
+
+workspace-recovery 读取并校验原 JSON 一次，将同一配置交给只读检查，避免两次读取配置产生选项不一致。全局根/成员问题阻塞全部操作，应用局部缺失仅阻塞自身。对于 not-created 再调用 resolveWorkspaceApplication 检查实际目录、作用域包名、peer 以及根声明配置；若目标在规划期间出现，返回 manual-review。
+
+application-invocations 抽取原批量应用 argv 构造，批量新建与恢复计划共用，保留框架/语言/UI/CSS/大屏/引擎/模型保护选项。UI Smoke argv 与增强安装选项分离，防止生成时重复集成。pendingRecovery 继续负责显示用 PowerShell 转义；没有新的 shell 执行路径。present 仅规划验证命令，不自动读取或执行 package scripts。

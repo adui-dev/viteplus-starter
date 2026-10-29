@@ -110,3 +110,7 @@ Chrome 中 Vue TS 与 React JS 两页面均通过按钮点击 0→1、CSS 颜色
 单应用 CLI 对官方模板、工作区准备/整理、UI/CSS、预设和验收页阶段提供失败阶段、目标目录、已完成步骤及现场保护说明。官方子进程非零退出码会保留，信号退出按失败处理。这里提供人工恢复信息，尚未实现自动断点续跑或覆盖式恢复。
 
 恢复前可使用 --inspect-workspace <已有根> --config <原批量 JSON>，只读对照预期应用的声明和文件结构；不会因根已存在而尝试覆盖创建。not-created / blocked / present 的含义见 [Monorepo 说明](MONOREPO.md)。检查通过仍不能直接将失败阶段视为完成，需执行对应的本地验证。
+
+## 已有工作区的逐应用操作计划
+
+使用 --plan-recovery <已有根> --config <原批量 JSON>，不复用 --config 的新建根流程。缺失应用、已存在应用和部分完成应用分别规划为 create-missing、validate-existing、manual-review；详见 [Monorepo 操作计划](MONOREPO.md)。该命令不会执行计划，保留原有批量新建根拒绝覆盖行为。
