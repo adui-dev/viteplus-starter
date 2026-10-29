@@ -30,7 +30,11 @@ async function configs(directory) {
   return found;
 }
 
-export async function inspectWorkspace(directory, configFile) {
+export async function readExpectedConfig(filename) {
+  return validateBatchConfig(await json(resolve(filename)));
+}
+
+export async function inspectWorkspace(directory, configFile, configuration) {
   const root = resolve(directory);
   if (!(await inspectPath(root, "工作区检查"))?.isDirectory())
     throw new Error("工作区根目录不存在");
@@ -47,7 +51,11 @@ export async function inspectWorkspace(directory, configFile) {
   validateWorkspacePackages(await readFile(yaml, "utf8"));
   if (!(await inspectPath(join(root, "apps"), "工作区检查"))?.isDirectory())
     throw new Error("缺少官方 apps 目录");
-  const expected = configFile ? validateBatchConfig(await json(resolve(configFile))).apps : [];
+  const expected = configuration
+    ? validateBatchConfig(configuration).apps
+    : configFile
+      ? (await readExpectedConfig(configFile)).apps
+      : [];
   const issues = [],
     members = [],
     names = new Set(typeof manifest.name === "string" ? [manifest.name] : []);

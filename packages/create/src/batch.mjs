@@ -1,7 +1,7 @@
+import { applicationInvocations } from "./application-invocations.mjs";
 import { pendingRecovery, recoveryAdvice } from "./recovery.mjs";
 import { lstat, readFile, realpath, stat } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 import { buildVpCommand, validateProjectName, validateProjectOptions } from "./options.mjs";
 import { planIntegrations } from "./integrations.mjs";
@@ -11,7 +11,6 @@ import { planEngine } from "./engine.mjs";
 import { planModelProtection } from "./model-protection.mjs";
 import { resolveWorkspaceApplication, runWorkspaceVp } from "./workspace.mjs";
 
-const cliPath = fileURLToPath(new URL("../bin/cli.mjs", import.meta.url));
 const maxConfigBytes = 1024 * 1024;
 
 function fields(value, allowed, label) {
@@ -132,37 +131,7 @@ export async function createBatchPlan(input, cwd = process.cwd()) {
   ];
   for (const app of config.apps) {
     const options = { ...app, type: "application", workspace: workspaceRoot };
-    const args = [
-      cliPath,
-      "--workspace",
-      workspaceRoot,
-      "--name",
-      app.name,
-      "--type",
-      "application",
-      "--framework",
-      app.framework,
-      "--language",
-      app.language,
-      "--ui",
-      app.ui,
-      "--css",
-      app.css,
-    ];
-    const uiArgs = [...args];
-    if (app.engine) args.push("--engine", app.engine);
-    if (app.engines) args.push("--engines", app.engines.join(","));
-    if (app.modelProtection !== undefined) args.push("--model-protection", app.modelProtection);
-    if (app.screen)
-      args.push(
-        "--screen",
-        "--screen-width",
-        String(app.screen.designWidth),
-        "--screen-height",
-        String(app.screen.designHeight),
-        "--screen-mode",
-        app.screen.mode,
-      );
+    const { args, uiArgs } = applicationInvocations(app, workspaceRoot);
     steps.push({
       kind: "application",
       label: "应用 " + app.name,

@@ -1,5 +1,6 @@
 const VALUE_OPTIONS = new Set([
   "--inspect-workspace",
+  "--plan-recovery",
   "--engine",
   "--engines",
   "--model-protection",
