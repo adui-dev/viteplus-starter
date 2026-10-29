@@ -38,6 +38,10 @@ test("Cesium 四种框架语言计划隔离，默认无模型保护与密钥", a
       const plan = await planCesium(options);
       assert.equal(plan.previewPath, "/cesium-smoke.html");
       assert.ok(plan.files["adui-cesium-build/vite.mjs"]);
+      assert.ok(plan.files["src/adui-cesium/model.mjs"]);
+      assert.ok(plan.files["src/adui-cesium/glb.mjs"]);
+      assert.ok(plan.files["src/adui-cesium/adui.d.mts"]);
+      assert.ok(!plan.files["src/adui-cesium/model.mjs"].includes("../../model-security/"));
       assert.match(
         plan.files["src/adui-cesium/demo.mjs"],
         /return import\(['"]\.\/scene\.mjs['"]\)/,

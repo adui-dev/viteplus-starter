@@ -1,5 +1,8 @@
 // The loader stays outside this module so importing the page does not import Cesium.
-export function createLazyGlobe(host, { load, onState = () => {}, onError = () => {} }) {
+export function createLazyGlobe(
+  host,
+  { load, onState = () => {}, onError = () => {}, onModelState = () => {} },
+) {
   let disposed = false,
     viewer,
     pending;
@@ -14,6 +17,16 @@ export function createLazyGlobe(host, { load, onState = () => {}, onError = () =
     onState({ loading, ready: Boolean(viewer), disposed });
   }
   return {
+    async loadModel(buffer, options) {
+      if (!viewer || disposed) throw new Error("请先加载 Cesium 场景");
+      return viewer.loadModel(buffer, options);
+    },
+    clearModel() {
+      viewer?.clearModel?.();
+    },
+    cancelModelLoad() {
+      viewer?.cancelModelLoad?.();
+    },
     load() {
       if (disposed || viewer) return Promise.resolve();
       if (pending) return pending;
@@ -22,7 +35,9 @@ export function createLazyGlobe(host, { load, onState = () => {}, onError = () =
         .then(load)
         .then((module) => {
           if (disposed) return;
-          const created = module.createGlobe(host);
+          const created = module.createGlobe(host, (value) => {
+            if (!disposed) onModelState(value);
+          });
           if (disposed) {
             if (!created.isDestroyed()) created.destroy();
             return;

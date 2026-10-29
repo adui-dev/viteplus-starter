@@ -14,9 +14,13 @@ export async function planCesium(input) {
   const files = {},
     ts = (options.language ?? "ts") === "ts",
     vue = options.framework === "vue";
-  for (const name of ["lazy.mjs", "lazy.d.mts", "scene.mjs", "demo.mjs", "demo.d.mts"])
+  for (const name of ["lazy.mjs", "lazy.d.mts", "scene.mjs", "demo.mjs", "demo.d.mts", "model.mjs"])
+    files["src/adui-cesium/" + name] = (
+      await readFile(new URL("../../cesium/src/" + name, import.meta.url), "utf8")
+    ).replaceAll("../../model-security/src/", "./");
+  for (const name of ["glb.mjs", "adui.mjs", "adui.d.mts", "local-grant.mjs", "local-grant.d.mts"])
     files["src/adui-cesium/" + name] = await readFile(
-      new URL("../../cesium/src/" + name, import.meta.url),
+      new URL("../../model-security/src/" + name, import.meta.url),
       "utf8",
     );
   for (const name of ["vite.mjs", "vite.d.mts"])
