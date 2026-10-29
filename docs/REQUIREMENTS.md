@@ -22,7 +22,7 @@
 
 ### FR-003 UI 集成
 
-- 状态：Vue TS/JS + TDesign/UnoCSS、React TS/JS + Ant Design/Tailwind 四种代表组合已验证安装、检查、构建及真实组件渲染；其余组合待验收；优先级：P1。
+- 状态：Vue TS/JS + TDesign/UnoCSS、React TS/JS + Ant Design/Tailwind 四种代表组合，以及 Vue JS Element Plus/Tailwind、Vue TS Ant Design Vue/UnoCSS、React JS/TS TDesign/UnoCSS 已有真实组件验收；其余组合待验收；优先级：P1。
 - 2026-10-28 补验：Vue JS Element Plus/Tailwind、Vue TS Ant Design Vue/UnoCSS、React JS TDesign/UnoCSS 已通过生成、检查和首页构建；这些补验不含组件渲染。Ant Design Vue 安装仅补充 core-js 的显式禁用构建脚本规则，保留已有用户策略。
 - 目标：None / Element Plus（Vue 专属）/ Ant Design（Vue 为 ant-design-vue，React 为 antd）/ TDesign（对应框架包），单选。
 - 验收：生成后组件正常加载、类型检查和构建成功；React 不出现 Element Plus。
@@ -42,7 +42,7 @@
 
 ### FR-006 3D 引擎
 
-- 状态：Three.js 共享运行时与模型能力已实测；Cesium 已接入 CLI/交互/批量逐应用预设、无 Token 场景、静态资源和按需加载。Babylon 新增同类逐应用选项及本地立方体、实例清理；CLI/JSON 多选已接入，交互多选已接入，具体实测范围见状态记录；优先级：P1。
+- 状态：Three/Cesium/Babylon 的逐应用预设、多引擎 CLI/JSON/交互选择、本地 GLB/.adui 与 env 自动构建保护均已接入；真实代表验收和限制以状态记录为准；优先级：P1。
 - 目标：可多选 Three.js、CesiumJS、Babylon.js，按应用集成。
 - 验收：最小场景渲染、资源回收及相应构建成功。
 - 首期边界：已有 --screen 应用单独安装固定版本依赖、添加独立页面，详见 [THREE_SMOKE](THREE_SMOKE.md)。不把此工具视为完整的多引擎生成或模型安全能力。
@@ -60,7 +60,7 @@
 
 ### FR-008 Monorepo 应用隔离
 
-- 状态：逐应用与 JSON 批量新建已实现；2026-10-27 官方根 + Vue TS/TDesign/UnoCSS + React JS/Ant Design/Tailwind 通过创建、检查、完整构建与浏览器验收；其他组合、自定义布局仍待扩展；优先级：P1。
+- 状态：逐应用与 JSON 批量新建已实现；2026-10-27 官方根 + Vue TS/TDesign/UnoCSS + React JS/Ant Design/Tailwind 通过创建、检查、完整构建与浏览器验收；其他组合、自定义布局仍待扩展；优先级：P1。 已接入已有工作区只读检查、操作计划与仅新建缺失应用的显式执行；部分完成应用仍需人工处理。
 - 目标：同一工作区可包含不同框架、语言和插件选择的应用；根工作区不指定统一语言。
 - 验收：配置互不污染，依赖与生成目录正确。
 - 边界：保留官方默认应用和库；已有官方 pnpm 工作区用 `--workspace` 逐个添加；批量新建见 FR-010。根不接受框架、语言、UI/CSS 统一配置。自定义 glob 及其他包管理器暂不支持。
@@ -103,8 +103,8 @@
 
 ### FR-009 UI 组件实际渲染验收
 
-- 状态：验收页面生成工具已实现；Vue TS/JS/TDesign/UnoCSS、React TS/JS/Ant Design/Tailwind 的代表组合已通过浏览器渲染、点击及 CSS 验收。React Fast Refresh lint 警告已通过分离组件与挂载入口修复，TS 实测热更新保留点击状态；其余组合待验收；优先级：P1。
-- 目标：显式 `--ui-smoke` 在已有 Vue/TDesign、React/Ant Design TS/JS 应用中添加隔离验收页面，测试组件加载、点击计数与 CSS 原子类。
+- 状态：五种框架/UI 的 TS/JS 验收页生成已实现；Vue TDesign、Element Plus、Ant Design Vue 与 React Ant Design、TDesign 均有代表组合的真实渲染、点击及 CSS 验收；其他组合不扩大验证声明；优先级：P1。
+- 目标：显式 `--ui-smoke` 在已有 Vue 三种 UI、React 两种 UI 的 TS/JS 应用中添加隔离验收页面，测试组件加载、点击计数与 CSS 原子类。
 - 验收：无需修改 App 或 main 入口，拒绝覆盖同名文件；浏览器中组件按钮可见、计数改变、CSS 样式正确且无控制台错误。
 - 范围：不支持未配置相应 UI 的应用，也不支持 Monorepo 根；不得增加 CI。
 
@@ -150,3 +150,7 @@ FR-008 / FR-010 / NFR-001：新增 --plan-recovery，必须携带 --config。复
 ## 2026-10-29：显式新建缺失应用
 
 FR-008 / FR-010 / NFR-001：新增 --execute-recovery，必须携带原批量 JSON，重新规划后仅执行缺失应用的新建和对应验收页步骤。初始计划存在人工阻塞时零执行；已有应用跳过。每个新建应用执行前重检现场，子进程返回后核对结构，UI 验收页另做预检，失败即停并保留现场。继续委托官方模板，禁止自动覆盖、删除、回滚或接收任意执行计划。
+
+## 2026-10-29：V1 收尾说明与示例校验
+
+NFR-002 / NFR-003：统一 README、CLI 帮助、示例索引和 V1 验收清单；逐个真实 CLI dry-run 校验全部批量 JSON，校验全过程不创建工程。文档链接校验扩大到 docs 全部 Markdown。新 UI 三应用 JSON 本轮仅验证计划，不声称工作区整体已实际生成。V1 收尾不等于全部平台/组合验收或发布完成。

@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -14,6 +14,8 @@ const required = [
   "docs/SKILLS.md",
   "docs/HARNESS.md",
   "docs/GENERATOR_STATUS.md",
+  "docs/V1_ACCEPTANCE.md",
+  "examples/README.md",
   "docs/CESIUM.md",
   "docs/BABYLON.md",
   "docs/MULTI_ENGINE.md",
@@ -28,7 +30,22 @@ for (const path of required) {
   }
 }
 
-for (const path of required.filter((file) => file.endsWith(".md"))) {
+function markdownFiles(directory) {
+  if (!existsSync(resolve(root, directory))) return [];
+  return readdirSync(resolve(root, directory), { withFileTypes: true }).flatMap((entry) => {
+    const path = directory + "/" + entry.name;
+    return entry.isDirectory()
+      ? markdownFiles(path)
+      : entry.isFile() && entry.name.endsWith(".md")
+        ? [path]
+        : [];
+  });
+}
+const markdown = new Set([
+  ...required.filter((file) => file.endsWith(".md")),
+  ...markdownFiles("docs"),
+]);
+for (const path of markdown) {
   const fullPath = resolve(root, path);
   if (!existsSync(fullPath)) continue;
   const contents = readFileSync(fullPath, "utf8");

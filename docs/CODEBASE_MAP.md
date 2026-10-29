@@ -170,3 +170,10 @@ engine-prompts.test.mjs：多选解析、摘要/取消、Three 保护提示；ve
 - workspace-recovery.mjs：提取同配置的规划入口，避免执行时信任保存的计划。
 - ui-smoke.mjs：只读 preflightUiSmoke 与原写入函数共用检查，保护依赖与输出冲突。
 - packages/create/test/workspace-recovery-execute.test.mjs：顺序/重复调用、部分失败保留、后续目标占用、验收页冲突、虚假子进程成功与 CLI 模式隔离。
+
+## V1 收尾入口
+
+- docs/V1_ACCEPTANCE.md：模式选择、端到端验收顺序、现有证据与剩余限制。
+- examples/README.md、ui-libraries.batch.json：示例索引及三个新增 UI 组合的可校验 JSON。
+- scripts/verify-examples.mjs、packages/create/test/examples.test.mjs：真实 CLI 批量预览与临时目录无输出校验。
+- scripts/validate-docs.mjs：必要文件、docs 全目录 Markdown 链接及需求编号检查。

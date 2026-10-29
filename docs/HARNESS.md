@@ -171,3 +171,7 @@ Cesium 自动构建使用 verify-model-app，检查双入口/base、密文与原
 5. 卸载后 canvas=0；重挂应回到等待加载，再点击加载进入 ready。检查控制台 warn/error，保存实际全屏截图。
 
 2026-10-29 已按此流程完成 Vue TS 独立应用和 React JS Monorepo 代表组合；具体边界见 [大屏说明](SCREEN.md)。接下来优先实现其他 UI 库的组件验收入口，不增加查看器操作。
+
+## V1 收尾入口
+
+模式选择、按顺序的端到端验收和未覆盖范围集中在 [V1 验收清单](V1_ACCEPTANCE.md)。新增 node scripts/verify-examples.mjs 对 examples 下所有 *.batch.json 做真实 CLI dry-run，并断言临时目录没有生成文件；只计计划，不计真实构建。当前示例与用途见 [示例索引](../examples/README.md)。

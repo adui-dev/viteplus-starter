@@ -248,3 +248,9 @@ application-invocations 抽取原批量应用 argv 构造，批量新建与恢�
 workspace-recovery-execute 仅读取一次校验后的原配置，使用 planRecoveryForConfig 重建计划；初始存在人工阻塞直接失败。固定初始 create-missing 名单，避免在运行中接管新出现的目录。每个应用前重新检查全计划及 resolveWorkspaceApplication，使用共用 argv 构造并以 Node argv 子进程执行，不运行 PowerShell 展示文本。
 
 创建后以同一应用 uiSmoke=false 核对基础/预设结构，再通过提取的只读 preflightUiSmoke 检查验收页依赖、配置及文件冲突；CLI 实际写入时仍重检并使用原文件保护。验收页创建后再核对完整结构。已存在应用完全跳过；completed 记录成功返回的子进程，后续结构失败仍作为失败报告，不称为构建成功。注入 runner 仅用于受控生命周期验证，CLI 不提供自定义执行器。
+
+## V1 示例与文档检查
+
+verify-examples 在仓库外新建独立临时目录，逐个以 Node argv 调用真实 CLI --config --dry-run，检查官方 Monorepo 阶段、应用数量及临时目录无输出，最后清理临时目录；输出计划计数与 actualBuilds=0。没有安装、构建或发布路径。node --test 同步覆盖这项示例兼容检查。
+
+validate-docs 保留必要文件与需求编号检查，并枚举 docs 的普通 Markdown 文件检查相对链接；不跟随目录链接。README、示例索引和 V1 清单通过链接统一导航，历史验证记录保留，当前状态正文同步纠正过时范围。

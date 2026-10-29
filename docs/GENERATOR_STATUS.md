@@ -41,16 +41,16 @@
 
 计划验证不会安装依赖、创建项目或生成 KEY。它不能证明全部组合在当前依赖版本下可构建或渲染。真实生成项目必须另跑 vp check、vp run build；需要组件效果时还要浏览器验收。
 
-## 本轮补验项目
+## UI 补验代表项目（含后续组件渲染补验）
 
 以下四个项目在仓库外使用官方入口创建，均通过 vp check 与 vp run build；详细记录见 [本轮状态记录](PROJECT_CONTEXT.md)。
 
-| 项目                    | 配置                                       | 本轮验证层次                                                             |
-| ----------------------- | ------------------------------------------ | ------------------------------------------------------------------------ |
-| audit-element-vue-js    | Vue JS / Element Plus / Tailwind           | 依赖安装、配置生成、检查及正式首页构建；不含 Element Plus 组件渲染声明   |
-| audit-antd-vue-ts       | Vue TS / Ant Design Vue / UnoCSS           | 依赖安装、配置生成、检查及正式首页构建；不含 Ant Design Vue 组件渲染声明 |
-| audit-tdesign-react-js  | React JS / TDesign / UnoCSS                | 依赖安装、配置生成、检查及正式首页构建；不含 TDesign 组件渲染声明        |
-| audit-preserve-react-ts | React TS / Ant Design / Tailwind，首次补装 | 配置增量集成、检查/构建及无关文件不被格式化                              |
+| 项目                    | 配置                                       | 本轮验证层次                                                                |
+| ----------------------- | ------------------------------------------ | --------------------------------------------------------------------------- |
+| audit-element-vue-js    | Vue JS / Element Plus / Tailwind           | 安装/配置/检查/首页及 UI 双入口构建；Element Plus 渲染、点击和 CSS 已补验   |
+| audit-antd-vue-ts       | Vue TS / Ant Design Vue / UnoCSS           | 安装/配置/检查/首页及 UI 双入口构建；Ant Design Vue 渲染、点击和 CSS 已补验 |
+| audit-tdesign-react-js  | React JS / TDesign / UnoCSS                | 安装/配置/检查/首页及 UI 双入口构建；TDesign 渲染、点击和 CSS 已补验        |
+| audit-preserve-react-ts | React TS / Ant Design / Tailwind，首次补装 | 配置增量集成、检查/构建及无关文件不被格式化                                 |
 
 已完成的其他代表组合与混合工作区验收见 [UI_SMOKE](UI_SMOKE.md)、[BATCH_CONFIG](BATCH_CONFIG.md)、[MODEL_BUILD](MODEL_BUILD.md) 和状态记录；不将它们扩大为全部 462 组合已实测。
 
@@ -64,10 +64,10 @@ Ant Design Vue 另补充 pnpm 的 core-js: false 构建脚本规则并定向格�
 
 ## 后续主线
 
-三引擎逐应用预设、多引擎选择、GLB/.adui 与 env 自动构建加载已接入；真实检查、构建与浏览器证据以状态记录为准，详见 [CESIUM](CESIUM.md)、[BABYLON](BABYLON.md)。Cesium/Babylon 的 Vue TS、React JS 代表组合已补验大屏缩放、DPR、原生全屏和卸载重挂。新增三种 UI 的验收页生成与代表组合渲染已补齐，下一阶段推进生成失败恢复和 Monorepo 管理；不再扩展模型查看器体验。新增预设仍通过官方基础模板增强，不把验收页面体验当作生成器功能完成条件。
+三引擎逐应用预设、多引擎选择、GLB/.adui 与 env 自动构建加载已接入；真实检查、构建与浏览器证据以状态记录为准，详见 [CESIUM](CESIUM.md)、[BABYLON](BABYLON.md)。Cesium/Babylon 的 Vue TS、React JS 代表组合已补验大屏缩放、DPR、原生全屏和卸载重挂。新增三种 UI 的验收页生成与代表组合渲染已补齐，生成失败报告、只读预检/规划及显式新建缺失应用已接入；后续按 V1 验收清单收尾；不再扩展模型查看器体验。新增预设仍通过官方基础模板增强，不把验收页面体验当作生成器功能完成条件。
 
 2026-10-29：CLI/JSON 多引擎编排已接入，交互已支持逗号多选，联合构建与浏览器证据分开记录，见 [说明](MULTI_ENGINE.md)。
 
 ## 已有工作区恢复边界
 
-已实现失败阶段报告 → 只读 --inspect-workspace → 人工 --plan-recovery → 显式 --execute-recovery。执行入口仅新建缺失应用，初始人工阻塞零执行，已存在应用跳过，逐应用重检、失败即停；部分完成应用仍需人工处理，不提供覆盖式续跑或自动回滚。Vue JS 与 React TS 的官方真实新建、验收页生成、重复跳过、构建和检查已有记录。下一阶段为 V1 帮助/示例/验收状态收尾，而非继续增加恢复模式或演示页功能。
+已实现失败阶段报告 → 只读 --inspect-workspace → 人工 --plan-recovery → 显式 --execute-recovery。执行入口仅新建缺失应用，初始人工阻塞零执行，已存在应用跳过，逐应用重检、失败即停；部分完成应用仍需人工处理，不提供覆盖式续跑或自动回滚。Vue JS 与 React TS 的官方真实新建、验收页生成、重复跳过、构建和检查已有记录。V1 帮助、示例和验收入口见 [集中清单](V1_ACCEPTANCE.md)；不增加恢复模式或演示页功能。

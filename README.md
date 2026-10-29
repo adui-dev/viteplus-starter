@@ -85,7 +85,7 @@ node .\viteplus-starter\packages\create\bin\cli.mjs --name starter-react-p3 --ty
 ```powershell
 git clone https://github.com/adui-dev/viteplus-starter.git
 cd viteplus-starter
-pnpm install
+pnpm install --frozen-lockfile
 node packages/create/bin/cli.mjs --help
 # 无参数交互创建（名称、类型、框架、确认）
 node packages/create/bin/cli.mjs
@@ -94,7 +94,7 @@ node packages/create/bin/cli.mjs --name demo-vue --type application --framework 
 node packages/create/bin/cli.mjs --name demo-react --type application --framework react
 # UI 与 CSS 按需选择，生成后安装依赖并追加对应配置
 node packages/create/bin/cli.mjs --name demo-ui --type application --framework vue --ui tdesign --css unocss
-# 已创建但此前 UI/CSS 增强失败的项目：显式补装，不重新创建
+# 仅确认对应 UI/CSS 预设尚未写入时首次补装；部分完成项目先检查现场
 node packages/create/bin/cli.mjs --name demo-ui --type application --framework vue --ui tdesign --css unocss --apply-existing
 ```
 
@@ -105,13 +105,28 @@ node packages/create/bin/cli.mjs --name demo-ui --type application --framework v
 ```powershell
 node --test
 node scripts/validate-docs.mjs
+node scripts/verify-examples.mjs
+vp check
 ```
 
 `vp check` 依赖本地可用的 Vite+ 工具链和已安装依赖。
 
-## 规划功能
+## 能力范围
 
 Application / Monorepo、Vue / React、Element Plus / Ant Design / TDesign、UnoCSS / Tailwind CSS、Three.js / CesiumJS / Babylon.js、大屏适配和模型安全加载。可选能力必须按应用独立集成。
+
+## 已有工作区检查与恢复
+
+在生成器仓库执行（路径按实际工作区调整）：
+
+```powershell
+node packages/create/bin/cli.mjs --inspect-workspace ../adui-batch-demo
+node packages/create/bin/cli.mjs --plan-recovery ../adui-batch-demo --config examples/monorepo.batch.json
+# 以下命令会安装依赖并新建缺失应用；先审阅计划
+node packages/create/bin/cli.mjs --execute-recovery ../adui-batch-demo --config examples/monorepo.batch.json
+```
+
+检查和规划只读；显式执行仅新建缺失应用，已有应用跳过，部分完成应用需要人工处理。详见 [工作区操作](docs/MONOREPO.md)。入口选择、完整验证步骤和未覆盖范围集中在 [V1 验收清单](docs/V1_ACCEPTANCE.md)，JSON 用法见 [示例索引](examples/README.md)。
 
 ## 工程文档
 
@@ -140,7 +155,7 @@ Application / Monorepo、Vue / React、Element Plus / Ant Design / TDesign、Uno
 
 Three 验收页现支持选择自包含 GLB、清除与重新加载；已使用 DamagedHelmet 验证。加载器按需导入，测试模型不打包进仓库。接口与边界见 [GLB 加载说明](docs/THREE_SMOKE.md)；模型授权及加解密见下文。
 
-模型现支持 AES-256-GCM `.adui` 封装和浏览器授权解密，操作与边界见 [模型加密](docs/MODEL_SECURITY.md)。生产授权服务仍需业务接入。
+模型现支持 AES-256-GCM `.adui` 封装和浏览器授权解密，操作与边界见 [模型加密](docs/MODEL_SECURITY.md)。默认模型自动打包无需服务端；外部授权回调可按业务需要接入。
 
 支持无服务端的模型自动加密构建：`.env` 配置、GLB 扫描、`.adui` 输出、密钥拆分与可选域名限制。默认自动加载，以提高直接复用门槛为目标，见 [模型自动打包](docs/MODEL_BUILD.md)。
 

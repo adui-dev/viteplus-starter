@@ -55,6 +55,9 @@ const usage = `ADui Vite+ Starter（Application / Monorepo）
   node packages/create/bin/cli.mjs --name my-workspace --type monorepo
   node packages/create/bin/cli.mjs --config ./monorepo.json --dry-run
   node packages/create/bin/cli.mjs --config ./monorepo.json
+  node packages/create/bin/cli.mjs --inspect-workspace ../adui-batch-demo
+  node packages/create/bin/cli.mjs --plan-recovery ../adui-batch-demo --config ./examples/monorepo.batch.json
+  node packages/create/bin/cli.mjs --execute-recovery ../adui-batch-demo --config ./examples/monorepo.batch.json
   node packages/create/bin/cli.mjs --name my-vue-app --type application --framework vue --ui tdesign --css unocss
   node packages/create/bin/cli.mjs --name my-vue-app --type application --framework vue --ui tdesign --css unocss --apply-existing
   node packages/create/bin/cli.mjs --name my-vue-app --type application --framework vue --ui tdesign --css unocss --repair-existing
@@ -84,7 +87,7 @@ const usage = `ADui Vite+ Starter（Application / Monorepo）
   UI/CSS 集成支持 None、Element Plus、Ant Design、TDesign、UnoCSS、Tailwind CSS。
   --apply-existing 用于首次补装；--repair-existing 用于修复旧版 starter.plugins 跨文件引用。
   旧插件文件会备份成 starter.plugins.ts.bak；两种模式不重装基础模板。
-  --ui-smoke 为已有应用创建独立的 /ui-smoke.html 验证页，不修改正式首页。
+  --ui-smoke 为已有应用创建独立的 /ui-smoke.html，支持 Vue 三种 UI / React 两种 UI，不修改正式首页。
   大屏、Three.js、Cesium 与 Babylon 独立验收页已支持。
 `;
 
