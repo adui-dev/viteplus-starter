@@ -136,3 +136,10 @@ engine-prompts.test.mjs：多选解析、摘要/取消、Three 保护提示；ve
 - packages/babylon/src/resolution.mjs、packages/cesium/src/resolution.mjs：各引擎公开分辨率 API 适配；lazy 模块持有观察器清理函数。
 - packages/create/src/engine-screen-smoke.mjs：Vue/React 两引擎独立验收页的模式、容器和全屏控件。
 - packages/screen/test/viewport.test.mjs、packages/create/test/engine-screen-smoke.test.mjs：比例/隐藏/硬件边界、DPR 无事件兜底及清理、四种框架语言计划的回归验证。
+
+## UI Smoke 扩展
+
+- packages/create/src/ui-smoke.mjs：五种 UI 预设、TS/JS 独立页面、对应依赖/resolver 校验与文件保护。
+- packages/create/test/ui-smoke.test.mjs、batch.test.mjs：30 个基础页面计划、新 UI 写入/拒绝及批量应用隔离回归。
+- scripts/verify-ui-build.mjs：保留原配置的首页+组件验收页双入口生产构建。
+- verify-generator-matrix 与对应测试：UI Smoke 计划扩展为 330，总计划仍为 462。

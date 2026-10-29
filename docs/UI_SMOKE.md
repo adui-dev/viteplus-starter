@@ -4,7 +4,7 @@
 
 ## 准备
 
-支持现有 Vue 3 + TDesign 或 React + Ant Design 项目，JavaScript 与 TypeScript 均可。请先创建并安装对应 UI/CSS 依赖；不支持尚未实现的 Monorepo 根目录和其他 UI 组合。
+支持 Vue 3 的 Element Plus、Ant Design Vue、TDesign，以及 React 的 Ant Design、TDesign；JavaScript 与 TypeScript 均可。支持独立应用和官方 Monorepo 子应用，不接受 Monorepo 根或 ui=none。先安装对应 UI/CSS 依赖，验收页不会重新安装依赖。
 
 在 `D:\Workspace\adui-studio` 执行：
 
@@ -63,3 +63,29 @@ React 新版通过独立组件模块修复 Fast Refresh lint 警告。已有 `st
 TS 页面额外验证了热更新：点击到 1 后修改组件标题，再恢复原标题，两次刷新均保留计数 1。此验证未改动正式 App/main 或项目配置。
 
 生成器当前 72 项单元测试、文档校验和全仓 `vp check` 已全部通过，前文格式失败与 React 警告为修复前的历史记录。Vue TS/JS 的浏览器验收见项目状态中的 P3/P4 记录；尚未穷举所有 UI/CSS 组合。
+
+## 2026-10-29：补齐其他 UI 库
+
+新增组合沿用 --ui-smoke：Vue --ui element-plus、Vue --ui antd、React --ui tdesign。Vue 分别生成 el-button、a-button、t-button，验证已有 resolver 自动导入；React 显式导入对应 Button，TDesign 使用 theme=primary，Ant Design 使用 type=primary。共享样式独立导入，Element Plus 样式由现有 resolver 按需注入。css=none 不生成原子 CSS 测试区域。
+
+例如在仓库上级目录，对已装好依赖且尚无验收页的应用执行：
+
+```powershell
+node .\viteplus-starter\packages\create\bin\cli.mjs --name audit-element-vue-js --type application --framework vue --language js --ui element-plus --css tailwindcss --ui-smoke
+node .\viteplus-starter\packages\create\bin\cli.mjs --name audit-antd-vue-ts --type application --framework vue --language ts --ui antd --css unocss --ui-smoke
+node .\viteplus-starter\packages\create\bin\cli.mjs --name audit-tdesign-react-js --type application --framework react --language js --ui tdesign --css unocss --ui-smoke
+```
+
+新增生产双入口验收工具，在仓库内执行：
+
+```powershell
+node scripts/verify-ui-build.mjs <应用绝对路径> /ui-check/
+# 或使用相对部署 base
+node scripts/verify-ui-build.mjs <应用绝对路径> ./
+```
+
+工具创建专用临时配置（已有文件拒绝覆盖），合并原配置后构建 index.html 与 ui-smoke.html，验证两个产物入口；输出 dist/ui-verify，结束清理临时配置。原 Vite 配置不修改。随后在应用目录运行 vp check，并通过 vp preview --outDir dist/ui-verify --base /ui-check/ 查看 /ui-check/ui-smoke.html；相对 base 则省略 --base。不要与同一应用或工作区的其他构建并行。该脚本不替代应用完整 build 脚本的类型检查，也不替代浏览器验收。
+
+本轮上述三套既有官方样例和新官方 Monorepo 子应用 ui-tdesign-react-ts（React TS/TDesign/UnoCSS）通过正式 build、双入口构建及 vp check。Chrome 四页按钮真实渲染、点击 0→1、CSS 绿色区域及 16px 内边距正常，warn/error 为空。三套既有样例 App/main/配置/package.json/锁文件共 15 项哈希一致。UnoCSS 多入口构建保留重复虚拟 CSS 导入提示，不宣称构建完全无提示。
+
+五种框架/UI × TS/JS × 三种 CSS 共 30 个基础页面计划已测试；跨增强配置矩阵的 UI Smoke 计划由 132 扩展至 330，总计划 462 不变。不是全部组合均已真实构建或浏览器验收。

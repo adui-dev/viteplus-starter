@@ -220,3 +220,7 @@ Cesium 复用原模型安装器、env 插件与 KEY 工具，setup/smoke 的 eng
 观察器监听 ResizeObserver、window.resize、document.fullscreenchange 和动态 resolution 查询，并持有一个可取消的 requestAnimationFrame 检查 DPR 数值；仅数值改变才读取布局和调整缓冲区。关闭引擎时清理全部来源，异步已排队通知通过 disposed 守卫忽略。Babylon 初始化也调整尺寸，异常仍进入原资源清理路径。
 
 engine-screen-smoke 生成两引擎共用的 Vue/React 验收 App：保留独立入口及原引擎 Demo，新增 HUD 标记、模式循环、半宽容器、非缩放覆盖层内全屏控件。回调以闭包保留方法上下文，失败反馈到 status。该控件仅用于独立验收页。
+
+## UI Smoke 五种 UI 适配
+
+ui-smoke 内部预设表统一维护框架/UI 对应包、展示名、Vue 标签/resolver、主按钮属性和可选样式入口，生成和预检使用同一表。Vue 保留自动导入，React 组件和挂载模块继续分离。既有入口、配置及清单不修改；JS/TS、CSS 选择与输出冲突保护沿用原流程。批量配置逐应用调用该工具，不增加根级 UI 依赖。verify-ui-build 提供本地双入口构建，临时配置 wx 创建，构建成功或失败均清理，只接受指定验收 base；没有生产配置迁移或新架构选型。

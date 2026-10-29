@@ -341,3 +341,12 @@
 - 本轮只收尾既有验收，不扩展模型查看器功能。下一步实现 Element Plus、Ant Design Vue、React TDesign 的 UI Smoke 生成及真实组件渲染，然后回到生成失败恢复与 Monorepo 管理。大屏专项不再作为阻塞 UI 主线的未完成项。
 
 本轮本地复验：node --test 189/189、文档静态校验通过、根 vp check 格式 155 文件及 lint 115 文件通过。复用样例未改源码，未重复创建应用或安装依赖；本轮自建 4372/4373 预览服务均已停止。
+
+## 2026-10-29：UI 生成主线——补齐三个组件库的验收入口
+
+- --ui-smoke 扩展到 Vue Element Plus/Ant Design Vue/TDesign 和 React Ant Design/TDesign，TS/JS、三种 CSS；对应依赖及 Vue resolver 预检共用预设表。CLI/JSON 批量沿用逐应用入口，没有修改大屏、3D 或模型功能。
+- 复用官方 audit-element-vue-js（Element Plus/Tailwind）、audit-antd-vue-ts（Ant Design Vue/UnoCSS）、audit-tdesign-react-js（TDesign/UnoCSS）补装独立页。App/main/配置/package.json/锁文件共 15 项 SHA256 一致，不重装依赖。
+- 官方 vite:application 在既有 adui-cesium-workspace 新建 ui-tdesign-react-ts（React TS/TDesign/UnoCSS），再生成独立页；完整 tsc -b + build、双入口构建及 vp check 通过，检查为 15 格式/6 代码文件。三个已有样例检查分别 46/32、19/9、14/6 文件无警告/错误。
+- verify-ui-build 新增本地双入口工具，专用 wx 临时配置、dist/ui-verify 产物；四套样例保留正式首页并构建验收页。Vue 使用 /ui-check/，React JS 使用 ./，React TS 工作区使用 /ui-check/。UnoCSS 多入口重复虚拟 CSS 提示保留，不修改正式样式入口来消除提示。
+- Chrome 四页具备 el-button / ant-btn / t-button 真实样式，点击 0→1；UnoCSS 绿色背景 rgb(209,250,229)、深绿色文字及 16px 内边距，Tailwind 对应 oklch 色值与 16px 内边距正常。四页 warn/error 为空。截图 ui-element-plus-acceptance.png、ui-ant-vue-acceptance.png、ui-tdesign-react-acceptance.png、ui-tdesign-workspace-ts-acceptance.png 在 D:/Workspace/adui-studio，不纳入 Git。
+- 本轮 Node 测试 193/193、文档校验及根 vp check（156 格式、116 代码文件）通过。30 个基础 UI 页面计划覆盖五种 UI × 两种语言 × 三种 CSS；只读矩阵 UI Smoke 从 132 增至 330，总计划 462，actualBuilds=0，不能替代真实构建计数。下一步进入生成失败后的明确恢复流程与 Monorepo 管理，不扩展演示功能。

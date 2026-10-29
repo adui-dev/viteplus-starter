@@ -130,3 +130,7 @@ FR-006：CLI --engines、JSON engines 与交互多选均已接入，保留 engin
 - 部分浏览器验收：Vue Babylon 已验证模式、容器与 DPR；原生全屏被浏览器拒绝，电脑操作工具随后停止。Cesium 新策略及 React 真实交互、全屏仍待补验，不能标记整项验收完成。
 
 2026-10-29 补验结果：上一轮大屏专项的浏览器遗留项已在 Vue TS 独立应用、React JS Monorepo 子应用完成。Cesium 两框架和 React Babylon 的 DPR 1/2/3 均符合最高 2 倍策略（Vue Babylon 已于前轮验证）；两框架、两引擎原生全屏进入/退出、覆盖层控件、卸载 canvas=0 和重挂 ready 均通过。仅对这些代表组合有效，不扩展为全部框架/语言及显示器环境已验证。
+
+## 2026-10-29：UI Smoke 组合扩展
+
+FR-003/FR-009：支持 Vue Element Plus、Ant Design Vue、TDesign 与 React Ant Design、TDesign 的 TS/JS 独立验收页。新增三种 UI 的代表组合及 React TDesign TS Monorepo 已通过真实按钮渲染、点击及原子 CSS 验收。检查对应组件包和 Vue resolver，仍拒绝无 UI、Monorepo 根、错误依赖和已存在文件。其余语言/CSS 组合不扩大验收声明；只读 UI Smoke 计划 330，总矩阵 462，实际构建另计。
