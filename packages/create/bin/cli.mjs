@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { executeWorkspaceRecovery } from "../src/workspace-recovery-execute.mjs";
 import { planWorkspaceRecovery } from "../src/workspace-recovery.mjs";
 import { inspectWorkspace } from "../src/workspace-inspect.mjs";
 import { createStageRunner } from "../src/recovery.mjs";
@@ -61,6 +62,7 @@ const usage = `ADui Vite+ Starter（Application / Monorepo）
   node packages/create/bin/cli.mjs --name my-vue-app --type application --framework vue --dry-run
 
 说明：
+  --execute-recovery <路径> --config <原批量 JSON>：显式新建缺失应用，已有应用跳过，遇阻停止。
   --plan-recovery <路径> --config <原批量 JSON>：只读生成逐应用操作指引，不执行恢复。
   --inspect-workspace <路径>：只读检查已有工作区；可配 --config <原批量 JSON> 预检应用结构。
   Application 委托 Vite+ 官方 vite:application，按框架和语言选择 vue/vue-ts/react/react-ts。
@@ -73,7 +75,7 @@ const usage = `ADui Vite+ Starter（Application / Monorepo）
   --engine none|three|cesium|babylon：按应用集成引擎；新建时同时指定 --screen。
   --model-protection embedded|external|none：三种引擎默认 embedded；可选择外置密钥或关闭。
   启用模型保护时自动生成项目 .env.local 与 models:keygen / models:keyrotate 脚本，IV 按模型随机生成。
-  --config <JSON 文件>：批量新建官方 Monorepo 和应用，仅可与 --dry-run 同用。
+  --config <JSON 文件>：单独使用时批量新建，可配 --dry-run；检查/恢复模式按各自说明使用。
   --workspace <已有工作区路径>：在官方 pnpm Monorepo 的 apps/<name> 中添加 Application。
   例：--workspace ../my-workspace --name admin --type application --framework vue --ui tdesign --css unocss
   Monorepo 使用官方 vite:monorepo；子应用的框架需分别选择。
@@ -90,6 +92,19 @@ async function main() {
   const args = parseCliArgs(process.argv.slice(2));
   if (args.help) {
     console.log(usage);
+    return;
+  }
+  if (args["execute-recovery"] !== undefined) {
+    for (const [key, value] of Object.entries(args))
+      if (!["execute-recovery", "config"].includes(key) && value !== undefined && value !== false)
+        throw new Error("--execute-recovery 仅能与 --config 同用");
+    console.log(
+      JSON.stringify(
+        await executeWorkspaceRecovery(args["execute-recovery"], args.config),
+        null,
+        2,
+      ),
+    );
     return;
   }
   if (args["plan-recovery"] !== undefined) {

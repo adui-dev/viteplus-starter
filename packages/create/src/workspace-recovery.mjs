@@ -7,6 +7,10 @@ import { pendingRecovery } from "./recovery.mjs";
 export async function planWorkspaceRecovery(directory, configFile) {
   if (!configFile) throw new Error("--plan-recovery 必须提供 --config 原批量 JSON");
   const config = await readExpectedConfig(configFile);
+  return planRecoveryForConfig(directory, config);
+}
+
+export async function planRecoveryForConfig(directory, config) {
   const inspection = await inspectWorkspace(directory, undefined, config);
   const rootIssues = [
     ...inspection.issues,

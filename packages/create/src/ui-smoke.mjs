@@ -166,7 +166,7 @@ async function fileExists(path) {
   return Boolean(await inspectPath(path, "UI Smoke"));
 }
 
-export async function addUiSmoke(directory, options, formatter = formatNewFiles) {
+export async function preflightUiSmoke(directory, options) {
   const plan = planUiSmoke(options);
   await inspectPath(join(directory, "package.json"), "UI Smoke");
   const manifest = JSON.parse(await readFile(join(directory, "package.json"), "utf8"));
@@ -208,6 +208,11 @@ export async function addUiSmoke(directory, options, formatter = formatNewFiles)
       throw new Error("UI Smoke 文件已存在，拒绝覆盖：" + relative);
     }
   }
+  return plan;
+}
+
+export async function addUiSmoke(directory, options, formatter = formatNewFiles) {
+  const plan = await preflightUiSmoke(directory, options);
   await mkdir(join(directory, "src", "ui-smoke"), { recursive: true });
   for (const [relative, content] of Object.entries(plan.files)) {
     await inspectPath(join(directory, relative), "UI Smoke");
