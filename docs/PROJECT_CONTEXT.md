@@ -6,7 +6,7 @@
 
 - 仓库：`adui-dev/viteplus-starter`。Vite+ 官方 `vite:application` / `vite:monorepo` 是唯一基础工程来源，Vue/React Application 按语言选 `vue` / `vue-ts` / `react` / `react-ts`。
 - 已实现：基础 CLI 交互与参数模式、Application UI/CSS 集成、旧项目补装及 `--repair-existing`、UI Smoke、通过 `--workspace` 逐个添加及通过 JSON 批量新建 Monorepo 应用、本地单元测试与文档检查。
-- 进行中：Monorepo 自定义布局与显式恢复、其余 UI/CSS 兼容矩阵、Cesium/Babylon 的大屏专项、Babylon 自动模型构建及 Cesium 模型适配；已实现范围见文末及 GENERATOR_STATUS。
+- 进行中：Monorepo 自定义布局与显式恢复、其余 UI/CSS 兼容矩阵、Cesium/Babylon 的大屏专项及 Cesium 模型适配；已实现范围见文末及 GENERATOR_STATUS。
 - 严格要求：**不得添加任何 CI/CD、自动发布或部署工作流**；仅人工本地测试。
 
 ## 用户 Windows 实机验收（已确认）
@@ -275,3 +275,18 @@
 - 最终 React 加密模型截图 D:/Workspace/adui-studio/babylon-model-react-final.png，Vue 初次截图 D:/Workspace/adui-studio/babylon-helmet-acceptance.jpg，均不纳入 Git。原 GLB SHA256 仍为 a1e3b04de97b11de564ce6e53b95f02954a297f0008183ac63a4f5974f6b32d8；未修改用户模型或生产密钥。两个临时标签页及 4311/4312 预览服务已清理。
 - Three 自动构建专项使用同一原模型回归，external/embedded 构建与解密、明文/密钥 HTTP 403、密文 200、模型变更重新加密及 env 轮换通过。最终 173/173 Node 测试、294 组合只读计划（实际构建计数仍为 0）、文档校验、根 vp check（146 格式/106 代码文件）与 diff 检查通过。仓库依赖锁文件未改，无流水线或发布，按中文 emoji 分步提交推送。
 - 下一步：接入 Babylon 的 env 自动加密与构建目录加载，复用逐应用 KEY/轮换和仅输出 .adui 的产物校验；之后推进 Cesium 模型适配。继续以生成器预设为主线。
+
+## 2026-10-29 Babylon env 自动模型打包
+
+- Babylon 默认启用 embedded，CLI/交互/逐应用 JSON 支持 external/none；Cesium 单选仍不启用。modelEngine 统一选择模型适配器，多引擎优先 Three，否则 Babylon，只在所属阶段安装一套插件、model-smoke 页面、目录与 KEY。受控测试覆盖 Cesium+Babylon 与 Three+Babylon 的阶段参数，未把它称为本轮新组合真实创建验收。
+- setupModelPlugin 复用原模型构建插件、KEY/轮换、备份、忽略和输出保护，增加 engine 参数；独立 setup CLI 可 --engine babylon，Three 保持默认。模型页模板按引擎选择导入/类型/回调，正式首页/App/main 保留。旧快照缺少 loadBundledModel 时拒绝安装，不自动覆盖引擎源码；格式化 runner 改为 await，异步检查失败不提前报告完成。
+- Babylon lazy 新增同源限长密文下载，下载完成才初始化并进入认证/GLB 校验/AssetContainer；清除、卸载、后发请求及外部 AbortSignal 使旧请求失效。模型状态与错误回传验收页。共享加解密算法、随机 IV 和客户端密钥可逆向的边界不变；不引入服务端或查看器操作工具。
+- 扩展只读矩阵至 378 个有效组合：108 UI Smoke、336 大屏、126 Three、42 Cesium、126 Babylon、168 模型保护计划。Babylon 的 none/embedded/external 均覆盖；该命令实际创建/构建计数仍为 0。
+- 官方入口新建独立 babylon-auto-vue-ts（Vue TS / embedded）、babylon-auto-react-js（React JS / external）；分别 vp check 61/43、57/41 格式/代码文件无警告错误，正式首页构建通过。原 DamagedHelmet.glb 以新文件方式复制到本轮样例 src/models，不修改原件。新建样例生成后的模型页 CSS补充画布尺寸，仅更新本轮自产快照，不触碰旧项目。
+- 在已有官方 adui-babylon-workspace 添加 auto-vue（Vue JS / external）、auto-react（React TS / embedded）。原成员保留，根 ready 0/15 缓存、15/15 成功，343 格式、240 lint/type 文件无警告错误，官方 utils 测试通过；保留 TypeScript API 实验性提示。
+- 新增 verify-model-app：真实生成应用的 index + model-smoke 双入口、部署 base、密文数量、解密与原模型一致性及无原 GLB/明文/原始 KEY 字面量检查。四种框架语言均通过，Vue 使用 /model-check/，React 使用 ./，产物保留各 dist/model-verify，临时配置删除；未与工作区检查并行。保留默认 500 kB 体积提醒，未声称所有引擎/模型被压缩到阈值内。
+- Chrome Vue TS embedded 生产页无需手工解锁即显示头盔并 ready，warn/error 为空。React JS external 初始 canvas=0 且加载禁用；选择本轮样例的独立解锁文件后 ready，warn/error 为空；锁定后模型状态 empty、加载按钮禁用。解锁文件位于网站目录外，仅用于本轮验收，结束移除；没有上传或读取业务生产密钥。
+- 真实生成 Vue 开发服务核对 src/models/helmet.glb 与 .env.local 为 HTTP 403、model-smoke.html 与加密目录 .adui 为 200。models:keygen 拒绝覆盖已有 KEY，models:keyrotate 成功更新 KEY 并备份，Git check-ignore 确认 env 与备份均忽略；重新构建解密一致，生产浏览器刷新后自动 ready。原模型 SHA256 未变。
+- 原共享 verify-model-build 也以同一原模型回归：两模式 build/decrypt、明文/KEY 403、密文 200、模型变更重新加密及 env 轮换均通过。最终 176/176 Node 测试、文档校验、根 vp check（147 格式/107 代码文件）和 diff 检查通过；仓库依赖版本/锁文件未改，不创建流水线或发布。
+- 截图 D:/Workspace/adui-studio/babylon-auto-model-acceptance.png 记录 KEY 轮换后的 Vue 自动解密渲染，不纳入 Git；本轮临时浏览器标签页、4321/4322 预览及自建 4331 开发进程已清理。
+- 下一步：接入 Cesium 的自包含 GLB/.adui 模型适配，先完成授权解密与实例生命周期，再接入同一套 env 自动构建；继续以生成器预设为主线。

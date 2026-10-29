@@ -153,3 +153,5 @@ vp build
 ## Babylon 本地验证
 
 按 [BABYLON](BABYLON.md) 创建 Vue/React、TS/JS 与官方工作区，执行 check/build/ready。之后单独运行 verify-babylon-build，确认首页+验收页双入口、场景分块及 /babylon-check/、./ 部署。浏览器检查点击前无 canvas/引擎场景请求、加载后立方体、卸载画布清除、重挂等待再次点击、控制台无错误。受控测试验证初始化和帧错误后的循环/场景/引擎清理，不将其等同 GPU 堆测量或模型支持。
+
+模型自动构建另执行 node scripts/verify-model-app.mjs <应用路径> [/model-check/|./]，需 src/models 至少一个自包含 GLB。验证官方首页+model-smoke 双入口、密文数量/解密一致、无原模型/明文与 KEY 字面量；产物保留 dist/model-verify，临时配置结束删除。对 embedded 页面检查无需手动解锁即 ready；external 页面检查初始锁定、独立解锁、锁定清除模型。补验生成项目开发服务的原 GLB/env HTTP 403 与密文 200，并验证 KEY 轮换后重新构建。受控下载/授权取消用例不等同任意 GPU 内存完全回收。

@@ -47,14 +47,14 @@
 - 验收：最小场景渲染、资源回收及相应构建成功。
 - 首期边界：已有 --screen 应用单独安装固定版本依赖、添加独立页面，详见 [THREE_SMOKE](THREE_SMOKE.md)。不把此工具视为完整的多引擎生成或模型安全能力。
 - Cesium 边界与命令见 [CESIUM](CESIUM.md)：保留正式首页与 Vite 其他字段，原配置备份；仅本地椭球，不接在线影像、模型保护或多引擎。
-- Babylon 边界与命令见 [BABYLON](BABYLON.md)：不改 Vite 配置或正式入口，按需场景、GLB/.adui 加载与实例清理；支持多引擎组合，env 自动构建保护仍待接入。
+- Babylon 边界与命令见 [BABYLON](BABYLON.md)：保留正式入口，按需场景、GLB/.adui 加载与实例清理；支持多引擎组合，默认启用 env 自动构建保护，Vite 配置备份后增量加入插件。
 
 ### FR-007 模型安全加载
 
-- 状态：已实现 .adui v1 AES-256-GCM 本地封装、浏览器授权回调解密及 Three/Babylon GLB 适配；Three 已按用户要求实现无服务端 env 自动构建/加载、拆分密钥与可选域名限制；Babylon 自动构建接入和 Cesium 模型适配仍进行中；优先级：P1。
+- 状态：已实现 .adui v1 AES-256-GCM 本地封装、浏览器授权回调解密及 Three/Babylon GLB 适配；两者均支持无服务端 env 自动构建/加载、拆分密钥与可选域名限制；Cesium 模型适配仍进行中；优先级：P1。
 - 目标：选择 3D 引擎时默认提供可关闭的模型加解密能力；优先 GLB，FBX / OBJ 按引擎格式兼容。
 - 验收：AES-256-GCM 正确解密，拒绝错误密钥及篡改文件；embedded 模式提高直接复用门槛，不宣称密钥无法提取；external 模式密钥不进入网站包，授权回调保持可扩展。
-- 创建选项：Three 默认启用 embedded，CLI --model-protection 和逐应用 JSON modelProtection 支持 embedded/external/none；自动生成项目独立 KEY、package 的 models:keygen/models:keyrotate、忽略规则和备份。IV 每个模型独立随机生成，不配置固定共享 IV。
+- 创建选项：Three/Babylon 默认启用 embedded，CLI --model-protection 和逐应用 JSON modelProtection 支持 embedded/external/none；自动生成项目独立 KEY、package 的 models:keygen/models:keyrotate、忽略规则和备份。多引擎只配置一套，包含 Three 时沿用 Three 模型验收页，否则使用 Babylon。IV 每个模型独立随机生成，不配置固定共享 IV。
 - 当前：建模师交付 GLB，开发/构建自动扫描、只输出 .adui；默认 embedded 由 env 配置并自动加载，不要求服务端或手动解锁，详见 [MODEL_BUILD](MODEL_BUILD.md)。
 - 首期：后缀固定 .adui，32 MiB 自包含 GLB，随机 IV、完整头 AAD、密钥不随模型保存；到期/取消/晚到保护。格式与未实现范围见 [MODEL_SECURITY](MODEL_SECURITY.md)。
 

@@ -64,7 +64,7 @@ authorize 接收只读 `{modelId,keyId,format:'glb'}` 及可选 AbortSignal，�
 
 浏览器获得合法解密能力后，用户仍可能提取明文；不可导出 CryptoKey 与 `.adui` 封装均不等于 DRM。当前未实现生产授权服务、远端模型下载、压缩解码器、FBX/OBJ、Cesium 模型或自动迁移旧源码快照。
 
-2026-10-29：Babylon 复用共享授权与 GLB 校验，createLazyScene 的 loadModel(buffer, {encrypted: true, authorize}) 在认证后调用按需 glTF AssetContainer loader。独立验收页可导入同一格式本地密钥；替换失败保留旧模型，清除授权同时清除模型并使晚到请求失效。加载器拥有独立字节副本，临时解密缓冲清零不等同抹除加载器副本。Babylon env 自动构建集成尚未实现，详见 [BABYLON](BABYLON.md)。
+2026-10-29：Babylon 复用共享授权与 GLB 校验，createLazyScene 的 loadModel(buffer, {encrypted: true, authorize}) 在认证后调用按需 glTF AssetContainer loader。独立验收页可导入同一格式本地密钥；替换失败保留旧模型，清除授权同时清除模型并使晚到请求失效。加载器拥有独立字节副本，临时解密缓冲清零不等同抹除加载器副本。loadBundledModel 已接入同源限长下载和 env 构建目录，默认 embedded 自动授权，external 使用独立解锁文件，详见 [BABYLON](BABYLON.md)。
 
 ## 本地验证
 

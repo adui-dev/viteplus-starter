@@ -155,7 +155,7 @@ lazy 适配先授权/认证解密再走原 GLB Loader；模型请求代次、Abo
 
 ## 模型保护创建选项与密钥脚本
 
-新增 CLI --model-protection 与 JSON modelProtection，严格枚举 none/embedded/external，Three 默认 embedded；非 Three 不能启用，Monorepo 根拒绝统一设置。交互流程在 UI/CSS 后加入大屏、引擎、保护模式，最终摘要含选择；非交互完整参数不询问。批量 UI Smoke 阶段去除引擎和保护参数，避免重复补装。
+新增 CLI --model-protection 与 JSON modelProtection，严格枚举 none/embedded/external，Three/Babylon 默认 embedded；未选两者时不能启用，Monorepo 根拒绝统一设置。交互流程在 UI/CSS 后加入大屏、引擎、保护模式，最终摘要含选择；非交互完整参数不询问。批量 UI Smoke 阶段去除引擎和保护参数，避免重复补装。
 
 planModelProtection 只列模式/文件/脚本/执行时生成标记；执行前检查 env、模型脚本、目录/链接及配置形态。新增模型集成在官方模板、UI/大屏/Three 就绪后运行安全安装器，生成项目独有 .env.local、空 src/models 与 MODEL_GUIDE，再定向格式化。Vite、package 和已有 Git 忽略文件分别备份；保留已有脚本，冲突拒绝。
 
@@ -177,9 +177,9 @@ engine.mjs 统一引擎计划供 CLI/批量调用；Cesium 对应独立增量安
 
 create/babylon 增量安装固定 @babylonjs/core 9.32.1，只新增源码快照和独立页面，不改 Vite 配置、正式入口或首页。按应用核对 manifest、框架/语言入口、大屏文件、输出路径及 catalog 实际安装版本，安装后再次预检。工作区由官方包管理器维护 catalog/锁文件，不执行依赖入口校验版本。
 
-runtime 管理 Engine、Scene 与渲染循环；初始化异常和帧异常停止循环并释放已返回对象。lazy 管理异步导入、画布与 ResizeObserver，点击前不导入场景，晚到结果丢弃、失败可重试、销毁幂等。组件只处理框架挂载/卸载，场景放入 AdScreen 引擎层；ES 深路径引入本地立方体所需模块，不引入在线资产或静态资源插件。模型/加密保持独立，当前 Babylon 拒绝 embedded/external。见 [BABYLON](BABYLON.md)。
+runtime 管理 Engine、Scene 与渲染循环；初始化异常和帧异常停止循环并释放已返回对象。lazy 管理异步导入、画布与 ResizeObserver，点击前不导入场景，晚到结果丢弃、失败可重试、销毁幂等。组件只处理框架挂载/卸载，场景放入 AdScreen 引擎层；ES 深路径引入本地立方体所需模块，不引入在线资产或静态资源插件。模型/加密保持独立，Babylon embedded/external 的共用构建接入见下文。见 [BABYLON](BABYLON.md)。
 
-多引擎通过规范排序和单引擎子阶段复用实现；统一输出冲突/版本预检，基础工程、大屏仅首阶段创建，保护只传 Three。失败保留现场。设计与限制见 [MULTI_ENGINE](MULTI_ENGINE.md)。
+多引擎通过规范排序和单引擎子阶段复用实现；统一输出冲突/版本预检，基础工程、大屏仅首阶段创建，保护只传选定的模型适配阶段（优先 Three，否则 Babylon）。失败保留现场。设计与限制见 [MULTI_ENGINE](MULTI_ENGINE.md)。
 
 交互多选解析数字/名称列表，保持单选返回 engine，多选返回规范 engines；确认后 CLI 分派到同一多引擎编排器。联合验收构建使用显式引擎分组、includeDependenciesRecursively=false 和 strictExecutionOrder=true，避免共享辅助模块导致跨引擎加载；普通项目配置不自动修改。
 
@@ -189,4 +189,12 @@ runtime 管理 Engine、Scene 与渲染循环；初始化异常和帧异常停�
 
 model 控制器快照输入，授权认证后检查格式/扩展，再传独立副本给加载器；原临时明文最终清零，加载器副本随资产管理。request 版本与 AbortController 使旧请求失效；晚到容器移出场景并 dispose，成功 prepare/add 后才释放旧资产，失败保留旧资产。scene 负责有限包围边界、归一化、占位网格显隐；runtime 先销毁模型控制器再销毁 Scene/Engine。对加载器拒绝前未返回的内部对象不作全部回收承诺。
 
-Vue/React TS/JS 使用同一模型控制器与本地验收 provider，文件读取后复查组件代次，清除授权/卸载同时取消加载。Babylon embedded/external 自动构建仍拒绝，避免把本地验收入口误称为 env 自动保护已完成。
+Vue/React TS/JS 使用同一模型控制器与本地验收 provider，文件读取后复查组件代次，清除授权/卸载同时取消加载。
+
+## Babylon 自动构建接入
+
+modelEngine 统一选择可保护引擎：优先 Three，否则 Babylon。单选、多选、CLI/交互和批量 JSON 共用默认 embedded；Cesium 单选仍不启用。多引擎只有模型适配器所属阶段安装保护，统一预检一套输出/env/脚本，后续阶段使用 none，避免配置、密钥和独立页面重复。
+
+setupModelPlugin 增加显式 engine（默认 Three），验证对应当前 lazy 快照具备 loadBundledModel。模型插件、KEY 生成/轮换、备份与忽略规则保持共用；modelSmoke 按引擎选择模块、类型和状态回调，不复制另一套加密算法。Babylon lazy 负责同源密文下载和独立取消代次，下载后再初始化并交给模型控制器认证；清除、卸载、后发请求与外部 AbortSignal 均使旧下载/模型失效，晚到结果不提交。
+
+verify-model-app 对真实生成应用临时构建官方首页与模型页，检查部署 base、密文数、解密与原 GLB 一致、无原模型或 KEY 字面量。临时配置 wx 写入并在 finally 删除，产物单独保存；不能与同一应用/工作区的检查并行。它验证特定应用，不把只读矩阵称为实际构建。

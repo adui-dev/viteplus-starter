@@ -4,7 +4,7 @@
 
 Cesium 预设已接入 --engine cesium，提供本地椭球、按需加载与资源配置；创建和批量用法见 [Cesium 指南](docs/CESIUM.md)。
 
-Babylon 预设使用 --engine babylon，提供本地立方体和独立验收页，支持四种框架/语言及工作区；用法见 [Babylon 指南](docs/BABYLON.md)。
+Babylon 预设使用 --engine babylon，提供本地场景、GLB/.adui 和默认 env 自动构建保护，支持四种框架/语言及工作区；用法见 [Babylon 指南](docs/BABYLON.md)。
 
 ## JSON 批量新建 Monorepo
 
@@ -98,7 +98,7 @@ node packages/create/bin/cli.mjs --name demo-ui --type application --framework v
 node packages/create/bin/cli.mjs --name demo-ui --type application --framework vue --ui tdesign --css unocss --apply-existing
 ```
 
-当前 CLI 使用 Vite+ 内置 `vite:application` 或 `vite:monorepo`；Application 用 `--framework` 和 `--language` 映射到官方 `vue` / `vue-ts` / `react` / `react-ts` 模板。现已支持 UI 组件库选项（None / Element Plus / Ant Design / TDesign）和 CSS 框架（None / UnoCSS / Tailwind CSS）。React 不提供 Element Plus。选中依赖后由 pnpm 安装并生成 Vite 插件/样式入口；大屏首期已实现（见下文），Three.js 真实场景验收已实现；其他引擎与安全模型加载尚未实现。现在支持针对官方 `plugins: [...]`、`plugins: lazyPlugins(() => [...])` 和不包含 `plugins` 属性的 `defineConfig` 进行兼容配置注入。Vue 自动导入的 `src/components.d.ts` 保留类型声明，但会自动加入 Vite+ `fmt.ignorePatterns`，避免其重新生成造成格式漂移。其他组合仍需运行真实 check/build 验证；未知配置结构会明确报错而不强行修改。
+当前 CLI 使用 Vite+ 内置 `vite:application` 或 `vite:monorepo`；Application 用 `--framework` 和 `--language` 映射到官方 `vue` / `vue-ts` / `react` / `react-ts` 模板。现已支持 UI 组件库选项（None / Element Plus / Ant Design / TDesign）和 CSS 框架（None / UnoCSS / Tailwind CSS）。React 不提供 Element Plus。选中依赖后由 pnpm 安装并生成 Vite 插件/样式入口；大屏首期已实现（见下文），Three.js 真实场景验收已实现；Cesium/Babylon 与 Three/Babylon 模型保护已接入，覆盖范围见对应指南。现在支持针对官方 `plugins: [...]`、`plugins: lazyPlugins(() => [...])` 和不包含 `plugins` 属性的 `defineConfig` 进行兼容配置注入。Vue 自动导入的 `src/components.d.ts` 保留类型声明，但会自动加入 Vite+ `fmt.ignorePatterns`，避免其重新生成造成格式漂移。其他组合仍需运行真实 check/build 验证；未知配置结构会明确报错而不强行修改。
 
 本地验证：
 
@@ -130,20 +130,20 @@ Application / Monorepo、Vue / React、Element Plus / Ant Design / TDesign、Uno
 
 ## 大屏适配
 
-已提供分层大屏插件和 --screen 预设，支持 Vue/React、TS/JS、已有项目补装与 Monorepo 应用配置。独立验收页不修改正式首页，详见 [使用与迁移](docs/SCREEN.md)。Three.js 最小场景已接入，其他引擎与模型安全仍待实现。
+已提供分层大屏插件和 --screen 预设，支持 Vue/React、TS/JS、已有项目补装与 Monorepo 应用配置。独立验收页不修改正式首页，详见 [使用与迁移](docs/SCREEN.md)。Three/Cesium/Babylon 最小场景已接入，Three/Babylon 支持模型保护，详见对应指南。
 
 ## Three.js 真实场景
 
-已有大屏应用可单独运行 --three-smoke，验证真实 WebGL、DPR、拾取、全屏与卸载清理，保留正式首页。详见 [Three.js 验收](docs/THREE_SMOKE.md)。已支持 --engine three 和逐应用 JSON engine 字段；其他引擎和模型安全仍待实现。
+已有大屏应用可单独运行 --three-smoke，验证真实 WebGL、DPR、拾取、全屏与卸载清理，保留正式首页。详见 [Three.js 验收](docs/THREE_SMOKE.md)。已支持 --engine three 和逐应用 JSON engine 字段；Cesium/Babylon 与模型保护的覆盖范围见各指南。
 
 ## 本地 GLB
 
-Three 验收页现支持选择自包含 GLB、清除与重新加载；已使用 DamagedHelmet 验证。加载器按需导入，测试模型不打包进仓库。接口与边界见 [GLB 加载说明](docs/THREE_SMOKE.md)；模型授权及加解密仍待实现。
+Three 验收页现支持选择自包含 GLB、清除与重新加载；已使用 DamagedHelmet 验证。加载器按需导入，测试模型不打包进仓库。接口与边界见 [GLB 加载说明](docs/THREE_SMOKE.md)；模型授权及加解密见下文。
 
 模型现支持 AES-256-GCM `.adui` 封装和浏览器授权解密，操作与边界见 [模型加密](docs/MODEL_SECURITY.md)。生产授权服务仍需业务接入。
 
 支持无服务端的模型自动加密构建：`.env` 配置、GLB 扫描、`.adui` 输出、密钥拆分与可选域名限制。默认自动加载，以提高直接复用门槛为目标，见 [模型自动打包](docs/MODEL_BUILD.md)。
 
-创建 Three 项目时现默认启用模型保护，可用 `--model-protection embedded|external|none` 选择；交互创建和批量 JSON 同步支持。生成项目提供 `models:keygen` / `models:keyrotate` 脚本，IV 按模型自动生成。见 [模型构建指南](docs/MODEL_BUILD.md) 和 [五应用示例](examples/models.batch.json)。
+创建 Three/Babylon 项目时现默认启用模型保护，可用 `--model-protection embedded|external|none` 选择；交互创建和批量 JSON 同步支持。生成项目提供 `models:keygen` / `models:keyrotate` 脚本，IV 按模型自动生成。见 [模型构建指南](docs/MODEL_BUILD.md) 和 [五应用示例](examples/models.batch.json)。
 
 多引擎用 --engines three,cesium,babylon，CLI/JSON 用法与限制见 [说明](docs/MULTI_ENGINE.md)。

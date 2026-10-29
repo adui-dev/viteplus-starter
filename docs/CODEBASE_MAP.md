@@ -120,6 +120,8 @@ UI/CSS 已在 `integrations.mjs` 实现；大屏核心见 `packages/screen`；Th
 - packages/babylon/src/runtime/lazy：Engine/Scene、渲染循环、延迟导入、画布与尺寸观察；test/lifecycle.test.mjs 验证异常、晚到、重试和清理。
 - scene/demo：本地立方体、模型归一化与文件/授权验收入口；loader/model：动态 glTF AssetContainer 加载、替换/取消/清理，test/model.test.mjs 覆盖认证与晚到边界。
 - model-security/src/glb.mjs：Three/Babylon 共用的纯 GLB 校验；生成源码及模型构建工具均复制该文件。
+- Babylon lazy/loadBundledModel：同源密文下载、初始化与授权解密，取消和清除失效旧下载；共享 smoke/setup 按适配引擎生成同一个 model-smoke 页面。
+- scripts/verify-model-app.mjs：生成应用双入口构建、base、密文解密一致性与原模型/KEY 字面量检查，输出 dist/model-verify。
 - scripts/verify-babylon-build.mjs：[双入口专项](BABYLON.md)，[批量示例](../examples/babylon.batch.json)。
 
 create/src/multi-engine.mjs、test/multi-engine.test.mjs：多选校验、规范顺序、失败停止、应用隔离；scripts/verify-multi-build.mjs：联合构建，见 [说明](MULTI_ENGINE.md)。

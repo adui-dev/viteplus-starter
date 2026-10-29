@@ -8,7 +8,7 @@ CLI 新增 --engines three,cesium,babylon；JSON 应用新增 engines 字符串�
 node ./viteplus-starter/packages/create/bin/cli.mjs --name multi-app --type application --framework vue --screen --engines three,cesium,babylon
 ```
 
-新建必须 --screen；已有匹配大屏应用可 --apply-existing，所有所选输出/版本在写入前统一预检。顺序固定 Three → Cesium → Babylon，只有首阶段创建官方基础工程、集成 UI/CSS 与大屏，之后复用补装流程；每引擎有独立源码目录和验收页，不实现同页场景混用或切换。包含 Three 时模型保护默认 embedded，仅安装到 Three 阶段；可显式 none/external。仅选择 Cesium/Babylon 时不支持启用模型保护。
+新建必须 --screen；已有匹配大屏应用可 --apply-existing，所有所选输出/版本在写入前统一预检。顺序固定 Three → Cesium → Babylon，只有首阶段创建官方基础工程、集成 UI/CSS 与大屏，之后复用补装流程；每引擎有独立源码目录和验收页，不实现同页场景混用或切换。包含 Three 或 Babylon 时模型保护默认 embedded，可显式 none/external。只安装一套模型目录、插件、KEY 和 model-smoke 页面：优先选择 Three，没有 Three 时选择 Babylon；Cesium 单选仍不支持保护。
 
 批量 JSON 示例应用：{"name":"viewer","framework":"react","screen":true,"engines":["three","babylon"],"modelProtection":"none"}。根仍委托官方 vite:monorepo，成员委托 vite:application。dry-run 列出合并依赖、文件、各验收地址及模型保护生成标记，不生成 KEY。每阶段失败停止，保留已生成内容，不回滚、覆盖续跑或跳过冲突。
 

@@ -12,7 +12,7 @@
 | FR-004 CSS        | UnoCSS/Tailwind 配置及代表组合已验收                                       | 未逐一真实构建全部 UI/CSS 组合                                                           |
 | FR-005 大屏       | 四种模式、坐标换算、浮层、全屏及三种引擎的原生像素层                       | Cesium/Babylon 全屏与 DPR 专项仍待验收                                                   |
 | FR-006 引擎       | 按应用选择 none/three/cesium/babylon、按需加载、实例清理                   | CLI/JSON/交互多选已接入；Cesium 模型适配仍待接入                                         |
-| FR-007 模型保护   | Three 自动构建/加载、KEY 脚本；Three/Babylon 的 .adui 授权解密             | Babylon 自动构建、Cesium、FBX/OBJ 与压缩格式待接入；客户端密钥仍可逆向提取               |
+| FR-007 模型保护   | Three/Babylon 自动构建/加载、KEY 脚本及 .adui 授权解密                     | Cesium、FBX/OBJ 与压缩格式待接入；客户端密钥仍可逆向提取                                 |
 | FR-008 工作区隔离 | 官方 pnpm apps/*，逐应用和批量配置、不同框架/语言/预设                     | 自定义布局与其他包管理器未支持                                                           |
 | FR-009 UI 验收页  | Vue TDesign / React Ant Design，TS/JS、点击及 CSS 验收                     | 工具不支持其他 UI 组件库的渲染验收                                                       |
 | FR-010 批量生成   | 严格 JSON、全量预检、顺序执行、dry-run 和失败摘要                          | 无自动回滚或覆盖式续跑                                                                   |
@@ -25,19 +25,19 @@
 
 ## 组合计划验证
 
-运行 `node scripts/verify-generator-matrix.mjs`。矩阵覆盖 Vue 的 4 种 UI 选择、React 的 3 种 UI 选择，TS/JS、3 种 CSS、7 种增强配置，共 294 个有效组合。
+运行 `node scripts/verify-generator-matrix.mjs`。矩阵覆盖 Vue 的 4 种 UI 选择、React 的 3 种 UI 选择，TS/JS、3 种 CSS、9 种增强配置，共 378 个有效组合。
 
-七种增强配置分别为：不启用大屏、只启用大屏、Cesium、Babylon、Three + 关闭保护、Three + embedded、Three + external。验证官方命令与语言模板、按框架隔离依赖、已有 Vite 字段及入口保留、新增文件不冲突、无输出路径越界及模型计划不含密钥。
+九种增强配置分别为：不启用大屏、只启用大屏、Cesium，以及 Three/Babylon 各自的关闭保护、embedded、external。验证官方命令与语言模板、按框架隔离依赖、已有 Vite 字段及入口保留、新增文件不冲突、无输出路径越界及模型计划不含密钥。
 
 | 项目            | 计划数量 | 实际创建/构建数量 |
 | --------------- | -------- | ----------------- |
-| 总组合          | 294      | 本命令为 0        |
-| 支持的 UI Smoke | 84       | 本命令为 0        |
-| 大屏            | 252      | 本命令为 0        |
+| 总组合          | 378      | 本命令为 0        |
+| 支持的 UI Smoke | 108      | 本命令为 0        |
+| 大屏            | 336      | 本命令为 0        |
 | Three           | 126      | 本命令为 0        |
 | Cesium          | 42       | 本命令为 0        |
-| Babylon         | 42       | 本命令为 0        |
-| 模型保护        | 84       | 本命令为 0        |
+| Babylon         | 126      | 本命令为 0        |
+| 模型保护        | 168      | 本命令为 0        |
 
 计划验证不会安装依赖、创建项目或生成 KEY。它不能证明全部组合在当前依赖版本下可构建或渲染。真实生成项目必须另跑 vp check、vp run build；需要组件效果时还要浏览器验收。
 
@@ -64,6 +64,6 @@ Ant Design Vue 另补充 pnpm 的 core-js: false 构建脚本规则并定向格�
 
 ## 后续主线
 
-Cesium 与 Babylon 逐应用预设及多引擎选择已接入，Babylon 新增本地 GLB/.adui 授权加载；真实检查、构建与浏览器证据以状态记录为准，详见 [CESIUM](CESIUM.md)、[BABYLON](BABYLON.md)。下一阶段接入 Babylon env 自动构建保护，再推进 Cesium 模型适配。新增预设仍通过官方基础模板增强，不把验收页面体验当作生成器功能完成条件。
+Cesium 与 Babylon 逐应用预设及多引擎选择已接入，Babylon 已支持本地 GLB/.adui 与 env 自动构建加载；真实检查、构建与浏览器证据以状态记录为准，详见 [CESIUM](CESIUM.md)、[BABYLON](BABYLON.md)。下一阶段推进 Cesium 模型适配。新增预设仍通过官方基础模板增强，不把验收页面体验当作生成器功能完成条件。
 
 2026-10-29：CLI/JSON 多引擎编排已接入，交互已支持逗号多选，联合构建与浏览器证据分开记录，见 [说明](MULTI_ENGINE.md)。

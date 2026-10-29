@@ -4,15 +4,16 @@
 
 ## 创建器直接启用
 
-在仓库上级目录创建官方应用，Three 默认启用 embedded 模型保护：
+在仓库上级目录创建官方应用，Three/Babylon 默认启用 embedded 模型保护：
 
 ```powershell
 node ./viteplus-starter/packages/create/bin/cli.mjs --name my-three-app --type application --framework vue --screen --engine three
 # 改用外置密钥：追加 --model-protection external
 # 关闭模型保护：追加 --model-protection none
+# 使用 Babylon：将 --engine three 改为 --engine babylon
 ```
 
-生成器自动添加模型插件、独立验收页、src/models 空目录、MODEL_GUIDE.md 和项目专属 .env.local，并增量维护 Git 忽略规则。默认只在选 Three 时启用；无引擎的普通项目不生成这些配置，Monorepo 根不能统一设置。交互创建会询问大屏/引擎/模型保护，完整非交互参数不额外询问。
+生成器自动添加模型插件、独立验收页、src/models 空目录、MODEL_GUIDE.md 和项目专属 .env.local，并增量维护 Git 忽略规则。选择 Three 或 Babylon 时默认启用；无引擎或仅 Cesium 不生成这些配置，Monorepo 根不能统一设置。多引擎只安装一套模型插件与 KEY：包含 Three 时采用 Three 适配，否则采用 Babylon。交互创建会询问大屏/引擎/模型保护，完整非交互参数不额外询问。
 
 package.json 自动提供：
 
@@ -23,21 +24,23 @@ vp run models:keyrotate
 
 models:keygen 在 KEY 缺失时生成 256 位 KEY；已有 KEY 会拒绝覆盖。models:keyrotate 先备份 .env.local 再轮换 KEY/标识，保留其他 env 配置与注释，随后须重新构建和部署匹配的 JS/.adui。密钥和 .env.local.before-* 备份由 .env.local* 规则忽略，不回显 KEY。IV 在每个模型加密时独立随机生成并写入 .adui 头，不提供或复用全局固定 IV；这两条命令不向 env 写固定 IV。
 
-批量 JSON 每应用可设 modelProtection=embedded/external/none；省略时 Three 默认 embedded，其他应用默认关闭。示例 [models.batch.json](../examples/models.batch.json) 覆盖四种框架语言及关闭模式。dry-run 只列文件、模式和脚本，不生成密钥或项目文件。已有输出、env、脚本或链接占用在修改前拒绝，不自动覆盖旧快照。
+批量 JSON 每应用可设 modelProtection=embedded/external/none；省略时 Three/Babylon 默认 embedded，其他应用默认关闭。示例 [models.batch.json](../examples/models.batch.json) 覆盖四种框架语言及关闭模式。dry-run 只列文件、模式、适配引擎和脚本，不生成密钥或项目文件。已有输出、env、脚本或链接占用在修改前拒绝，不自动覆盖旧快照。
 
 ## 已有当前版本应用单独安装
 
-应用须由当前生成器的 `--screen --engine three` 创建，支持 Vue/React × TS/JS、独立应用和 Monorepo 成员。先在仓库根执行：
+应用须由当前生成器的 `--screen --engine three|babylon --model-protection none` 创建，支持 Vue/React × TS/JS、独立应用和 Monorepo 成员。先在仓库根执行：
 
 ```powershell
 # 默认 embedded：无服务端、无需手动解锁
 node packages/model-security/bin/setup.mjs --project ../my-three-app
+# Babylon 应用必须显式选择适配器：
+# node packages/model-security/bin/setup.mjs --project ../my-babylon-app --engine babylon
 
 # 创建新密钥；已有 .env.local 会拒绝覆盖
 node packages/model-security/bin/cli.mjs keygen-env --out ../my-three-app/.env.local --key-id project-v1
 ```
 
-安装器增量添加 adui-model-build、虚拟模块声明、独立 model-smoke 页面、密钥脚本与 Git 忽略规则，并向官方 Vite 插件列表追加 aduiModels。已有 Vite、package.json 和 .gitignore 原件保存在相应 `.before-adui-models` 备份，其他配置保留；正式首页、App/main、大屏和已有 Three 源码不覆盖。已有输出/备份、链接路径或旧运行时不匹配时拒绝。不会安装依赖或自动迁移旧快照；失败保留现场，不自动回滚。
+安装器增量添加 adui-model-build、虚拟模块声明、独立 model-smoke 页面、密钥脚本与 Git 忽略规则，并向官方 Vite 插件列表追加 aduiModels。已有 Vite、package.json 和 .gitignore 原件保存在相应 `.before-adui-models` 备份，其他配置保留；正式首页、App/main、大屏和已有引擎源码不覆盖。已有输出/备份、链接路径或旧运行时不匹配时拒绝。不会安装依赖或自动迁移旧快照；失败保留现场，不自动回滚。
 
 在 `.env.local` 中配置：
 
@@ -68,6 +71,8 @@ scene.destroy();
 ```
 
 models 包含 name、modelId、keyId、url，生产 URL 指向带随机构建哈希的 .adui；文件头绑定标识，避免替换成目录中的另一合法模型。加载器只获取同源 .adui，限制响应大小并支持 AbortSignal；后续请求、清除、卸载会取消或丢弃晚到结果。已有模型在认证失败时保留，成功后释放旧模型。
+
+Babylon 对应从 ./adui-babylon/lazy.mjs 导入 createLazyScene，loadBundledModel 调用方式相同；onError 接收字符串，模型状态使用 onModelState({state,message})，支持 clearModel/cancelModelLoad/destroy。不需要手工先初始化场景。embedded 的授权仍由虚拟密钥模块提供，external 使用该目录下的 createOfflineKeyring；解锁文件是 {version:1,keyId,key} JSON，key 与 env 中同一 KEY 的 Base64 值匹配，必须通过网站文件之外的渠道提供。
 
 ## 配置与边界
 
