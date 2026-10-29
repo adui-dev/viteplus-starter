@@ -26,6 +26,7 @@ export async function planThreeSmoke(input) {
     ).replaceAll("../../model-security/src/", "./");
   for (const name of [
     "adui.mjs",
+    "glb.mjs",
     "adui.d.mts",
     "local-grant.mjs",
     "local-grant.d.mts",

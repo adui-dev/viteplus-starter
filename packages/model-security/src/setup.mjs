@@ -100,10 +100,10 @@ export async function setupModelPlugin(project, keyMode = "embedded") {
     files["adui-model-build/" + name] = (
       await readFile(new URL(name, import.meta.url), "utf8")
     ).replace("../../three/src/model.mjs", "./model.mjs");
-  files["adui-model-build/model.mjs"] = await readFile(
-    new URL("../../three/src/model.mjs", import.meta.url),
-    "utf8",
-  );
+  files["adui-model-build/model.mjs"] = (
+    await readFile(new URL("../../three/src/model.mjs", import.meta.url), "utf8")
+  ).replace("../../model-security/src/glb.mjs", "./glb.mjs");
+  files["adui-model-build/glb.mjs"] = await readFile(new URL("./glb.mjs", import.meta.url), "utf8");
   files["src/adui-models.d.ts"] = await readFile(
     new URL("virtual-models.d.ts", import.meta.url),
     "utf8",

@@ -15,7 +15,7 @@ export function planModelProtection(input) {
       ...Object.keys(
         modelSmoke(options.framework, options.language ?? "ts", options.modelProtection),
       ),
-      ...["vite.mjs", "vite.d.mts", "adui.mjs", "model.mjs", "keygen.mjs"].map(
+      ...["vite.mjs", "vite.d.mts", "adui.mjs", "glb.mjs", "model.mjs", "keygen.mjs"].map(
         (name) => "adui-model-build/" + name,
       ),
       "src/adui-models.d.ts",
