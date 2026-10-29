@@ -36,7 +36,7 @@ node .\viteplus-starter\packages\create\bin\cli.mjs --name react-js-check --type
 
 ## 环境
 
-- Node.js 22+（计划最低版本，尚待官方工具链版本验证）
+- Node.js `^22.18.0 || ^24.11.0 || >=26.0.0`（与锁定的 Vite+ 1.4.0 一致，Node 22 最低为 22.18.0）
 - pnpm
 - Vite+ CLI（`vp`）
 
@@ -175,3 +175,30 @@ Cesium 自动构建使用 verify-model-app，检查双入口/base、密文与原
 ## V1 收尾入口
 
 模式选择、按顺序的端到端验收和未覆盖范围集中在 [V1 验收清单](V1_ACCEPTANCE.md)。新增 node scripts/verify-examples.mjs 对 examples 下所有 *.batch.json 做真实 CLI dry-run，并断言临时目录没有生成文件；只计计划，不计真实构建。当前示例与用途见 [示例索引](../examples/README.md)。
+
+## Node 22 最低版本复验
+
+根与 create 包的 engines.node 使用锁定 Vite+ 1.4.0 的范围：`^22.18.0 || ^24.11.0 || >=26.0.0`。依据是已安装 vite-plus/package.json 的 engines 字段及随包 guide/vitest-v5.md；不是泛指任意 Node 22。依赖更新后需重新核对范围和实测结果。
+
+用官方环境管理器安装指定运行时，再在当前 PowerShell 进程临时选择。仅给最外层 node 指定 --node，不能作为后续 vp 子进程也使用该版本的证据；VP_NODE_VERSION 应同时传给子进程。以下步骤不修改全局默认、项目 pin、系统 Node 或依赖版本：
+
+```powershell
+vp env install 22.18.0
+$node22Previous = [Environment]::GetEnvironmentVariable('VP_NODE_VERSION', 'Process')
+try {
+  $env:VP_NODE_VERSION = '22.18.0'
+  vp env current --json
+  vp env exec node -p "process.version + ' ' + process.execPath"
+  vp env exec node --test
+  vp env exec node scripts/validate-docs.mjs
+  vp env exec node scripts/verify-examples.mjs
+  vp env exec node scripts/verify-generator-matrix.mjs
+  vp check
+} finally {
+  [Environment]::SetEnvironmentVariable('VP_NODE_VERSION', $node22Previous, 'Process')
+}
+```
+
+真实生成和构建需在同样的临时环境选择下另行执行：先用仓库外 JSON 指定一个不存在的官方工作区及 Vue/React × TS/JS 四个应用，运行原 CLI --config；随后在新工作区核对 vp env current --json，再运行 vp run ready --no-cache、vp check，以及 UI 应用的 verify-ui-build。保留官方根和应用的运行时声明，不通过修改模板来强行兼容。所有命令都需检查退出码，前一步失败应先处理现场，不将后续命令的成功代替前一步结果。
+
+示例和组合验证仍为 actualBuilds=0；真实生成、完整类型/构建、UI 双入口构建与浏览器验收分别记录，不把运行时兼容验证扩大成新增浏览器验收。

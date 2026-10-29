@@ -80,7 +80,7 @@ node .\viteplus-starter\packages\create\bin\cli.mjs --name starter-react-p3 --ty
 
 ## 快速开始（开发者）
 
-环境：Node.js 22+、pnpm，以及可运行的 `vp` 命令。
+环境：Node.js `^22.18.0 || ^24.11.0 || >=26.0.0`、pnpm，以及可运行的 `vp` 命令。版本范围与当前锁定的 Vite+ 1.4.0 一致；Node 22 的最低版本是 22.18.0，复验方法见 [Harness](docs/HARNESS.md#node-22-最低版本复验)。
 
 ```powershell
 git clone https://github.com/adui-dev/viteplus-starter.git

@@ -6,7 +6,7 @@
 
 ## 本地封装
 
-需要 Node >=22。以下命令从仓库根执行；密钥单独保存在源码、Web 静态目录和版本控制以外。输出父目录必须已存在，输入/输出及祖先不能是符号链接或 junction；任何已有输出均拒绝覆盖。路径来自操作者，不承诺抵御另一个进程恶意并发替换文件系统。
+仓库工具链需要 Node `^22.18.0 || ^24.11.0 || >=26.0.0`，Node 22 最低为 22.18.0。以下命令从仓库根执行；密钥单独保存在源码、Web 静态目录和版本控制以外。输出父目录必须已存在，输入/输出及祖先不能是符号链接或 junction；任何已有输出均拒绝覆盖。路径来自操作者，不承诺抵御另一个进程恶意并发替换文件系统。
 
 ```powershell
 node packages/model-security/bin/cli.mjs keygen --out C:/Users/ADui/Downloads/helmet-demo.key.json --key-id helmet-demo-v1

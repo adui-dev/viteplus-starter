@@ -258,3 +258,7 @@ validate-docs 保留必要文件与需求编号检查，并枚举 docs 的普通
 ## 共享构建策略的格式化工作目录
 
 Vite+ 当前 fmt 不接受含 .. 的 PATH。applyIntegrations 不再把根 pnpm-workspace.yaml 拼入子应用的相对格式化列表；应用文件仍在应用目录定向处理，共享策略单独在 dirname(policyPath) 中格式化 basename(policyPath)。实际格式化前继续检查链接路径，保留原 core-js 策略合并和用户规则。失败现场及文件保护不变，没有新增覆盖式恢复能力。
+
+## Node 运行时兼容边界
+
+根和 create 包的 engines.node 与当前锁定 Vite+ 1.4.0 一致，为 `^22.18.0 || ^24.11.0 || >=26.0.0`，修正原 >=22 的过宽声明；不新增依赖或修改官方模板输出。最低版本验证通过进程级 VP_NODE_VERSION 同时选择 CLI 及其 Vite+ 子进程，配合显式 Node 路径与环境报告核对，避免实际使用较高托管版本却误记为 Node 22。复验方法见 [Harness](HARNESS.md#node-22-最低版本复验)；生成器测试与真实项目构建证据分开记录。
