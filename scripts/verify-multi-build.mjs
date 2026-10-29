@@ -1,4 +1,4 @@
-import { writeFile, unlink, stat } from "node:fs/promises";
+import { writeFile, unlink, stat, readFile } from "node:fs/promises";
 import { resolve, join } from "node:path";
 import { spawnSync } from "node:child_process";
 import assert from "node:assert/strict";
@@ -27,7 +27,7 @@ assert.ok(
 );
 await writeFile(
   temp,
-  `import config from './${configs[0]}'\nexport default {...config,base:'/multi-check/',build:{...config.build,outDir:'dist/multi-verify',rolldownOptions:{input:${JSON.stringify(input)}}}}\n`,
+  `import config from './${configs[0]}'\nexport default {...config,base:'/multi-check/',build:{...config.build,outDir:'dist/multi-verify',rolldownOptions:{output:{strictExecutionOrder:true,codeSplitting:{includeDependenciesRecursively:false,groups:[{name:"cesium-engine",test:/node_modules.*cesium/},{name:"babylon-engine",test:/node_modules.*babylonjs/},{name:"three-engine",test:/node_modules.*three/}]}},input:${JSON.stringify(input)}}}}\n`,
   { flag: "wx" },
 );
 try {
@@ -39,6 +39,25 @@ try {
   assert.equal(result.status, 0, "多入口构建失败");
   for (const file of Object.values(input))
     assert.ok((await stat(join(root, "dist/multi-verify", file))).isFile());
+  for (const name of ["three", "cesium", "babylon"].filter((name) => input[name])) {
+    const html = await readFile(join(root, "dist/multi-verify", input[name]), "utf8");
+    const pending = [...html.matchAll(/(?:src|href)="[^"]*assets\/([^"]+\.js)"/g)].map(
+        (match) => "assets/" + match[1],
+      ),
+      seen = new Set();
+    while (pending.length) {
+      const file = pending.pop();
+      if (seen.has(file)) continue;
+      seen.add(file);
+      assert.ok(
+        !/(?:three|cesium|babylon)-engine-/.test(file),
+        "页面初始静态依赖提前加载引擎：" + file,
+      );
+      const source = await readFile(join(root, "dist/multi-verify", file), "utf8");
+      for (const match of source.matchAll(/(?:from|import)\s*["']\.\/([^"']+\.js)["']/g))
+        pending.push("assets/" + match[1]);
+    }
+  }
   if (input.cesium)
     for (const name of ["Workers", "Assets", "ThirdParty", "Widgets"])
       assert.ok((await stat(join(root, "dist/multi-verify/adui-cesium", name))).isDirectory());
