@@ -163,3 +163,10 @@ engine-prompts.test.mjs：多选解析、摘要/取消、Three 保护提示；ve
 - packages/create/src/application-invocations.mjs：批量生成和恢复指引共用的逐应用 argv 构造。
 - packages/create/src/workspace-inspect.mjs：共用预期 JSON 读取与同配置检查入口，不回显配置内容。
 - packages/create/test/workspace-recovery.test.mjs：混合状态、全局/作用域冲突、多引擎和大屏参数、CLI 只读及参数隔离、链接拒绝。
+
+## 缺失应用恢复执行
+
+- packages/create/src/workspace-recovery-execute.mjs：显式执行、初始全量预检、逐应用重检、结构确认、失败即停和已有应用跳过。
+- workspace-recovery.mjs：提取同配置的规划入口，避免执行时信任保存的计划。
+- ui-smoke.mjs：只读 preflightUiSmoke 与原写入函数共用检查，保护依赖与输出冲突。
+- packages/create/test/workspace-recovery-execute.test.mjs：顺序/重复调用、部分失败保留、后续目标占用、验收页冲突、虚假子进程成功与 CLI 模式隔离。

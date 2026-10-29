@@ -242,3 +242,9 @@ workspace-inspect 复用 safe-paths 的逐祖先链接拒绝、现有官方 YAML
 workspace-recovery 读取并校验原 JSON 一次，将同一配置交给只读检查，避免两次读取配置产生选项不一致。全局根/成员问题阻塞全部操作，应用局部缺失仅阻塞自身。对于 not-created 再调用 resolveWorkspaceApplication 检查实际目录、作用域包名、peer 以及根声明配置；若目标在规划期间出现，返回 manual-review。
 
 application-invocations 抽取原批量应用 argv 构造，批量新建与恢复计划共用，保留框架/语言/UI/CSS/大屏/引擎/模型保护选项。UI Smoke argv 与增强安装选项分离，防止生成时重复集成。pendingRecovery 继续负责显示用 PowerShell 转义；没有新的 shell 执行路径。present 仅规划验证命令，不自动读取或执行 package scripts。
+
+## 缺失应用恢复执行
+
+workspace-recovery-execute 仅读取一次校验后的原配置，使用 planRecoveryForConfig 重建计划；初始存在人工阻塞直接失败。固定初始 create-missing 名单，避免在运行中接管新出现的目录。每个应用前重新检查全计划及 resolveWorkspaceApplication，使用共用 argv 构造并以 Node argv 子进程执行，不运行 PowerShell 展示文本。
+
+创建后以同一应用 uiSmoke=false 核对基础/预设结构，再通过提取的只读 preflightUiSmoke 检查验收页依赖、配置及文件冲突；CLI 实际写入时仍重检并使用原文件保护。验收页创建后再核对完整结构。已存在应用完全跳过；completed 记录成功返回的子进程，后续结构失败仍作为失败报告，不称为构建成功。注入 runner 仅用于受控生命周期验证，CLI 不提供自定义执行器。

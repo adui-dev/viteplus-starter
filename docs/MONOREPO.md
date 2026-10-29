@@ -93,3 +93,20 @@ node packages/create/bin/cli.mjs --plan-recovery D:/Workspace/adui-studio/adui-c
 存在根问题、重复包名或成员清单问题时，所有应用先进入人工处理；单个应用只是预设/入口缺失时，该应用单独阻塞。发现 manual-review 退出 1，其余计划退出 0；ok=true 仅表示本次计划没有人工阻塞，不表示应用已恢复、依赖已安装或构建通过。
 
 每个步骤给出 cwd、command、args、PowerShell 显示文本；新建步骤另有 requires 条件。生成和消费计划均不在检查命令中执行。运行输出的新建命令仍走原官方模板 CLI，执行时再次拒绝已存在目标；新建后的 UI 验收页也必须重检输出冲突。计划不会写状态文件或自动断点续跑。
+
+## 显式执行缺失应用新建
+
+先审阅 --plan-recovery 输出，再显式运行：
+
+```powershell
+node packages/create/bin/cli.mjs --execute-recovery D:/Workspace/adui-studio/adui-cesium-workspace --config ./expected-apps.json
+```
+
+该命令会创建应用并安装所选依赖。只接受路径和原批量 JSON，不接受计划 JSON、外部命令、--dry-run 或其他创建/补装选项。读取并校验配置后重新检查整个计划；存在 manual-review 时，在启动任何子进程前退出。原批量新建命令的目标保护保持有效。
+
+- 初次检查为 create-missing 的应用按 JSON 顺序处理。每个应用创建前重新规划并检查目录、包名和工作区；若现场已变化，立即停止。
+- 初次检查为 validate-existing 的应用仅记录 skipped，不执行其检查/构建脚本或重新集成。新应用安装过程中，共享锁文件、catalog 和必要根配置仍可能按原工作区集成规则更新。
+- 创建步骤通过原 CLI 委托 Vite+ 官方模板。返回成功后核对新应用结构；选择 uiSmoke 时，再预检组件依赖、配置及输出冲突，通过后才创建验收页并核对结构。
+- 任一步失败即停，保留部分输出和依赖现场，报告失败阶段与已返回成功的子进程。该记录不等于应用检查/构建通过。失败后重新运行可能被部分应用阻塞，必须先处理现场。
+
+执行结果包含 completed、skipped 和 validation。结构检查不替代 vp check、完整 build 和适用的浏览器验收。全部应用已存在且结构检查通过时，重复调用只返回跳过结果；没有删除、覆盖式补装、自动回滚或恢复状态文件。原 --plan-recovery 仍是只读模式。

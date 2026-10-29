@@ -376,3 +376,13 @@
 - 真实 CLI 在既有 adui-cesium-workspace 上检查 ui-tdesign-react-ts，并仅规划 recovery-planned-vue（Vue TS/TDesign/UnoCSS）、recovery-planned-react（React JS/Ant Design/Tailwind）。已有应用给出两项验证步骤，两个未创建应用各给出新建和 UI 验收步骤。退出 0；33 项文件 SHA256 和应用目录清单一致，没有实际创建应用、安装或运行验证命令。临时配置已移除。
 - 本轮 204/204 Node 测试通过，文档校验通过，根 vp check 格式 163 文件、lint 123 文件通过；受控用例覆盖局部/全局阻塞、作用域包冲突、参数完整转发、禁止混写与无配置、junction 及无目标写入。未修改 UI/大屏/引擎预设或新增浏览器验收声明。
 - 下一步：显式执行计划中允许新建的缺失应用，每一步执行前重新预检、遇阻即停；已有和部分完成应用继续人工处理。自动覆盖式续跑与自定义布局仍不在本阶段范围。
+
+## 2026-10-29：显式执行缺失应用新建
+
+- 新增 --execute-recovery <已有根> --config <原 JSON>。执行时重新规划；初始存在人工阻塞零执行，固定初始缺失应用名单，按序重检后调用原 CLI/官方模板。已有应用仅跳过，不执行其检查、构建或补装。创建后核对结构，UI Smoke 额外预检依赖/配置/冲突并在写入后再核对结构。
+- 提取 preflightUiSmoke 为纯预检入口，原 addUiSmoke 写入保护保持不变。执行器使用重新构造的 argv，不读取保存的计划或执行 PowerShell 文本。不删除、回滚、补写部分应用或写入恢复状态；子进程成功记录与构建验收分开。
+- 208/208 Node 测试通过；受控用例覆盖新建→验收页顺序、重复执行跳过、已有应用不改、失败部分文件保留与后续停止、目录/验收页竞争冲突、子进程虚假成功但结构缺失、CLI 无配置与混合模式拒绝。根 vp check 格式 165 文件、lint 125 文件通过，文档校验通过。
+- 使用既有官方 adui-cesium-workspace 真实执行：跳过 ui-tdesign-react-ts，新建 recovery-exec-vue-js（Vue JS/TDesign/UnoCSS）与 recovery-exec-react-ts（React TS/Ant Design/Tailwind），分别生成 UI 验收页。四个子进程均成功并通过结构检查；全程继续委托官方模板，没有修改模板来源。
+- 同配置再次执行 completed=[]，三个应用全部 skipped。创建前后 38 项既有应用清单/入口/首页/Vite 配置 SHA256 一致。原工作区共享锁文件/catalog 按新应用安装规则更新，不将它们称为完全不变。
+- 两个新应用均通过完整 build、verify-ui-build 双入口构建及 vp check；Vue 子路径 /ui-check/，React 相对 ./。检查文件数分别 15 格式/8 代码、15 格式/5 代码，无警告或类型错误；保留 UnoCSS 多入口重复虚拟 CSS 及构建性能提示。未新增浏览器渲染声明。
+- 临时执行 JSON 与哈希记录位于工作区外，验证结束后清理。下一步进入 V1 收尾：统一 CLI 帮助、示例配置与端到端验收清单，核对功能状态及未覆盖范围；不继续扩展演示功能或自动发布。
