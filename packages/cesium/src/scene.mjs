@@ -1,3 +1,4 @@
+import { resizeGlobe } from "./resolution.mjs";
 import {
   Viewer,
   Color,
@@ -81,10 +82,10 @@ export function createGlobe(host, onModelState = () => {}) {
         onModelState({ state, message });
       },
     });
-    viewer.scene.requestRender();
+    resizeGlobe(viewer, host);
     return {
       scene: viewer.scene,
-      resize: () => viewer.resize(),
+      resize: () => resizeGlobe(viewer, host),
       isDestroyed: () => viewer.isDestroyed(),
       loadModel: (buffer, options) => models.load(buffer, options),
       clearModel: () => models.clear(),

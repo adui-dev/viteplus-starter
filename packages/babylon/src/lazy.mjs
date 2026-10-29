@@ -1,3 +1,4 @@
+import { observeViewport } from "../../screen/src/viewport.mjs";
 import { fetchBundledAdui } from "../../model-security/src/bundled.mjs";
 export function createLazyScene(
   host,
@@ -20,8 +21,9 @@ export function createLazyScene(
     modelAbort = undefined;
     scene?.cancelModelLoad?.();
   }
-  const observer = new ResizeObserver(() => scene?.resize());
-  observer.observe(host);
+  const stopObserving = observeViewport(host, () => {
+    scene?.resize();
+  });
   function state(loading) {
     onState({ loading, ready: Boolean(scene), disposed });
   }
@@ -133,7 +135,7 @@ export function createLazyScene(
       if (disposed) return;
       disposed = true;
       invalidate();
-      observer.disconnect();
+      stopObserving();
       clear();
       state(false);
     },

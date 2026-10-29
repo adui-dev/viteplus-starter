@@ -1,3 +1,4 @@
+import { engineScreenSmoke, engineScreenStyles } from "./engine-screen-smoke.mjs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join, relative } from "node:path";
 import { createRequire } from "node:module";
@@ -14,10 +15,24 @@ export async function planCesium(input) {
   const files = {},
     ts = (options.language ?? "ts") === "ts",
     vue = options.framework === "vue";
-  for (const name of ["lazy.mjs", "lazy.d.mts", "scene.mjs", "demo.mjs", "demo.d.mts", "model.mjs"])
+  for (const name of [
+    "lazy.mjs",
+    "lazy.d.mts",
+    "scene.mjs",
+    "resolution.mjs",
+    "demo.mjs",
+    "demo.d.mts",
+    "model.mjs",
+  ])
     files["src/adui-cesium/" + name] = (
       await readFile(new URL("../../cesium/src/" + name, import.meta.url), "utf8")
-    ).replaceAll("../../model-security/src/", "./");
+    )
+      .replaceAll("../../model-security/src/", "./")
+      .replaceAll("../../screen/src/", "./");
+  files["src/adui-cesium/viewport.mjs"] = await readFile(
+    new URL("../../screen/src/viewport.mjs", import.meta.url),
+    "utf8",
+  );
   for (const name of [
     "glb.mjs",
     "adui.mjs",
@@ -50,31 +65,32 @@ let cleanup${ts ? ": (()=>void)|undefined" : ""}
 onMounted(()=>{if(host.value)cleanup=mountGlobeDemo(host.value)})
 onBeforeUnmount(()=>cleanup?.())
 </script><template><div ref="host" class="cesium-engine"/></template>`;
-    files["src/cesium-smoke/App.vue"] = `<script setup${ts ? ' lang="ts"' : ""}>
-import {ref} from 'vue'
-import {AdScreen} from '../adui-screen/vue.mjs'
-import {screenConfig} from '../adui-screen/config.${ts ? "ts" : "js"}'
-import GlobeView from './GlobeView.vue'
-import './demo.css'
-const mounted=ref(true)
-</script><template><header>Cesium · 本地椭球（无影像/Token）<button @click="mounted=!mounted">{{mounted?'卸载':'挂载'}}</button></header><div class="cesium-frame"><AdScreen v-if="mounted" v-bind="screenConfig"><template #engine><GlobeView/></template></AdScreen></div></template>`;
+    files["src/cesium-smoke/App.vue"] = engineScreenSmoke({
+      engine: "cesium",
+      view: "GlobeView",
+      vue,
+      ts,
+      ext,
+    });
     files["src/cesium-smoke/main." + ext] =
       "import {createApp} from 'vue'\nimport App from './App.vue'\ncreateApp(App).mount('#cesium-root')\n";
   } else {
     files["src/cesium-smoke/GlobeView." + ext] = `import {useRef,useEffect} from 'react'
 import {mountGlobeDemo} from '../adui-cesium/demo.mjs'
 export default function GlobeView(){const host=useRef${ts ? "<HTMLDivElement|null>" : ""}(null);useEffect(()=>{if(host.current)return mountGlobeDemo(host.current)},[]);return <div ref={host} className="cesium-engine"/>}`;
-    files["src/cesium-smoke/App." + ext] = `import {useState} from 'react'
-import {AdScreen} from '../adui-screen/react.mjs'
-import {screenConfig} from '../adui-screen/config.${ts ? "ts" : "js"}'
-import GlobeView from './GlobeView.${ext}'
-import './demo.css'
-export default function App(){const [mounted,setMounted]=useState(true);return <><header>Cesium · 本地椭球（无影像/Token）<button onClick={()=>setMounted(!mounted)}>{mounted?'卸载':'挂载'}</button></header><div className="cesium-frame">{mounted&&<AdScreen {...screenConfig} engine={<GlobeView/>}/>}</div></>}`;
+    files["src/cesium-smoke/App." + ext] = engineScreenSmoke({
+      engine: "cesium",
+      view: "GlobeView",
+      vue,
+      ts,
+      ext,
+    });
     files["src/cesium-smoke/main." + ext] =
       `import {createRoot} from 'react-dom/client'\nimport App from './App.${ext}'\nconst root=document.getElementById('cesium-root');if(root)createRoot(root).render(<App/>)\n`;
   }
   files["cesium-smoke.html"] =
     `<!doctype html><html lang="zh-CN"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>ADui Cesium</title></head><body><div id="cesium-root"></div><script type="module" src="/src/cesium-smoke/main.${ext}"></script></body></html>`;
+  files["src/cesium-smoke/demo.css"] += engineScreenStyles;
   return { files, previewPath: "/cesium-smoke.html" };
 }
 export async function preflightCesium(directory, input, requireScreen = true) {

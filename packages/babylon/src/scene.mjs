@@ -1,3 +1,4 @@
+import { resizeScene } from "./resolution.mjs";
 import { Engine } from "@babylonjs/core/Engines/engine.js";
 import { Scene } from "@babylonjs/core/scene.js";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera.js";
@@ -14,6 +15,7 @@ export function createScene(canvas, onError, onModelState = () => {}) {
     createEngine: (target) => new Engine(target, true),
     createScene: (engine) => new Scene(engine),
     onError,
+    resize: resizeScene,
     initialize(scene) {
       scene.clearColor = new Color4(0.035, 0.075, 0.13, 1);
       const camera = new FreeCamera("camera", new Vector3(0, 2, -5), scene);

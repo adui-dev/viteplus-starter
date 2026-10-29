@@ -1,6 +1,12 @@
 export function createRuntime(
   canvas,
-  { createEngine, createScene, initialize, onError = () => {} },
+  {
+    createEngine,
+    createScene,
+    initialize,
+    resize = (engine) => engine.resize(),
+    onError = () => {},
+  },
 ) {
   let engine,
     scene,
@@ -36,11 +42,12 @@ export function createRuntime(
     engine = createEngine(canvas);
     scene = createScene(engine);
     extension = initialize(scene);
+    resize(engine, canvas);
     engine.runRenderLoop(render);
     return {
       ...extension,
       resize() {
-        if (!disposed) engine.resize();
+        if (!disposed) resize(engine, canvas);
       },
       destroy,
     };

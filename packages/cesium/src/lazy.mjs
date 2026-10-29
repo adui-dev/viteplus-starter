@@ -1,3 +1,4 @@
+import { observeViewport } from "../../screen/src/viewport.mjs";
 // Importing the page does not import Cesium; initialization stays behind load().
 import { fetchBundledAdui } from "../../model-security/src/bundled.mjs";
 export function createLazyGlobe(
@@ -27,13 +28,12 @@ export function createLazyGlobe(
     modelAbort = undefined;
     viewer?.cancelModelLoad?.();
   }
-  const observer = new ResizeObserver(() => {
+  const stopObserving = observeViewport(host, () => {
     if (viewer && !viewer.isDestroyed()) {
       viewer.resize();
       viewer.scene.requestRender();
     }
   });
-  observer.observe(host);
   function state(loading) {
     onState({ loading, ready: Boolean(viewer), disposed });
   }
@@ -111,7 +111,7 @@ export function createLazyGlobe(
       if (disposed) return;
       disposed = true;
       invalidate();
-      observer.disconnect();
+      stopObserving();
       if (viewer && !viewer.isDestroyed()) viewer.destroy();
       viewer = undefined;
       state(false);

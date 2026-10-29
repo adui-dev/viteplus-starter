@@ -248,7 +248,7 @@ test("Babylon 初始化异常与帧错误停止循环并释放 Scene/Engine", ()
       scene.destroy();
       scene.destroy();
       scene.resize();
-      assert.equal(resized, 1);
+      assert.equal(resized, 2);
       assert.equal(errors, fail === "render" ? 1 : 0);
     }
     assert.equal(stopped, 1);

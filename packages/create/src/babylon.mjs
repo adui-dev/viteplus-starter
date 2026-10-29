@@ -1,3 +1,4 @@
+import { engineScreenSmoke, engineScreenStyles } from "./engine-screen-smoke.mjs";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { join, dirname } from "node:path";
 import { createRequire } from "node:module";
@@ -16,6 +17,7 @@ export async function planBabylon(input) {
   for (const name of [
     "runtime.mjs",
     "scene.mjs",
+    "resolution.mjs",
     "lazy.mjs",
     "lazy.d.mts",
     "demo.mjs",
@@ -25,7 +27,13 @@ export async function planBabylon(input) {
   ])
     files["src/adui-babylon/" + name] = (
       await readFile(new URL("../../babylon/src/" + name, import.meta.url), "utf8")
-    ).replaceAll("../../model-security/src/", "./");
+    )
+      .replaceAll("../../model-security/src/", "./")
+      .replaceAll("../../screen/src/", "./");
+  files["src/adui-babylon/viewport.mjs"] = await readFile(
+    new URL("../../screen/src/viewport.mjs", import.meta.url),
+    "utf8",
+  );
   for (const name of [
     "glb.mjs",
     "adui.mjs",
@@ -52,31 +60,32 @@ let cleanup${ts ? ": (()=>void)|undefined" : ""}
 onMounted(()=>{if(host.value)cleanup=mountBabylonDemo(host.value)})
 onBeforeUnmount(()=>cleanup?.())
 </script><template><div ref="host" class="babylon-engine"/></template>`;
-    files["src/babylon-smoke/App.vue"] = `<script setup${ts ? ' lang="ts"' : ""}>
-import {ref} from 'vue'
-import {AdScreen} from '../adui-screen/vue.mjs'
-import {screenConfig} from '../adui-screen/config.${ts ? "ts" : "js"}'
-import BabylonView from './BabylonView.vue'
-import './demo.css'
-const mounted=ref(true)
-</script><template><header>Babylon · 本地立方体<button @click="mounted=!mounted">{{mounted?'卸载':'挂载'}}</button></header><div class="babylon-frame"><AdScreen v-if="mounted" v-bind="screenConfig"><template #engine><BabylonView/></template></AdScreen></div></template>`;
+    files["src/babylon-smoke/App.vue"] = engineScreenSmoke({
+      engine: "babylon",
+      view: "BabylonView",
+      vue,
+      ts,
+      ext,
+    });
     files["src/babylon-smoke/main." + ext] =
       "import {createApp} from 'vue'\nimport App from './App.vue'\ncreateApp(App).mount('#babylon-root')\n";
   } else {
     files["src/babylon-smoke/BabylonView." + ext] = `import {useRef,useEffect} from 'react'
 import {mountBabylonDemo} from '../adui-babylon/demo.mjs'
 export default function BabylonView(){const host=useRef${ts ? "<HTMLDivElement|null>" : ""}(null);useEffect(()=>{if(host.current)return mountBabylonDemo(host.current)},[]);return <div ref={host} className="babylon-engine"/>}`;
-    files["src/babylon-smoke/App." + ext] = `import {useState} from 'react'
-import {AdScreen} from '../adui-screen/react.mjs'
-import {screenConfig} from '../adui-screen/config.${ts ? "ts" : "js"}'
-import BabylonView from './BabylonView.${ext}'
-import './demo.css'
-export default function App(){const [mounted,setMounted]=useState(true);return <><header>Babylon · 本地立方体<button onClick={()=>setMounted(!mounted)}>{mounted?'卸载':'挂载'}</button></header><div className="babylon-frame">{mounted&&<AdScreen {...screenConfig} engine={<BabylonView/>}/>}</div></>}`;
+    files["src/babylon-smoke/App." + ext] = engineScreenSmoke({
+      engine: "babylon",
+      view: "BabylonView",
+      vue,
+      ts,
+      ext,
+    });
     files["src/babylon-smoke/main." + ext] =
       `import {createRoot} from 'react-dom/client'\nimport App from './App.${ext}'\nconst root=document.getElementById('babylon-root');if(root)createRoot(root).render(<App/>)\n`;
   }
   files["babylon-smoke.html"] =
     `<!doctype html><html lang="zh-CN"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>ADui Babylon</title></head><body><div id="babylon-root"></div><script type="module" src="/src/babylon-smoke/main.${ext}"></script></body></html>`;
+  files["src/babylon-smoke/demo.css"] += engineScreenStyles;
   return { files, previewPath: "/babylon-smoke.html" };
 }
 export async function preflightBabylon(directory, input, requireScreen = true) {
