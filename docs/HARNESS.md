@@ -148,7 +148,9 @@ vp build
 
 ## Cesium 本地验证
 
-按 [CESIUM](CESIUM.md) 生成独立应用和官方工作区，运行 check/build/ready 后，再单独执行 verify-cesium-build 双入口脚本，验证 /cesium-check/ 与 ./ 部署及四类资源。专项脚本暂存配置，不与同一工作区检查并行。生产浏览器验证点击前无 canvas/场景分块、点击后本地椭球和 Worker/Assets 请求成功、卸载无 canvas、重挂等待点击；开发服务器另核对资源 HTTP 状态和 MIME。Cesium 模型与全屏/DPR 专项不在本轮完成声明内。
+按 [CESIUM](CESIUM.md) 生成独立应用和官方工作区，运行 check/build/ready 后，再单独执行 verify-cesium-build 双入口脚本，验证 /cesium-check/ 与 ./ 部署及四类资源。专项脚本暂存配置，不与同一工作区检查并行。生产浏览器验证点击前无 canvas/场景分块、点击后本地椭球和 Worker/Assets 请求成功、卸载无 canvas、重挂等待点击；开发服务器另核对资源 HTTP 状态和 MIME。全屏/DPR 专项仍需另外验收。
+
+Cesium 模型另选择原 GLB 和匹配 .adui/验收密钥，确认资源就绪后显示贴图、无授权拒绝、清除授权移除模型、卸载画布为 0。受控测试验证 ready/error/超时监听、取消与晚到创建、替换失败保留旧资产及 Blob URL 回收；不将其扩大为全部 GPU 缓存回收或 env 自动构建完成。
 
 ## Babylon 本地验证
 

@@ -6,7 +6,7 @@
 
 - 仓库：`adui-dev/viteplus-starter`。Vite+ 官方 `vite:application` / `vite:monorepo` 是唯一基础工程来源，Vue/React Application 按语言选 `vue` / `vue-ts` / `react` / `react-ts`。
 - 已实现：基础 CLI 交互与参数模式、Application UI/CSS 集成、旧项目补装及 `--repair-existing`、UI Smoke、通过 `--workspace` 逐个添加及通过 JSON 批量新建 Monorepo 应用、本地单元测试与文档检查。
-- 进行中：Monorepo 自定义布局与显式恢复、其余 UI/CSS 兼容矩阵、Cesium/Babylon 的大屏专项及 Cesium 模型适配；已实现范围见文末及 GENERATOR_STATUS。
+- 进行中：Monorepo 自定义布局与显式恢复、其余 UI/CSS 兼容矩阵、Cesium/Babylon 的大屏专项及 Cesium 自动模型构建；已实现范围见文末及 GENERATOR_STATUS。
 - 严格要求：**不得添加任何 CI/CD、自动发布或部署工作流**；仅人工本地测试。
 
 ## 用户 Windows 实机验收（已确认）
@@ -290,3 +290,17 @@
 - 原共享 verify-model-build 也以同一原模型回归：两模式 build/decrypt、明文/KEY 403、密文 200、模型变更重新加密及 env 轮换均通过。最终 176/176 Node 测试、文档校验、根 vp check（147 格式/107 代码文件）和 diff 检查通过；仓库依赖版本/锁文件未改，不创建流水线或发布。
 - 截图 D:/Workspace/adui-studio/babylon-auto-model-acceptance.png 记录 KEY 轮换后的 Vue 自动解密渲染，不纳入 Git；本轮临时浏览器标签页、4321/4322 预览及自建 4331 开发进程已清理。
 - 下一步：接入 Cesium 的自包含 GLB/.adui 模型适配，先完成授权解密与实例生命周期，再接入同一套 env 自动构建；继续以生成器预设为主线。
+
+## 2026-10-29 Cesium GLB/.adui 模型适配
+
+- Cesium 预设新增共享 glb/adui/local-grant 源码与模型控制器、文件/授权验收入口；不增加依赖或改变官方基础模板。保留正式首页/App/main 和原有静态资源配置方式，仍为 Cesium 1.146.0/static-copy 4.1.1。旧快照不覆盖升级。
+- 先快照、授权认证与自包含 GLB/扩展检查，再使用受控 Blob URL 调用公开 Model.fromGltfAsync。候选模型隐藏加入场景，使用 readyEvent/errorEvent、加载期间帧请求和 30 秒超时等待 GPU/纹理就绪，有限包围球聚焦后再替换旧模型。示例位置 116.4°E、39.9°N、高度 100 米，不将其称为业务配准能力或新增查看器操作工具。
+- 创建失败、错误/超时、取消、清除及卸载均解除等待监听，移除/销毁候选并撤销 URL；晚到创建返回后立即清理，不提交失效实例。失败保留旧资产。Blob 明文副本随资产生命周期保留，临时解密缓冲最终清零，不声称清除全部引擎缓存或 GPU 副本。
+- 新增六项模型测试，覆盖先校验再创建 Blob、成功替换与失败保留、创建失败重试、晚到与等待中卸载、ready/error/超时/请求帧异常监听清理、.adui 认证/篡改/晚到授权取消；原 Cesium lazy 生命周期测试保留。扩展检查同时覆盖声明和实际扩展映射，遗漏声明的 Draco 也在 Blob 前拒绝；忽略业务 extras 元数据。生成器四组合计划同时核对新模型/共享源码路径及导入重写。
+- 官方入口创建独立 cesium-model-vue-ts（Vue TS）与 cesium-model-react-js（React JS），vp check 分别 45/30、40/28 格式/代码文件无警告错误，正式首页构建通过。Vue 构建保留静态复制插件耗时提示，没有关闭构建检查。首批官方模板依赖安装约 100 秒，后续完成，未更换镜像或全局权限策略。
+- 在既有官方 adui-cesium-workspace 新增 models-vue（Vue JS）、models-react（React TS），保留旧成员。根 ready 首次 1/11 缓存、最终 8/11 缓存，两次均 11/11 成功，170 格式、110 lint/type 文件无警告错误，官方 utils 一项测试通过，TypeScript API 实验性提示保留。最终销毁增加 finally 保证 Viewer 清理后，仅刷新本轮四份自产场景快照并复验，没有修改旧引擎快照。
+- 四应用通过 index + cesium-smoke 双入口专项构建及四类资源检查，Vue 使用 /cesium-check/、React 使用 ./；临时配置结束删除，产物保留各 dist/cesium-verify。专项未与同一工作区全局检查并行。场景主块约 4.17 MB/gzip 1.12 MB，保留默认 500 kB 提醒，不宣称引擎资源已裁剪。
+- Chrome Vue TS 子路径与 React JS 相对路径生产页均加载原 DamagedHelmet.glb 并显示贴图；Vue 无密钥选择 .adui 被拒绝，导入既有独立验收密钥后成功。两框架均完成 .adui 资源就绪与实际渲染，warn/error 为空；清除授权时模型状态 empty，卸载 canvas=0，React 重挂可再次初始化。未扩大为其他框架语言的浏览器验收或 Cesium 全屏/DPR 专项。
+- Vue 加密头盔截图保存 D:/Workspace/adui-studio/cesium-helmet-acceptance.png，不纳入 Git；原 GLB SHA256 仍为 a1e3b04de97b11de564ce6e53b95f02954a297f0008183ac63a4f5974f6b32d8，没有修改用户模型、既有 .adui 或验收密钥。临时浏览器标签页与 4341/4342 预览服务已清理。
+- 本轮未开放 Cesium embedded/external，也未生成 env/KEY 脚本，Three/Babylon 自动保护行为不变。最终 182/182 Node 测试、378 只读组合计划（实际创建/构建计数仍为 0）、文档校验、根 vp check（149 格式/109 代码文件）与 diff 检查通过；仓库依赖/锁文件未改，不创建流水线或发布，按中文 emoji 分步提交推送。
+- 下一步：将 Cesium 模型适配接入共用 env 自动加密与构建目录加载，复用 KEY/轮换及仅输出 .adui 的产物检查，再验收多引擎下的一套模型配置。

@@ -198,3 +198,11 @@ modelEngine 统一选择可保护引擎：优先 Three，否则 Babylon。单选
 setupModelPlugin 增加显式 engine（默认 Three），验证对应当前 lazy 快照具备 loadBundledModel。模型插件、KEY 生成/轮换、备份与忽略规则保持共用；modelSmoke 按引擎选择模块、类型和状态回调，不复制另一套加密算法。Babylon lazy 负责同源密文下载和独立取消代次，下载后再初始化并交给模型控制器认证；清除、卸载、后发请求与外部 AbortSignal 均使旧下载/模型失效，晚到结果不提交。
 
 verify-model-app 对真实生成应用临时构建官方首页与模型页，检查部署 base、密文数、解密与原 GLB 一致、无原模型或 KEY 字面量。临时配置 wx 写入并在 finally 删除，产物单独保存；不能与同一应用/工作区的检查并行。它验证特定应用，不把只读矩阵称为实际构建。
+
+## Cesium 模型适配
+
+Cesium 模型控制器复用 glb/adui/local-grant，与 Viewer/框架分离。先快照、授权认证与格式/扩展检查，再将独立 Blob URL 交给公开 Model.fromGltfAsync({url})。Blob 在资产生命周期内保留；临时明文最终清零，释放 URL 不代表抹除所有缓存副本。
+
+创建返回后将候选模型隐藏加入 primitives，使用 readyEvent/errorEvent 和加载期间 postRender 请求帧等待资源就绪，30 秒超时退出。就绪后检查包围球并聚焦，显示新模型后释放旧模型；错误保留旧资产。代次与 AbortController 防止晚到结果安装，取消即解除等待监听并回收候选；异步创建本身不承诺可强制中断，晚到返回后销毁并撤销 URL。Viewer 销毁前先清理模型控制器。
+
+createGlobe 返回包含原场景生命周期及模型方法的最小 handle，lazy 负责框架外的状态和晚到导入；Vue/React TS/JS 仅管理挂载与卸载。独立验收页提供本地 GLB/.adui 与验收密钥，不上传文件。固定示例地理锚点与包围球聚焦只用于集成验收，不等于业务模型配准或操作工具；Cesium embedded/external 和自动构建仍留待下一阶段。

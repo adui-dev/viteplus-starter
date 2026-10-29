@@ -105,13 +105,14 @@ UI/CSS 已在 `integrations.mjs` 实现；大屏核心见 `packages/screen`；Th
 
 - create/src/safe-paths.mjs：目标及祖先路径检查；file-protection.test.mjs：链接、悬空目标、安装期间修改与站外保护。
 - create/src/build-policy.mjs、test/build-policy.test.mjs：Ant Design Vue 的 core-js 安装脚本显式禁用策略，保留已有根配置与用户选择。
-- scripts/verify-generator-matrix.mjs、create/test/generator-matrix.test.mjs：294 个有效组合的只读计划/配置隔离检查，不执行实际构建。
+- scripts/verify-generator-matrix.mjs、create/test/generator-matrix.test.mjs：378 个有效组合的只读计划/配置隔离检查，不执行实际构建。
 - [GENERATOR_STATUS](GENERATOR_STATUS.md)：需求状态、实测边界与主线优先级。
 
 ## Cesium 生成预设
 
 - create/src/engine.mjs、cesium.mjs：按引擎计划、四组合页面、依赖/catalog 检查、配置备份与路径保护；test/cesium.test.mjs 覆盖安装、冲突和工作区隔离。
 - packages/cesium/src/lazy.mjs、test/lazy.test.mjs：延迟导入、重试、晚到与实例清理；scene/demo：无 Token 椭球及点击入口；vite：四类静态资源映射。
+- packages/cesium/src/model.mjs、test/model.test.mjs：共享 GLB/.adui 前置检查、候选 ready/error/超时、替换与取消、Blob URL/模型回收；scene 绑定公开 Model API 和示例地理位置。
 - scripts/verify-cesium-build.mjs：双入口真实构建及 base/资源目录检查；[CESIUM](CESIUM.md)、[批量示例](../examples/cesium.batch.json)。
 
 ## Babylon 生成预设
@@ -119,7 +120,7 @@ UI/CSS 已在 `integrations.mjs` 实现；大屏核心见 `packages/screen`；Th
 - create/src/babylon.mjs、test/babylon.test.mjs：四组合页面、依赖/catalog 校验、链接与输出保护、交互和批量隔离；engine/CLI/prompts 统一入口。
 - packages/babylon/src/runtime/lazy：Engine/Scene、渲染循环、延迟导入、画布与尺寸观察；test/lifecycle.test.mjs 验证异常、晚到、重试和清理。
 - scene/demo：本地立方体、模型归一化与文件/授权验收入口；loader/model：动态 glTF AssetContainer 加载、替换/取消/清理，test/model.test.mjs 覆盖认证与晚到边界。
-- model-security/src/glb.mjs：Three/Babylon 共用的纯 GLB 校验；生成源码及模型构建工具均复制该文件。
+- model-security/src/glb.mjs：三引擎共用的纯 GLB 校验；生成源码及模型构建工具均复制该文件。
 - Babylon lazy/loadBundledModel：同源密文下载、初始化与授权解密，取消和清除失效旧下载；共享 smoke/setup 按适配引擎生成同一个 model-smoke 页面。
 - scripts/verify-model-app.mjs：生成应用双入口构建、base、密文解密一致性与原模型/KEY 字面量检查，输出 dist/model-verify。
 - scripts/verify-babylon-build.mjs：[双入口专项](BABYLON.md)，[批量示例](../examples/babylon.batch.json)。

@@ -25,7 +25,7 @@ node ./viteplus-starter/packages/create/bin/cli.mjs --config ./viteplus-starter/
 node ./viteplus-starter/packages/create/bin/cli.mjs --config ./viteplus-starter/examples/cesium.batch.json
 ```
 
-已有工作区用 --workspace <路径> 添加应用。官方 catalog: 引用通过本应用解析到的已安装包元数据核对版本，不执行包入口或覆盖 catalog；每个应用只增加自身所选引擎。暂不支持多引擎、Cesium 模型加载或 .adui 模型保护；Cesium 下传 embedded/external 明确拒绝，不生成无作用的 KEY 脚本。Three 的保护保持原有行为。
+已有工作区用 --workspace <路径> 添加应用。官方 catalog: 引用通过本应用解析到的已安装包元数据核对版本，不执行包入口或覆盖 catalog；每个应用只增加自身所选引擎。支持 [多引擎组合](MULTI_ENGINE.md) 和本地 GLB/.adui 加载。Cesium env 自动构建保护尚未接入，embedded/external 仍拒绝，不生成无作用的 KEY 脚本；Three/Babylon 的自动保护保持原有行为。
 
 ## 资源与构建
 
@@ -45,3 +45,17 @@ node scripts/verify-cesium-build.mjs D:/Workspace/adui-studio/globe ./
 脚本在目标项目暂存独立配置，结束后删除，产物在 dist/cesium-verify；不要与同一项目/工作区的全局检查并行运行。现有同名临时配置拒绝覆盖。Cesium 场景约 4.17 MB（gzip 1.12 MB），仅点击后加载，保留默认 500 kB 提醒。正式首页未导入 Cesium 时仍复制静态资源，首期不做引用裁剪。
 
 验收区分：单元/计划检查、真实双入口构建、真实浏览器分别记录。四组合及工作区的执行结果见 [状态记录](PROJECT_CONTEXT.md)，不将计划矩阵等同全部组合构建通过。
+
+## 本地 GLB 与 .adui 模型
+
+先点击“加载 Cesium”，再通过“Cesium 模型文件”选择自包含 GLB。加载前检查 GLB 2.0、32 MiB 上限和外部资源 URI；拒绝 Draco/KTX2/Meshopt 及未支持扩展，不自动下载解码器。当前扩展范围为 KHR_materials_unlit/pbrSpecularGlossiness/specular/clearcoat/anisotropy、KHR_texture_transform、KHR_mesh_quantization、EXT_mesh_gpu_instancing。
+
+.adui 与独立验收密钥使用同一套 [模型封装工具](MODEL_SECURITY.md)。先导入“Cesium 验收密钥”，再选择匹配的 .adui；本地文件不上传。缺少授权或认证失败不创建 Blob/模型；清除授权同时清除模型并取消待处理授权，验收授权有效期 10 分钟。
+
+代码接口是 createLazyGlobe 返回的 loadModel(buffer, {encrypted, authorize})、cancelModelLoad、clearModel、destroy，授权契约复用 decryptAdui。onModelState 接收 {state,message}。当前验收将模型放在示例位置 116.4°E、39.9°N、高度 100 米，按就绪后的有限包围球聚焦，不宣称完成业务地理配准或新增查看器工具。
+
+模型使用公开 Model.fromGltfAsync({url}) 接口加载受控 Blob URL。创建返回后，候选模型隐藏加入场景，等待 readyEvent/errorEvent；加载期间持续请求帧，最长等待 30 秒。只有资源就绪且边界有效才显示并替换旧模型；失败保留旧资产。取消、清除、卸载及晚到结果均移除候选、销毁模型、撤销 URL，并解除就绪/错误/帧监听。
+
+Blob 保存独立明文副本供加载器使用，URL 存活至对应资产释放。临时解密缓冲最终清零不等于清除 Blob、引擎缓存或 GPU 的所有副本；浏览器合法解密仍可提取模型。旧源码快照不会覆盖升级。
+
+API 依据 [Cesium 官方 Model 文档](https://cesium.com/learn/cesiumjs/ref-doc/Model.html) 和本项目固定版本 [1.146 的加载实现](https://github.com/CesiumGS/cesium/blob/1.146/packages/engine/Source/Scene/Model/Model.js)，就绪判定使用事件，不把创建 Promise 当作全部资源就绪。

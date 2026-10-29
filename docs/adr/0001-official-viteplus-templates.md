@@ -87,3 +87,7 @@ Babylon 首期采用固定版本 @babylonjs/core 的 ES 深路径模块，按需
 采用与 core 同版的 @babylonjs/loaders 9.32.1，动态导入 glTF 并用官方 LoadAssetContainerAsync 接收内存字节。授权解密、GLB 格式检查和引擎容器生命周期分离；共享校验移入 model-security，Three 的公开导出不变。只接受自包含 GLB，避免隐式远端资源及解码器下载。加载器可能保留原字节视图，因此提交独立副本，仅清零临时解密缓冲。先验收本地 GLB/.adui，env 自动构建另行接入，避免把未验证的保护选项开放给 Babylon。依据 [Babylon 官方加载文档](https://github.com/BabylonJS/Documentation/blob/master/content/features/featuresDeepDive/importers/loadingFileTypes.md)。
 
 2026-10-29 后续：Babylon 自动构建复用已有 env 插件、密钥工具与同源限长下载，增加引擎适配参数，保持加密核心独立。多引擎只安装一套模型插件与 KEY，优先 Three 保持已有行为；没有 Three 时选择 Babylon。旧快照拒绝覆盖升级，避免自动修改既有引擎源码。客户端拆分只是提高直接复用成本，不能称为无法提取。
+
+## 2026-10-29：Cesium 模型就绪与 Blob 生命周期
+
+Cesium 使用公开 Model.fromGltfAsync({url}) 接收受控 Blob URL，复用共享授权/GLB 核心。按固定版本实现，创建结果仍须加入场景处理资源，因此使用隐藏候选、readyEvent/errorEvent、限时请求帧完成就绪判断，再替换旧模型；取消/失败回收候选、监听与 URL。Blob 的明文副本随资产持有，不能宣称清零全部内存。先完成本地文件与授权适配，再单独验收 env 自动构建。依据 [官方 Model 文档](https://cesium.com/learn/cesiumjs/ref-doc/Model.html)。

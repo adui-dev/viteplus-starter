@@ -23,7 +23,7 @@ flowchart TD
 
 - `packages/create`：CLI、配置校验、官方命令调用和 UI/CSS 应用集成；负责已实现的官方模板编排、按应用集成及独立验收入口。
 - `packages/three` 提供引擎适配，`packages/model-security` 提供共享加解密源码与独立工具；生产授权服务尚未创建。
-- `packages/cesium` 提供按需场景、实例生命周期与静态资源配置源码；create/engine 统一生成 Three/Cesium 计划，create/cesium 增量安装和配置，Cesium 暂不接入模型保护。
+- `packages/cesium` 提供按需场景、实例生命周期、静态资源配置和 GLB/.adui 适配；create/cesium 增量安装与配置。共享授权解密和 GLB 校验，Cesium 控制器独立管理候选模型就绪、替换、Blob URL 和销毁；env 自动构建保护待接入。
 - `packages/babylon` 提供按需场景、Engine/Scene 生命周期和 GLB/.adui AssetContainer 适配；create/babylon 增量安装 core/loaders 及四组合独立页面。与 Three 共用格式检查、授权解密、env 构建插件和 KEY 脚本；保护默认启用，配置备份后增量写入，关闭时不改 Vite 配置。多引擎只选择一个模型适配器；create/engine 同时编排其计划。
 - `scripts/validate-docs.mjs`：本地文档静态校验；不是 CI。
 - 官方 Vite+ 负责应用模板、基础工具链；不得偷偷替换官方模板。

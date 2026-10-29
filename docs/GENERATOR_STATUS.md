@@ -11,8 +11,8 @@
 | FR-003 UI         | Vue Element Plus/Ant Design Vue/TDesign，React Ant Design/TDesign 生成计划 | 实际组件渲染仅验收 Vue TDesign、React Ant Design；不把依赖安装或首页构建视为组件渲染完成 |
 | FR-004 CSS        | UnoCSS/Tailwind 配置及代表组合已验收                                       | 未逐一真实构建全部 UI/CSS 组合                                                           |
 | FR-005 大屏       | 四种模式、坐标换算、浮层、全屏及三种引擎的原生像素层                       | Cesium/Babylon 全屏与 DPR 专项仍待验收                                                   |
-| FR-006 引擎       | 按应用选择 none/three/cesium/babylon、按需加载、实例清理                   | CLI/JSON/交互多选已接入；Cesium 模型适配仍待接入                                         |
-| FR-007 模型保护   | Three/Babylon 自动构建/加载、KEY 脚本及 .adui 授权解密                     | Cesium、FBX/OBJ 与压缩格式待接入；客户端密钥仍可逆向提取                                 |
+| FR-006 引擎       | 按应用选择 none/three/cesium/babylon、按需加载、实例清理与 GLB 适配        | 三引擎模型范围各自验收；不提供同页混合运行时                                             |
+| FR-007 模型保护   | 三引擎 .adui 授权解密；Three/Babylon 自动构建与 KEY 脚本                   | Cesium 自动构建、FBX/OBJ 与压缩格式待接入；客户端密钥仍可逆向提取                        |
 | FR-008 工作区隔离 | 官方 pnpm apps/*，逐应用和批量配置、不同框架/语言/预设                     | 自定义布局与其他包管理器未支持                                                           |
 | FR-009 UI 验收页  | Vue TDesign / React Ant Design，TS/JS、点击及 CSS 验收                     | 工具不支持其他 UI 组件库的渲染验收                                                       |
 | FR-010 批量生成   | 严格 JSON、全量预检、顺序执行、dry-run 和失败摘要                          | 无自动回滚或覆盖式续跑                                                                   |
@@ -64,6 +64,6 @@ Ant Design Vue 另补充 pnpm 的 core-js: false 构建脚本规则并定向格�
 
 ## 后续主线
 
-Cesium 与 Babylon 逐应用预设及多引擎选择已接入，Babylon 已支持本地 GLB/.adui 与 env 自动构建加载；真实检查、构建与浏览器证据以状态记录为准，详见 [CESIUM](CESIUM.md)、[BABYLON](BABYLON.md)。下一阶段推进 Cesium 模型适配。新增预设仍通过官方基础模板增强，不把验收页面体验当作生成器功能完成条件。
+Cesium 与 Babylon 逐应用预设、多引擎选择和本地 GLB/.adui 已接入，Three/Babylon 支持 env 自动构建加载；真实检查、构建与浏览器证据以状态记录为准，详见 [CESIUM](CESIUM.md)、[BABYLON](BABYLON.md)。下一阶段接入 Cesium env 自动构建。新增预设仍通过官方基础模板增强，不把验收页面体验当作生成器功能完成条件。
 
 2026-10-29：CLI/JSON 多引擎编排已接入，交互已支持逗号多选，联合构建与浏览器证据分开记录，见 [说明](MULTI_ENGINE.md)。

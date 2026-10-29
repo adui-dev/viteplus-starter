@@ -2,7 +2,7 @@
 
 项目定位、需求完成度和计划/构建/浏览器验收的区别见 [生成器能力与验收范围](docs/GENERATOR_STATUS.md)。
 
-Cesium 预设已接入 --engine cesium，提供本地椭球、按需加载与资源配置；创建和批量用法见 [Cesium 指南](docs/CESIUM.md)。
+Cesium 预设已接入 --engine cesium，提供本地椭球、GLB/.adui 授权加载、按需场景与资源配置；env 自动构建仍待接入。创建和批量用法见 [Cesium 指南](docs/CESIUM.md)。
 
 Babylon 预设使用 --engine babylon，提供本地场景、GLB/.adui 和默认 env 自动构建保护，支持四种框架/语言及工作区；用法见 [Babylon 指南](docs/BABYLON.md)。
 
