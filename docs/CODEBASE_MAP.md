@@ -177,3 +177,9 @@ engine-prompts.test.mjs：多选解析、摘要/取消、Three 保护提示；ve
 - examples/README.md、ui-libraries.batch.json：示例索引及三个新增 UI 组合的可校验 JSON。
 - scripts/verify-examples.mjs、packages/create/test/examples.test.mjs：真实 CLI 批量预览与临时目录无输出校验。
 - scripts/validate-docs.mjs：必要文件、docs 全目录 Markdown 链接及需求编号检查。
+
+## 三应用端到端验收修复
+
+- packages/create/src/integrations.mjs：应用文件与根构建策略在各自目录单独定向格式化，避免向 Vite+ fmt 传递 ..。
+- packages/create/test/build-policy.test.mjs：Monorepo 根策略格式化工作目录及无父目录路径回归，保留原 App。
+- docs/V1_ACCEPTANCE.md：主工作区失败后显式继续、全新回归、构建/浏览器与保护证据。

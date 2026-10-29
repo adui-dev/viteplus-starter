@@ -22,4 +22,4 @@ node ./viteplus-starter/packages/create/bin/cli.mjs --config ./viteplus-starter/
 
 已有根不能重跑批量新建。使用相同 JSON 对照检查或规划；显式恢复执行只新建缺失应用，部分完成的应用先人工处理。步骤见 [工作区说明](../docs/MONOREPO.md)。
 
-本地校验全部示例：在生成器仓库运行 node scripts/verify-examples.mjs。该工具逐个使用真实 CLI --config --dry-run，临时目录验证结束清理；当前 8 个示例、20 个应用计划，actualBuilds=0。它不安装依赖、生成 KEY 或证明整个示例已实际构建；新 UI 示例的组合有独立代表项目验收记录，不宣称该三应用工作区本轮已生成。完整验收标准见 [V1 清单](../docs/V1_ACCEPTANCE.md)。
+本地校验全部示例：在生成器仓库运行 node scripts/verify-examples.mjs。该工具逐个使用真实 CLI --config --dry-run，临时目录验证结束清理；当前 8 个示例、20 个应用计划，actualBuilds=0。它不安装依赖、生成 KEY 或证明整个示例已实际构建；2026-10-29 已实际创建三应用工作区；首次 Ant Design Vue 格式化失败后修复并显式继续，随后通过工作区构建与三页浏览器验收；另有全新 Ant Design Vue 工作区验证修复后首次生成连续通过。具体证据见项目状态，不扩展为全部示例均已真实构建。完整验收标准见 [V1 清单](../docs/V1_ACCEPTANCE.md)。

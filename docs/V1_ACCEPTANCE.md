@@ -48,7 +48,15 @@ vp check
 - 支持 Vue/React × TS/JS；Vue Element Plus/Ant Design Vue/TDesign、React Ant Design/TDesign；CSS none/UnoCSS/Tailwind。五种框架/UI 均有真实代表渲染记录，尚未穷举语言、CSS 和增强功能的全部组合。
 - 三引擎逐应用按需加载、GLB/.adui 与 env 模型构建已接入，多引擎只选择一套模型保护配置。仅自包含 GLB、32 MiB 上限；FBX/OBJ、压缩解码器、远端资源和业务查看器不在已实现范围。
 - 默认 embedded 无服务端；客户端密钥可被逆向，目标是提高直接复用成本。external 的独立授权来源由业务决定，不将浏览器解密称为无法提取。
-- 工作区只支持官方 pnpm apps/_、packages/_、tools/* 布局。部分完成应用人工处理，不自动覆盖、删除、回滚或接管运行中新出现的目录，不承诺事务性或抵御恶意并发文件系统替换。
+- 工作区只支持官方 pnpm `apps/*`、`packages/*`、`tools/*` 布局。部分完成应用人工处理，不自动覆盖、删除、回滚或接管运行中新出现的目录，不承诺事务性或抵御恶意并发文件系统替换。
 - 本地真实证据主要来自 Windows、Node 24/26；声明的 Node 22 最低版本及其他系统仍需专门验证。结构/依赖声明存在不代表安装完成或版本兼容。
 
 这些限制是后续兼容性验收事项，不通过新增演示功能掩盖。后续以清单核对发现的实际阻塞为优先，发布与部署另行授权。
+
+## 三应用 UI 示例端到端补验（2026-10-29）
+
+ui-libraries.batch.json 已实际创建 adui-ui-libraries：Element Plus/Vue JS/Tailwind、Ant Design Vue/Vue TS/UnoCSS、TDesign/React JS/UnoCSS。首次批量在 Ant Design Vue 格式化阶段停止：共享 YAML 的相对子路径含 .. 被 Vite+ 拒绝。修复为应用和根策略分别在所属目录定向格式化；未删除失败现场，显式完成剩余步骤。随后在全新 adui-ant-vue-format-regression 中验证根→Ant Design Vue 应用→验收页三阶段一次通过，不将主工作区称为首次无干预生成成功。
+
+主工作区 ready 9/9、最终 vp check 62 格式/28 代码文件通过，三个 UI 双入口构建通过。Chrome 三页均渲染真实组件，点击 0→1，CSS 绿色区域和 16px 内边距正确，warn/error 为空。默认 website/utils 的 19 个文件哈希一致，根无 UI/CSS/框架直接依赖；重复批量和重复三页生成均拒绝，29 项保护文件哈希一致。inspect/plan 状态正确，execute completed=0、skipped=3。构建保留官方 TypeScript API 实验性、UnoCSS 多入口及性能提示，不称为无提示。
+
+本次将该示例的证据从计划补充到实际生成/构建/浏览器层；未改变其他平台、最低 Node 版本或全部组合的未覆盖声明。

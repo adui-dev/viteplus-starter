@@ -254,3 +254,7 @@ workspace-recovery-execute 仅读取一次校验后的原配置，使用 planRec
 verify-examples 在仓库外新建独立临时目录，逐个以 Node argv 调用真实 CLI --config --dry-run，检查官方 Monorepo 阶段、应用数量及临时目录无输出，最后清理临时目录；输出计划计数与 actualBuilds=0。没有安装、构建或发布路径。node --test 同步覆盖这项示例兼容检查。
 
 validate-docs 保留必要文件与需求编号检查，并枚举 docs 的普通 Markdown 文件检查相对链接；不跟随目录链接。README、示例索引和 V1 清单通过链接统一导航，历史验证记录保留，当前状态正文同步纠正过时范围。
+
+## 共享构建策略的格式化工作目录
+
+Vite+ 当前 fmt 不接受含 .. 的 PATH。applyIntegrations 不再把根 pnpm-workspace.yaml 拼入子应用的相对格式化列表；应用文件仍在应用目录定向处理，共享策略单独在 dirname(policyPath) 中格式化 basename(policyPath)。实际格式化前继续检查链接路径，保留原 core-js 策略合并和用户规则。失败现场及文件保护不变，没有新增覆盖式恢复能力。

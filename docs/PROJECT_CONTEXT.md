@@ -394,3 +394,16 @@
 - 新增 verify-examples，真实 CLI dry-run 验证 8 个示例、20 个应用计划，临时目录没有输出，actualBuilds=0；加入 Node 测试。文档校验扩大至 docs 全部 Markdown 和示例索引，现有链接检查通过。新三应用 UI 示例未在本轮整体创建，相关组合的历史独立代表验收不能替代该工作区的端到端证据。
 - 本轮 209/209 Node 测试、示例校验、文档校验与根 vp check 通过。没有安装/升级依赖、生成业务工程或重新声明全部浏览器验收完成。
 - 下一步按集中清单对新三应用 UI 示例做一次完整端到端验收，确认正式创建、根 ready、类型/构建、组件渲染和文件保护；只修复实测发现的问题，不增加功能范围或发布流程。
+
+## 2026-10-29：三应用 UI 示例完整验收及实测修复
+
+- 实际使用 ui-libraries.batch.json 创建 D:/Workspace/adui-studio/adui-ui-libraries，官方根与 Element Plus 应用/验收页成功后，Ant Design Vue 应用在 UI/CSS 格式化阶段失败；未执行的验收页和 React 应用按既有批量保护停止。错误为 vp fmt 拒绝含 .. 的 PATH，不能称为首轮批量全阶段成功。
+- 修复 integrations 对共享 pnpm-workspace.yaml 的处理：应用文件和根策略分别在自身 cwd 定向格式化，不再传 ../../ 路径，增加对应回归。保留失败现场，没有重新覆盖安装；显式完成已有文件的定向格式化、Vue 声明忽略配置整理，再按原阶段参数生成 ant-vue 验收页、td-react 应用及验收页。
+- 另新建 adui-ant-vue-format-regression（同版官方根+Vue TS/Ant Design Vue/UnoCSS），直接使用修复后的生成器，根/应用/验收页三阶段一次通过，vp check 35 格式/14 代码文件无警告错误；确认修复作用于首次安装，而非依靠原现场已有策略跳过问题。
+- 主工作区保留 website/utils，ready 0/9 缓存、9/9 成功，包含 utils 测试、类型及完整构建；最终 vp check 62 格式/28 代码文件无警告错误。三个应用分别通过首页+ui-smoke 双入口构建：Vue 两页 /ui-check/、React ./。保留 TypeScript 7 API 实验性、UnoCSS 重复虚拟 CSS 和性能提示。
+- Chrome 三页均是 BUTTON 元素并带 el-button / ant-btn / t-button 对应类，点击 0→1；UnoCSS 背景 rgb(209,250,229)、深绿色文字、16px 内边距，Tailwind 对应 oklch 色值正确。三页控制台 warn/error 为空。本地截图 ui-libraries-element-e2e.jpg、ui-libraries-ant-vue-e2e.jpg、ui-libraries-td-react-e2e.jpg 在 D:/Workspace/adui-studio，不纳入 Git。
+- 根无 UI/CSS/框架直接依赖，官方默认成员 19 个文件哈希保持。inspect 识别 5 成员和三个 present，plan 三个 validate-existing，execute completed=[]、skipped=3。重复 batch 与重复三页 UI Smoke 均安全拒绝，29 项根/应用保护文件 SHA256 一致。
+- 三个临时标签页和 4391/4392/4393 服务已关闭；工作区外临时哈希与回归 JSON 已清理。验证工作区和独立构建产物保留。修正文档中 glob 被 Markdown 误识别的显示，不改功能范围。
+- 下一步验证声明的 Node 22 最低版本兼容性，按 V1 剩余清单处理实测阻塞；不增加演示功能或发布流程。
+
+本轮最终仓库检查：node --test 210/210，文档静态校验通过，vp check 格式 170 文件、lint 127 文件通过。没有修改仓库依赖声明或锁文件；实际验证工程的安装变化仅保留于仓库外的测试工作区。
