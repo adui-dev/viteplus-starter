@@ -150,3 +150,9 @@ engine-prompts.test.mjs：多选解析、摘要/取消、Three 保护提示；ve
 - packages/create/bin/cli.mjs：官方模板、集成和工作区整理执行阶段标记，保留官方非零退出码。
 - packages/create/src/batch.mjs：从重建后的计划生成未执行步骤指引，失败步骤保留为人工检查。
 - packages/create/test/recovery.test.mjs、batch.test.mjs：错误原因/退出码、无自动重试、参数转义、CLI 失败文件保留及批量阶段边界。
+
+## 已有工作区检查
+
+- packages/create/src/workspace-inspect.mjs：只读成员清单、预期应用的声明/文件检查与 JSON 状态；复用现有校验和生成计划。
+- packages/create/src/cli-args.mjs、bin/cli.mjs：--inspect-workspace 参数及隔离的只读 CLI 分支。
+- packages/create/test/workspace-inspect.test.mjs：清单/预设缺失、语言与配置歧义、重复包名、junction、路径遍历、秘密内容不输出、CLI 退出码及写入选项拒绝。

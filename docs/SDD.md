@@ -230,3 +230,9 @@ ui-smoke 内部预设表统一维护框架/UI 对应包、展示名、Vue 标签
 createStageRunner 只包裹执行动作，不接管原有路径/选项预检。成功后记录阶段，失败时保留 cause、有效非零 exitCode，快照复制已完成步骤并附目标和人工检查说明。CLI 继续通过原有官方模板入口和集成函数执行，异常传播到顶层停止后续动作。
 
 批量执行仍重建并预检计划；catch 仅对当前 index 之后的未执行步骤生成 recovery.pending，包含 label/cwd/command/args 和 PowerShell 显示文本。失败阶段的局部输出不视为完成，不生成自动重试动作。PowerShell 对每个参数单独单引号转义，不把显示文本交给 shell。没有新状态文件、依赖或配置迁移。
+
+## 已有工作区只读检查
+
+workspace-inspect 复用 safe-paths 的逐祖先链接拒绝、现有官方 YAML 列表校验和批量 JSON 校验，不调用 loadBatchPlan 的新建目标校验。成员按 apps/packages/tools 一层枚举，跳过隐藏目录和 node_modules；JSON/YAML 最大 1 MiB。不执行 Vite 配置、不返回清单脚本或环境文件内容。
+
+携带预期配置时复用 UI/CSS、screen、engine、modelProtection 的计划，检查对应声明及输出文件存在性；生成计划只在内存中执行，模型 env 文件仅检查元数据。输出 not-created / blocked / present，最后一个状态不表示依赖已安装或配置内容兼容。CLI 分支位于创建/批量生成之前，严格限制参数组合；不启动子进程或写入恢复状态。

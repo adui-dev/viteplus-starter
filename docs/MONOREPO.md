@@ -54,3 +54,26 @@ vp dev
 - 根无 UI/CSS 直接依赖，应用配置隔离；71 项生成器单元测试、文档校验和定向 lint 通过。生成器仓库本身的根 `vp check` 仍受全仓格式问题阻塞，详见项目状态记录。
 
 尚未穷举 Vue/React × TS/JS × 全部 UI/CSS；通过上述代表组合不等于所有组合均已验收。
+
+## 只读状态检查与恢复前预检
+
+在生成器仓库执行：
+
+```powershell
+# 查看已有官方 pnpm 工作区的成员和基础问题
+node packages/create/bin/cli.mjs --inspect-workspace D:/Workspace/adui-studio/adui-cesium-workspace
+# 使用原批量配置描述预期应用，不重新创建根目录
+node packages/create/bin/cli.mjs --inspect-workspace D:/Workspace/adui-studio/adui-cesium-workspace --config ./expected-apps.json
+```
+
+仅支持当前官方 apps/_、packages/_、tools/* 布局。检查根 private/Vite+ 声明、YAML 列表、apps 目录和唯一根 Vite 配置；枚举成员清单及重复包名。带 --config 时按原批量 JSON 的校验规则检查预期应用的框架、语言入口、Vite 配置、UI/CSS/引擎依赖声明和已选择预设/验收页的文件存在性。额外官方默认成员和其他应用保留，不要求工作区名称与配置 name 相同。
+
+JSON 报告包含 root、readOnly、ok、issues、members、apps 和 limitations。应用状态：
+
+- not-created：预期目录尚未创建。
+- blocked：目录被占用、清单/入口/配置或依赖声明缺失等问题需要人工处理。
+- present：本次结构检查未发现缺失；仍需 vp check、完整 build 和适用的浏览器验收。
+
+无 --config 时只是成员清单及根结构检查，不推断每个应用原本应有哪些预设。发现问题或预期应用缺失时退出 1，检查无问题时退出 0；不安全路径、损坏根或无效 JSON 参数会报错并退出 1。该模式只能配合 --config，不能混用创建、补装、dry-run 等选项。
+
+不会执行 Vite 配置或清单脚本，不扫描 node_modules，不读取 env 内容，也不会安装、格式化、生成或恢复文件。声明存在不等于依赖已安装；文件存在不证明配置有效或版本兼容。旧生成项目源码快照与当前计划可能不同，缺失文件只提示人工核对，不自动补写。若需继续操作，先修复现场，再用已有逐应用命令重新预检。
