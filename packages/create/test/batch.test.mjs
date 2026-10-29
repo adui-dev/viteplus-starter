@@ -233,6 +233,14 @@ test("后续应用失败立即停止，报告已完成/未执行，并保留部�
       assert.equal(error.failed, "应用 portal");
       assert.deepEqual(error.pending, ["验收页 portal"]);
       assert.match(error.message, /install failed/);
+      assert.equal(error.recovery.mode, "manual");
+      assert.deepEqual(
+        error.recovery.pending.map((step) => step.label),
+        ["验收页 portal"],
+      );
+      assert.ok(error.recovery.pending[0].args.includes("--ui-smoke"));
+      assert.ok(!error.recovery.pending[0].args.includes("--apply-existing"));
+      assert.match(error.message, /不要重跑相同 batch/);
       return true;
     },
   );
@@ -264,6 +272,11 @@ test("根生成失败、生成后预检失败均不运行应用，也不清理�
       ),
       (error) => {
         assert.ok(error.pending.includes("应用 admin"));
+        assert.deepEqual(
+          error.recovery.pending.map((step) => step.label),
+          error.pending,
+        );
+        assert.ok(error.recovery.pending.every((step) => step.args.includes("--workspace")));
         return true;
       },
     );

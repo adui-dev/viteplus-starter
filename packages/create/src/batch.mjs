@@ -1,3 +1,4 @@
+import { pendingRecovery, recoveryAdvice } from "./recovery.mjs";
 import { lstat, readFile, realpath, stat } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -264,7 +265,9 @@ export async function executeBatch(plan, runner = runStep, report = console.log)
       completed.push(phase);
     }
   } catch (cause) {
-    const pending = current.steps.slice(index + 1).map((step) => step.label);
+    const remaining = current.steps.slice(index + 1);
+    const pending = remaining.map((step) => step.label);
+    const recovery = pendingRecovery(remaining);
     const error = new Error(
       `批量生成失败：${phase}；${cause.message}\n已完成：${completed.join("、") || "无"}\n未执行：${pending.join("、") || "无"}\n已生成内容保留在 ${current.workspaceRoot}，当前失败阶段可能部分完成；不会自动删除、覆盖或回滚。`,
       { cause },
@@ -275,6 +278,14 @@ export async function executeBatch(plan, runner = runStep, report = console.log)
       pending,
       workspaceRoot: current.workspaceRoot,
     });
+    error.recovery = { mode: "manual", pending: recovery };
+    error.message +=
+      "\n" +
+      recoveryAdvice +
+      "\n若根目录已存在，不要重跑相同 batch；若不存在，确认无残留后重新规划。修复失败阶段并确认工作区完整后，按顺序处理以下未执行步骤；以下命令未经现场可执行性确认：\n" +
+      recovery
+        .map((step) => step.label + "\n工作目录：" + step.cwd + "\nPowerShell：" + step.powershell)
+        .join("\n");
     throw error;
   }
   return { workspaceRoot: current.workspaceRoot, completed };

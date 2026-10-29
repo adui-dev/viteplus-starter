@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { createStageRunner } from "../src/recovery.mjs";
 import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
@@ -144,14 +145,17 @@ async function main() {
   const workspace = options.workspace ? await resolveWorkspaceApplication(options) : null;
   const commandCwd = workspace?.root ?? process.cwd();
   const target = workspace?.target ?? resolve(process.cwd(), options.name);
+  const stage = createStageRunner(target);
   await inspectPath(target);
   if (!args.dryRun && !args.applyExisting) await preflightModelProtection(target, options);
   async function finishWorkspaceIntegration() {
     if (!workspace) return;
-    if (await updateWorkspaceDeclarationIgnore(workspace)) {
-      runWorkspaceVp(commandCwd, ["fmt", basename(workspace.configPath), "--write"]);
-    }
-    runWorkspaceVp(commandCwd, ["fmt", "pnpm-workspace.yaml", "--write"]);
+    return stage("工作区配置整理", async () => {
+      if (await updateWorkspaceDeclarationIgnore(workspace)) {
+        runWorkspaceVp(commandCwd, ["fmt", basename(workspace.configPath), "--write"]);
+      }
+      runWorkspaceVp(commandCwd, ["fmt", "pnpm-workspace.yaml", "--write"]);
+    });
   }
   if (args.threeSmoke) {
     if (
@@ -164,7 +168,7 @@ async function main() {
       (options.css ?? "none") !== "none"
     )
       throw new Error("--three-smoke 需单独调用，不混用创建/补装/其他验收选项");
-    const result = await addThreeSmoke(target, options);
+    const result = await stage("Three 集成", () => addThreeSmoke(target, options));
     await finishWorkspaceIntegration();
     console.log("Three.js 验收页已生成：" + result.previewPath);
     console.log("运行 vp check、vp dev；验证真实 WebGL、DPR、拾取与卸载清理");
@@ -175,7 +179,7 @@ async function main() {
       throw new Error("--ui-smoke 不能与 --dry-run、--apply-existing、--repair-existing 同时使用");
     }
     if (!existsSync(target)) throw new Error("目标目录不存在，请先创建 Application");
-    const result = await addUiSmoke(target, options);
+    const result = await stage("UI 验收页", () => addUiSmoke(target, options));
     console.log("UI Smoke 验证页已生成：" + result.previewPath);
     console.log("进入项目运行 vp dev，访问 http://localhost:5173" + result.previewPath);
     console.log("确认组件按钮可见、点击计数增加，以及 CSS 区域显示预期颜色");
@@ -193,7 +197,7 @@ async function main() {
     if (!dependencies["vite-plus"] || !dependencies[options.framework]) {
       throw new Error("目标项目与所选 Vue/React 不匹配，拒绝修复");
     }
-    await repairExistingIntegrations(target, options);
+    await stage("旧配置修复", () => repairExistingIntegrations(target, options));
     console.log("旧版插件引用修复完成，旧文件已备份，请运行 vp check 和 vp build");
     return;
   }
@@ -222,13 +226,14 @@ async function main() {
       await validateThreeTarget(target, options, !options.screen);
     }
     await preflightModelProtection(target, options);
-    if (workspace) await prepareWorkspacePeerExtensions(workspace);
-    await applyIntegrations(target, options);
-    if (options.screen) await addScreenPreset(target, options);
-    if (options.engine === "three") await addThreeSmoke(target, options);
-    if (options.engine === "cesium") await addCesium(target, options);
-    if (options.engine === "babylon") await addBabylon(target, options);
-    await addModelProtection(target, options);
+    if (workspace) await stage("工作区依赖准备", () => prepareWorkspacePeerExtensions(workspace));
+    await stage("UI/CSS 集成", () => applyIntegrations(target, options));
+    if (options.screen) await stage("大屏集成", () => addScreenPreset(target, options));
+    if (options.engine === "three") await stage("Three 集成", () => addThreeSmoke(target, options));
+    if (options.engine === "cesium") await stage("Cesium 集成", () => addCesium(target, options));
+    if (options.engine === "babylon")
+      await stage("Babylon 集成", () => addBabylon(target, options));
+    await stage("模型保护集成", () => addModelProtection(target, options));
     await finishWorkspaceIntegration();
     console.log("补装完成，请在项目中执行 vp check 和 vp build");
     return;
@@ -278,44 +283,55 @@ async function main() {
       : "调用 Vite+ 官方 Monorepo 模板",
   );
 
-  if (workspace) await prepareWorkspacePeerExtensions(workspace);
+  if (workspace) await stage("工作区依赖准备", () => prepareWorkspacePeerExtensions(workspace));
 
   // Windows 的 vp 通常是 .cmd shim；所有值在构造命令前均被白名单校验。
   // 以单个 shell 命令执行，避免 Node.js 24 在 shell:true + args[] 时的 DEP0190。
-  const result =
-    process.platform === "win32"
-      ? spawnSync([command, ...vpArgs].join(" "), {
-          cwd: commandCwd,
-          stdio: "inherit",
-          shell: true,
-        })
-      : spawnSync(command, vpArgs, { cwd: commandCwd, stdio: "inherit" });
+  const result = await stage("官方模板生成", () => {
+    const result =
+      process.platform === "win32"
+        ? spawnSync([command, ...vpArgs].join(" "), {
+            cwd: commandCwd,
+            stdio: "inherit",
+            shell: true,
+          })
+        : spawnSync(command, vpArgs, { cwd: commandCwd, stdio: "inherit" });
 
-  if (result.error) throw result.error;
+    if (result.error) throw result.error;
+    if (result.status !== 0)
+      throw Object.assign(
+        new Error("官方模板子进程失败：" + (result.signal ?? result.status ?? "unknown")),
+        { exitCode: result.status ?? 1 },
+      );
+    return result;
+  });
   if (result.status === 0 && workspace)
-    await normalizeNewWorkspaceApplication(workspace, undefined, options);
+    await stage("工作区应用规范化", () =>
+      normalizeNewWorkspaceApplication(workspace, undefined, options),
+    );
   if (
     result.status === 0 &&
     (integrations.dependencies.length || integrations.devDependencies.length)
   ) {
     console.log("正在安装和配置所选 UI/CSS 插件...");
-    await applyIntegrations(target, options);
+    await stage("UI/CSS 集成", () => applyIntegrations(target, options));
     console.log("UI/CSS 插件配置已写入，请运行 vp check 和 vp build 验证");
   }
   if (result.status === 0) await finishWorkspaceIntegration();
   if (result.status === 0 && options.screen) {
-    await addScreenPreset(target, options);
+    await stage("大屏集成", () => addScreenPreset(target, options));
     console.log("AdScreen 大屏预设已生成：/screen-smoke.html");
   }
   if (result.status === 0 && options.engine) {
-    if (options.engine === "three") await addThreeSmoke(target, options);
-    if (options.engine === "cesium") await addCesium(target, options);
-    if (options.engine === "babylon") await addBabylon(target, options);
+    if (options.engine === "three") await stage("Three 集成", () => addThreeSmoke(target, options));
+    if (options.engine === "cesium") await stage("Cesium 集成", () => addCesium(target, options));
+    if (options.engine === "babylon")
+      await stage("Babylon 集成", () => addBabylon(target, options));
     await finishWorkspaceIntegration();
     console.log("引擎按需场景已生成：" + (await planEngine(options)).previewPath);
   }
   if (result.status === 0 && planModelProtection(options)) {
-    await addModelProtection(target, options);
+    await stage("模型保护集成", () => addModelProtection(target, options));
     console.log(
       "模型保护已配置：/model-smoke.html；KEY 已写入被忽略的 .env.local，IV 按模型自动随机生成。",
     );
@@ -330,5 +346,5 @@ async function main() {
 
 main().catch((error) => {
   console.error(`创建失败: ${error.message}`);
-  process.exitCode = 1;
+  process.exitCode = error.exitCode ?? 1;
 });
