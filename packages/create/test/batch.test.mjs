@@ -302,3 +302,22 @@ test("规划后目标被占用、末尾应用非法时，执行前拒绝且不�
   assert.equal(calls, 0);
   assert.deepEqual(await readdir(cwd), []);
 });
+
+test("批量 UI Smoke 接受 Element Plus、Ant Design Vue 和 React TDesign，仍逐应用生成", async (t) => {
+  const plan = await createBatchPlan(
+    {
+      version: 1,
+      name: "ui-repo",
+      apps: [
+        { name: "element", framework: "vue", ui: "element-plus", uiSmoke: true },
+        { name: "ant-vue", framework: "vue", ui: "antd", uiSmoke: true },
+        { name: "td-react", framework: "react", ui: "tdesign", language: "js", uiSmoke: true },
+      ],
+    },
+    await temporary(t),
+  );
+  const steps = plan.steps.filter((step) => step.files?.includes("ui-smoke.html"));
+  assert.equal(steps.length, 3);
+  assert.ok(steps[0].files.includes("src/ui-smoke/SmokeApp.vue"));
+  assert.ok(steps[2].files.includes("src/ui-smoke/SmokeApp.jsx"));
+});

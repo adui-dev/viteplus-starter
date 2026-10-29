@@ -67,7 +67,7 @@ test("不支持未知组合或 Monorepo 根目录", () => {
     planUiSmoke({ name: "demo", type: "application", framework: "vue", ui: "none" }),
   );
   assert.throws(() =>
-    planUiSmoke({ name: "demo", type: "application", framework: "vue", ui: "antd" }),
+    planUiSmoke({ name: "demo", type: "application", framework: "react", ui: "element-plus" }),
   );
   assert.throws(() => planUiSmoke({ name: "demo", type: "monorepo" }));
 });
@@ -75,7 +75,14 @@ async function fakeProject(options, fn) {
   const dir = await mkdtemp(join(tmpdir(), "vp-smoke-"));
   try {
     await mkdir(join(dir, "src"));
-    const pkg = options.framework === "vue" ? "tdesign-vue-next" : "antd";
+    const pkg =
+      options.framework === "vue"
+        ? { tdesign: "tdesign-vue-next", antd: "ant-design-vue", "element-plus": "element-plus" }[
+            options.ui
+          ]
+        : options.ui === "tdesign"
+          ? "tdesign-react"
+          : "antd";
     await writeFile(
       join(dir, "package.json"),
       JSON.stringify({
@@ -93,7 +100,7 @@ async function fakeProject(options, fn) {
     await writeFile(join(dir, "src", "main." + ext), "/* original */\n");
     await writeFile(
       join(dir, "vite.config.ts"),
-      "export default defineConfig({ plugins: [TDesignResolver(), UnoCSS(), tailwindcss()] })",
+      "export default defineConfig({ plugins: [TDesignResolver(), ElementPlusResolver(), AntDesignVueResolver(), UnoCSS(), tailwindcss()] })",
     );
     return await fn(dir);
   } finally {
@@ -183,4 +190,123 @@ test("缺少组件依赖时拒绝写入任何测试文件", async () => {
     );
     await assert.rejects(readFile(join(dir, "ui-smoke.html")), { code: "ENOENT" });
   });
+});
+
+test("五种 UI 的 TS/JS 与三种 CSS 均生成相符的组件、样式及独立入口", () => {
+  const cases = [
+    ["vue", "element-plus", "el-button", "Element Plus", 'type="primary"'],
+    ["vue", "antd", "a-button", "Ant Design Vue", 'type="primary"'],
+    ["vue", "tdesign", "t-button", "TDesign", 'theme="primary"'],
+    ["react", "antd", "Button", "Ant Design", 'type="primary"'],
+    ["react", "tdesign", "Button", "TDesign", 'theme="primary"'],
+  ];
+  for (const [framework, ui, tag, label, primary] of cases)
+    for (const language of ["ts", "js"])
+      for (const css of ["none", "unocss", "tailwindcss"]) {
+        const plan = planUiSmoke({
+          name: "smoke",
+          type: "application",
+          framework,
+          ui,
+          language,
+          css,
+        });
+        const ext = framework === "vue" ? "vue" : language === "ts" ? "tsx" : "jsx";
+        const component = plan.files["src/ui-smoke/SmokeApp." + ext];
+        assert.ok(component.includes("<" + tag + " " + primary));
+        assert.ok(component.includes(label + " 按钮"));
+        assert.ok(component.includes("data-ui-smoke-count"));
+        assert.equal(component.includes("data-ui-smoke-css"), css !== "none");
+        assert.ok(
+          !Object.keys(plan.files).some(
+            (path) =>
+              path.startsWith("src/main.") ||
+              path.startsWith("src/App.") ||
+              path.startsWith("vite.config"),
+          ),
+        );
+        if (framework === "react")
+          assert.ok(
+            component.includes("from '" + (ui === "antd" ? "antd" : "tdesign-react") + "'"),
+          );
+        const entry = Object.entries(plan.files).find(([path]) =>
+          path.startsWith("src/ui-smoke/main."),
+        )[1];
+        assert.equal(entry.includes("virtual:uno.css"), css === "unocss");
+        assert.equal(entry.includes("starter.tailwind.css"), css === "tailwindcss");
+        if (ui === "tdesign")
+          assert.ok(
+            entry.includes(
+              framework === "vue"
+                ? "tdesign-vue-next/es/style/index.css"
+                : "tdesign-react/es/style/index.css",
+            ),
+          );
+        if (framework === "vue" && ui === "antd")
+          assert.ok(entry.includes("ant-design-vue/dist/reset.css"));
+      }
+});
+
+test("新 UI 可补装独立验收页，保留入口配置和清单；错误组件依赖在写入前拒绝", async () => {
+  for (const [framework, ui] of [
+    ["vue", "element-plus"],
+    ["vue", "antd"],
+    ["react", "tdesign"],
+  ]) {
+    const options = {
+      name: "smoke",
+      type: "application",
+      framework,
+      ui,
+      language: "js",
+      css: "none",
+    };
+    await fakeProject(options, async (dir) => {
+      const paths = [
+        "package.json",
+        "vite.config.ts",
+        "src/main." + (framework === "vue" ? "js" : "jsx"),
+      ];
+      const before = await Promise.all(paths.map((path) => readFile(join(dir, path), "utf8")));
+      await addUiSmoke(dir, options, () => {});
+      assert.deepEqual(
+        await Promise.all(paths.map((path) => readFile(join(dir, path), "utf8"))),
+        before,
+      );
+    });
+    await fakeProject(options, async (dir) => {
+      await writeFile(
+        join(dir, "package.json"),
+        JSON.stringify({
+          dependencies: {
+            "vite-plus": "1",
+            [framework]: "1",
+            [framework === "vue" ? "tdesign-vue-next" : "antd"]: "1",
+          },
+        }),
+      );
+      await assert.rejects(
+        addUiSmoke(dir, options, () => {}),
+        /对应 UI 组件库/,
+      );
+      await assert.rejects(readFile(join(dir, "ui-smoke.html")), { code: "ENOENT" });
+    });
+  }
+});
+
+test("Vue 新 UI 不能误用其他组件库的自动导入配置", async () => {
+  for (const ui of ["element-plus", "antd"]) {
+    const options = { name: "smoke", type: "application", framework: "vue", ui };
+    await fakeProject(options, async (dir) => {
+      await writeFile(
+        join(dir, "vite.config.ts"),
+        "export default defineConfig({plugins:[TDesignResolver()]})",
+      );
+      await assert.rejects(
+        addUiSmoke(dir, options, () => {}),
+        /自动导入配置/,
+      );
+      await assert.rejects(readFile(join(dir, "ui-smoke.html")), { code: "ENOENT" });
+    });
+  }
 });

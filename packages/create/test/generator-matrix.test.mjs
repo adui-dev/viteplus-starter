@@ -15,7 +15,7 @@ test("完整选项矩阵保留官方命令、按框架隔离、输出无冲突�
   assert.equal(result.status, 0, result.stderr);
   assert.deepEqual(JSON.parse(result.stdout), {
     planningCases: 462,
-    uiSmokePlans: 132,
+    uiSmokePlans: 330,
     screenPlans: 420,
     threePlans: 126,
     cesiumPlans: 126,

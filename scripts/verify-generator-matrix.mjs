@@ -74,10 +74,7 @@ export async function verifyGeneratorMatrix() {
             add(
               Object.keys(generated?.files ?? {}).filter((path) => !path.startsWith("src/main.")),
             );
-            if (
-              (framework === "vue" && ui === "tdesign") ||
-              (framework === "react" && ui === "antd")
-            ) {
+            if (ui !== "none") {
               add(Object.keys(planUiSmoke(options).files));
               uiSmoke++;
             } else assert.throws(() => planUiSmoke(options));

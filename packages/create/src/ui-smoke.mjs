@@ -4,6 +4,48 @@ import { spawnSync } from "node:child_process";
 import { validateProjectOptions } from "./options.mjs";
 import { inspectPath } from "./safe-paths.mjs";
 
+const presets = {
+  vue: {
+    tdesign: {
+      name: "TDesign",
+      package: "tdesign-vue-next",
+      resolver: "TDesignResolver",
+      style: "tdesign-vue-next/es/style/index.css",
+      tag: "t-button",
+      primary: 'theme="primary"',
+    },
+    "element-plus": {
+      name: "Element Plus",
+      package: "element-plus",
+      resolver: "ElementPlusResolver",
+      tag: "el-button",
+      primary: 'type="primary"',
+    },
+    antd: {
+      name: "Ant Design Vue",
+      package: "ant-design-vue",
+      resolver: "AntDesignVueResolver",
+      style: "ant-design-vue/dist/reset.css",
+      tag: "a-button",
+      primary: 'type="primary"',
+    },
+  },
+  react: {
+    antd: {
+      name: "Ant Design",
+      package: "antd",
+      style: "antd/dist/reset.css",
+      primary: 'type="primary"',
+    },
+    tdesign: {
+      name: "TDesign",
+      package: "tdesign-react",
+      style: "tdesign-react/es/style/index.css",
+      primary: 'theme="primary"',
+    },
+  },
+};
+
 function htmlPage(mainFile) {
   return [
     "<!doctype html>",
@@ -22,7 +64,7 @@ function htmlPage(mainFile) {
   ].join("\n");
 }
 
-function vueComponent(css) {
+function vueComponent(css, preset) {
   const lines = [
     "<script setup>",
     "import { ref } from 'vue'",
@@ -32,9 +74,9 @@ function vueComponent(css) {
     "",
     "<template>",
     '  <main style="max-width: 680px; margin: 64px auto; padding: 24px; font-family: sans-serif">',
-    "    <h1>ADui UI Smoke — Vue + TDesign</h1>",
+    `    <h1>ADui UI Smoke — Vue + ${preset.name}</h1>`,
     "    <p>测试组件渲染、CSS 样式和点击交互，不修改应用首页。</p>",
-    '    <t-button theme="primary" data-ui-smoke-button @click="clicks += 1">TDesign 按钮</t-button>',
+    `    <${preset.tag} ${preset.primary} data-ui-smoke-button @click="clicks += 1">${preset.name} 按钮</${preset.tag}>`,
     "    <p data-ui-smoke-count>点击次数：{{ clicks }}</p>",
   ];
   if (css !== "none") {
@@ -48,18 +90,18 @@ function vueComponent(css) {
   return lines.join("\n");
 }
 
-function reactComponent(css) {
-  const lines = ["import { useState } from 'react'", "import { Button } from 'antd'"];
+function reactComponent(css, preset) {
+  const lines = ["import { useState } from 'react'", `import { Button } from '${preset.package}'`];
   lines.push(
     "",
     "export default function SmokeApp() {",
     "  const [clicks, setClicks] = useState(0)",
     "  return (",
     "    <main style={{ maxWidth: 680, margin: '64px auto', padding: 24, fontFamily: 'sans-serif' }}>",
-    "      <h1>ADui UI Smoke — React + Ant Design</h1>",
+    `      <h1>ADui UI Smoke — React + ${preset.name}</h1>`,
     "      <p>测试组件渲染、CSS 样式和点击交互，不修改应用首页。</p>",
-    '      <Button type="primary" data-ui-smoke-button onClick={() => setClicks((value) => value + 1)}>',
-    "        Ant Design 按钮",
+    `      <Button ${preset.primary} data-ui-smoke-button onClick={() => setClicks((value) => value + 1)}>`,
+    `        ${preset.name} 按钮`,
     "      </Button>",
     "      <p data-ui-smoke-count>点击次数：{clicks}</p>",
   );
@@ -78,36 +120,32 @@ export function planUiSmoke(input) {
   const options = validateProjectOptions(input);
   const { type, framework, language = "ts", ui = "none", css = "none" } = options;
   if (type !== "application") throw new Error("UI Smoke 仅支持独立 Application");
-  if (!((framework === "vue" && ui === "tdesign") || (framework === "react" && ui === "antd"))) {
-    throw new Error("UI Smoke 当前仅支持 Vue + TDesign 或 React + Ant Design");
-  }
+  const preset = presets[framework]?.[ui];
+  if (!preset) throw new Error("UI Smoke 需要选择与框架兼容的 UI 组件库");
   const extension =
     framework === "vue" ? (language === "js" ? "js" : "ts") : language === "js" ? "jsx" : "tsx";
   const mainFile = "main." + extension;
   const files = { "ui-smoke.html": htmlPage(mainFile) };
   if (framework === "vue") {
-    const imports = [
-      "import { createApp } from 'vue'",
-      "import SmokeApp from './SmokeApp.vue'",
-      "import 'tdesign-vue-next/es/style/index.css'",
-    ];
+    const imports = ["import { createApp } from 'vue'", "import SmokeApp from './SmokeApp.vue'"];
+    if (preset.style) imports.push(`import '${preset.style}'`);
     if (css === "unocss") imports.push("import 'virtual:uno.css'");
     if (css === "tailwindcss") imports.push("import '../starter.tailwind.css'");
     files["src/ui-smoke/" + mainFile] =
       imports.join("\n") + "\n\ncreateApp(SmokeApp).mount('#ui-smoke-root')\n";
-    files["src/ui-smoke/SmokeApp.vue"] = vueComponent(css);
+    files["src/ui-smoke/SmokeApp.vue"] = vueComponent(css, preset);
   } else {
     const imports = [
       "import { createRoot } from 'react-dom/client'",
       `import SmokeApp from './SmokeApp.${extension}'`,
-      "import 'antd/dist/reset.css'",
+      `import '${preset.style}'`,
     ];
     if (css === "tailwindcss") imports.push("import '../starter.tailwind.css'");
     if (css === "unocss") imports.push("import 'virtual:uno.css'");
     files["src/ui-smoke/" + mainFile] =
       imports.join("\n") +
       "\n\nconst root = document.getElementById('ui-smoke-root')\nif (root) createRoot(root).render(<SmokeApp />)\n";
-    files["src/ui-smoke/SmokeApp." + extension] = reactComponent(css);
+    files["src/ui-smoke/SmokeApp." + extension] = reactComponent(css, preset);
   }
   return { framework, language, ui, css, files, previewPath: "/ui-smoke.html" };
 }
@@ -133,7 +171,8 @@ export async function addUiSmoke(directory, options, formatter = formatNewFiles)
   await inspectPath(join(directory, "package.json"), "UI Smoke");
   const manifest = JSON.parse(await readFile(join(directory, "package.json"), "utf8"));
   const dependencies = { ...manifest.dependencies, ...manifest.devDependencies };
-  const componentPackage = plan.framework === "vue" ? "tdesign-vue-next" : "antd";
+  const preset = presets[plan.framework][plan.ui];
+  const componentPackage = preset.package;
   if (
     !dependencies["vite-plus"] ||
     !dependencies[plan.framework] ||
@@ -155,8 +194,8 @@ export async function addUiSmoke(directory, options, formatter = formatNewFiles)
   }
   if (configs.length !== 1) throw new Error("无法唯一识别 Vite+ 配置文件");
   const config = await readFile(join(directory, configs[0]), "utf8");
-  if (plan.framework === "vue" && !config.includes("TDesignResolver")) {
-    throw new Error("未发现 Vue TDesign 自动导入配置");
+  if (plan.framework === "vue" && !config.includes(preset.resolver)) {
+    throw new Error(`未发现 Vue ${preset.name} 自动导入配置`);
   }
   if (plan.css === "unocss" && !config.includes("UnoCSS")) {
     throw new Error("未发现 UnoCSS 插件配置");
