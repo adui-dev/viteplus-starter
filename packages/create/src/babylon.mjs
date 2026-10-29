@@ -20,9 +20,15 @@ export async function planBabylon(input) {
     "lazy.d.mts",
     "demo.mjs",
     "demo.d.mts",
+    "model.mjs",
+    "loader.mjs",
   ])
+    files["src/adui-babylon/" + name] = (
+      await readFile(new URL("../../babylon/src/" + name, import.meta.url), "utf8")
+    ).replaceAll("../../model-security/src/", "./");
+  for (const name of ["glb.mjs", "adui.mjs", "adui.d.mts", "local-grant.mjs", "local-grant.d.mts"])
     files["src/adui-babylon/" + name] = await readFile(
-      new URL("../../babylon/src/" + name, import.meta.url),
+      new URL("../../model-security/src/" + name, import.meta.url),
       "utf8",
     );
   files["src/babylon-smoke/demo.css"] =
@@ -79,21 +85,24 @@ export async function preflightBabylon(directory, input, requireScreen = true) {
     deps = { ...manifest.devDependencies, ...manifest.dependencies };
   if (!deps["vite-plus"] || !deps[options.framework])
     throw new Error("Babylon 需要所选框架的 Vite+ 应用");
-  let version = deps["@babylonjs/core"];
-  if (version === "catalog:") {
-    const require = createRequire(manifestPath);
-    try {
-      const metadata = JSON.parse(
-        await readFile(require.resolve("@babylonjs/core/package.json"), "utf8"),
-      );
-      if (metadata.name !== "@babylonjs/core" || typeof metadata.version !== "string")
-        throw new Error("缺少依赖版本元数据");
-      version = metadata.version;
-    } catch {
-      throw new Error("无法确认 Babylon catalog 的已安装版本");
+  for (const dependency of ["@babylonjs/core", "@babylonjs/loaders"]) {
+    let version = deps[dependency];
+    if (version === "catalog:") {
+      const require = createRequire(manifestPath);
+      try {
+        const metadata = JSON.parse(
+          await readFile(require.resolve(dependency + "/package.json"), "utf8"),
+        );
+        if (metadata.name !== dependency || typeof metadata.version !== "string")
+          throw new Error("缺少依赖版本元数据");
+        version = metadata.version;
+      } catch {
+        throw new Error("无法确认 Babylon catalog 的已安装版本");
+      }
     }
+    if (version && version !== babylonVersion)
+      throw new Error("已有 Babylon 版本未经验证，拒绝升级");
   }
-  if (version && version !== babylonVersion) throw new Error("已有 Babylon 版本未经验证，拒绝升级");
   const ts = (options.language ?? "ts") === "ts",
     entry =
       options.framework === "vue" ? (ts ? "main.ts" : "main.js") : ts ? "main.tsx" : "main.jsx";
@@ -117,6 +126,8 @@ export async function addBabylon(directory, input, runner = runWorkspaceVp) {
   const before = await preflightBabylon(directory, input);
   if (!before.dependencies["@babylonjs/core"])
     await runner(directory, ["add", "@babylonjs/core@" + babylonVersion, "--save-exact"]);
+  if (!before.dependencies["@babylonjs/loaders"])
+    await runner(directory, ["add", "@babylonjs/loaders@" + babylonVersion, "--save-exact"]);
   const current = await preflightBabylon(directory, input);
   for (const [path, source] of Object.entries(current.plan.files)) {
     const target = join(directory, path);

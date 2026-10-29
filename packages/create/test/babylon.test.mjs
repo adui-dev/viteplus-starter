@@ -53,6 +53,7 @@ test("Babylon 增量安装保留官方入口与配置，重复和安装期间输
     calls = [];
   await addBabylon(root, base, async (_cwd, args) => calls.push(args));
   assert.deepEqual(calls[0], ["add", "@babylonjs/core@9.32.1", "--save-exact"]);
+  assert.deepEqual(calls[1], ["add", "@babylonjs/loaders@9.32.1", "--save-exact"]);
   assert.equal(await readFile(join(root, "src/main.ts"), "utf8"), "original entry");
   assert.equal(await readFile(join(root, "vite.config.ts"), "utf8"), "original config");
   await assert.rejects(
@@ -120,7 +121,10 @@ test("Babylon 交互与批量计划按应用隔离，不询问 Three 保护策�
     },
     root,
   );
-  assert.deepEqual(plan.steps[1].engine.dependencies, ["@babylonjs/core@9.32.1"]);
+  assert.deepEqual(plan.steps[1].engine.dependencies, [
+    "@babylonjs/core@9.32.1",
+    "@babylonjs/loaders@9.32.1",
+  ]);
   assert.equal(plan.steps[1].modelProtection, undefined);
   assert.equal(plan.steps[2].modelProtection.mode, "embedded");
 });

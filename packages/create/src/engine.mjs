@@ -28,7 +28,7 @@ export async function planEngine(options) {
     const plan = await planBabylon(options);
     return {
       name: "babylon",
-      dependencies: ["@babylonjs/core@" + babylonVersion],
+      dependencies: ["@babylonjs/core@" + babylonVersion, "@babylonjs/loaders@" + babylonVersion],
       devDependencies: [],
       files: Object.keys(plan.files),
       previewPath: plan.previewPath,

@@ -10,10 +10,14 @@
     }
   },
   "peerDependencies": {
-    "@babylonjs/core": "9.32.1"
+    "@babylonjs/core": "9.32.1",
+    "@babylonjs/loaders": "9.32.1"
   },
   "peerDependenciesMeta": {
     "@babylonjs/core": {
+      "optional": true
+    },
+    "@babylonjs/loaders": {
       "optional": true
     }
   }

@@ -4,6 +4,15 @@ export interface SceneState {
   disposed: boolean;
 }
 export interface SceneHandle {
+  loadModel(
+    buffer: ArrayBuffer,
+    options?: {
+      encrypted?: boolean;
+      authorize?: import("../../model-security/src/adui.mjs").DecryptOptions["authorize"];
+    },
+  ): Promise<boolean>;
+  clearModel(): void;
+  cancelModelLoad(): void;
   load(): Promise<void>;
   destroy(): void;
 }
@@ -14,7 +23,13 @@ export function createLazyScene(
       createScene(
         canvas: HTMLCanvasElement,
         onError: (message: string) => void,
-      ): { resize(): void; destroy(): void };
+      ): {
+        resize(): void;
+        destroy(): void;
+        loadModel?(buffer: ArrayBuffer, options?: unknown): Promise<boolean>;
+        clearModel?(): void;
+        cancelModelLoad?(): void;
+      };
     }>;
     onState?(state: SceneState): void;
     onError?(message: string): void;

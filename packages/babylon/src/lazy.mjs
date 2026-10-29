@@ -25,6 +25,16 @@ export function createLazyScene(host, { load, onState = () => {}, onError = () =
     }
   }
   return {
+    async loadModel(buffer, options) {
+      if (!scene || disposed) throw new Error("请先加载 Babylon 场景");
+      return scene.loadModel(buffer, options);
+    },
+    clearModel() {
+      scene?.clearModel?.();
+    },
+    cancelModelLoad() {
+      scene?.cancelModelLoad?.();
+    },
     load() {
       if (disposed || scene) return Promise.resolve();
       if (pending) return pending;

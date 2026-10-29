@@ -4,6 +4,7 @@ export function createRuntime(
 ) {
   let engine,
     scene,
+    extension,
     disposed = false;
   function destroy() {
     if (disposed) return;
@@ -12,7 +13,11 @@ export function createRuntime(
       engine?.stopRenderLoop(render);
     } finally {
       try {
-        scene?.dispose();
+        try {
+          extension?.destroy?.();
+        } finally {
+          scene?.dispose();
+        }
       } finally {
         engine?.dispose();
       }
@@ -30,9 +35,10 @@ export function createRuntime(
   try {
     engine = createEngine(canvas);
     scene = createScene(engine);
-    initialize(scene);
+    extension = initialize(scene);
     engine.runRenderLoop(render);
     return {
+      ...extension,
       resize() {
         if (!disposed) engine.resize();
       },

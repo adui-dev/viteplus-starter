@@ -7,6 +7,8 @@ import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight.js";
 import { CreateBox } from "@babylonjs/core/Meshes/Builders/boxBuilder.js";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial.js";
 import { createRuntime } from "./runtime.mjs";
+import { createModelController } from "./model.mjs";
+import { DirectionalLight } from "@babylonjs/core/Lights/directionalLight.js";
 export function createScene(canvas, onError) {
   return createRuntime(canvas, {
     createEngine: (target) => new Engine(target, true),
@@ -23,6 +25,39 @@ export function createScene(canvas, onError) {
       box.material = material;
       box.rotation.y = 0.5;
       box.rotation.x = 0.2;
+      const light = new DirectionalLight("model-key", new Vector3(-1, -1, 1), scene);
+      light.intensity = 3;
+      const models = createModelController({
+        async parse(buffer) {
+          const { parseModel } = await import("./loader.mjs");
+          return parseModel(buffer, scene);
+        },
+        prepare(asset) {
+          if (!asset.meshes.some((mesh) => mesh.getTotalVertices() > 0))
+            throw new Error("GLB 没有可显示网格");
+          const root = asset.createRootMesh(),
+            bounds = root.getHierarchyBoundingVectors(true),
+            size = bounds.max.subtract(bounds.min),
+            max = Math.max(size.x, size.y, size.z);
+          if (!Number.isFinite(max) || max <= 0) throw new Error("GLB 边界无效");
+          const scale = 2 / max,
+            center = bounds.min.add(bounds.max).scale(0.5);
+          root.scaling.setAll(scale);
+          root.position.copyFrom(center.scale(-scale));
+        },
+        onState(state, message) {
+          canvas.dataset.modelState = state;
+          canvas.dataset.modelError = message;
+          if (state === "ready") box.setEnabled(false);
+          if (state === "empty") box.setEnabled(true);
+        },
+      });
+      return {
+        loadModel: (buffer, options) => models.load(buffer, options),
+        clearModel: () => models.clear(),
+        cancelModelLoad: () => models.cancel(),
+        destroy: () => models.destroy(),
+      };
     },
   });
 }
