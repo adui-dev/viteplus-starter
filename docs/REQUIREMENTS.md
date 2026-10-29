@@ -134,3 +134,7 @@ FR-006：CLI --engines、JSON engines 与交互多选均已接入，保留 engin
 ## 2026-10-29：UI Smoke 组合扩展
 
 FR-003/FR-009：支持 Vue Element Plus、Ant Design Vue、TDesign 与 React Ant Design、TDesign 的 TS/JS 独立验收页。新增三种 UI 的代表组合及 React TDesign TS Monorepo 已通过真实按钮渲染、点击及原子 CSS 验收。检查对应组件包和 Vue resolver，仍拒绝无 UI、Monorepo 根、错误依赖和已存在文件。其余语言/CSS 组合不扩大验收声明；只读 UI Smoke 计划 330，总矩阵 462，实际构建另计。
+
+## 2026-10-29：生成失败恢复信息
+
+FR-010 / NFR-001：单应用执行失败报告阶段、目标与已完成步骤；批量失败保留现场，增加未执行步骤的独立 argv 和 PowerShell 指引。失败步骤不列为可直接重试，必须先检查现场和依赖关系。参数重新校验、重复输出拒绝及官方模板入口保持有效；没有自动删除、回滚、覆盖式续跑或生产凭据持久化。可恢复性预检与真正的断点恢复仍未实现。

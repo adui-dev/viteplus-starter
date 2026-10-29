@@ -96,3 +96,15 @@ Chrome 中 Vue TS 与 React JS 两页面均通过按钮点击 0→1、CSS 颜色
 每应用可用 "engine":"three" 、"engine":"cesium" 或 "engine":"babylon"（none/省略不安装引擎），必须同时启用 screen。UI 验收阶段不重复传 engine/screen。运行样例见 [THREE_SMOKE](THREE_SMOKE.md)、[CESIUM](CESIUM.md)，Babylon 见 [指南](BABYLON.md) 与 [示例](../examples/babylon.batch.json)。完整 JSON 见 [three.batch.json](../examples/three.batch.json)、[cesium.batch.json](../examples/cesium.batch.json)。
 
 应用 engines 数组与 engine 互斥，规范执行顺序及模型保护边界见 [多引擎说明](MULTI_ENGINE.md)。
+
+## 失败后的人工恢复指引
+
+批量失败报告增加每个未执行步骤的工作目录和 PowerShell 命令；API 的 error.recovery.pending 同时保留 command/args 数组。命令由重新校验后的原计划生成，路径和参数使用 PowerShell 单引号转义，不拼入失败原因。恢复报告不会运行命令、写入状态文件或保存密钥。
+
+先处理失败阶段，再按顺序处理未执行步骤。失败阶段可能部分完成，报告不为该阶段生成盲目重试命令。后面的 UI Smoke 命令可能依赖失败应用恢复完成，不能直接跳过修复执行。根目录已存在时重跑同一个 batch 仍被拒绝；根目录不存在时应先确认无残留，再重新规划。
+
+- 官方根生成失败：检查根目录、清单、工作区配置及锁文件；根未完整时不运行子应用命令。
+- 应用生成或集成失败：保留现场，核对 App/main、Vite 配置、预设备份和依赖。仅确认相应预设尚未写入时才用 --apply-existing；已写入的预设不能作为通用覆盖式重试目标。
+- 验收页失败：已有 HTML/目录不覆盖；检查输出和格式化错误，修复后运行 vp check。不要为重跑删除未知文件。
+
+单应用 CLI 对官方模板、工作区准备/整理、UI/CSS、预设和验收页阶段提供失败阶段、目标目录、已完成步骤及现场保护说明。官方子进程非零退出码会保留，信号退出按失败处理。这里提供人工恢复信息，尚未实现自动断点续跑或覆盖式恢复。

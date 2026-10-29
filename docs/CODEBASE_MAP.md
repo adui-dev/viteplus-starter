@@ -143,3 +143,10 @@ engine-prompts.test.mjs：多选解析、摘要/取消、Three 保护提示；ve
 - packages/create/test/ui-smoke.test.mjs、batch.test.mjs：30 个基础页面计划、新 UI 写入/拒绝及批量应用隔离回归。
 - scripts/verify-ui-build.mjs：保留原配置的首页+组件验收页双入口生产构建。
 - verify-generator-matrix 与对应测试：UI Smoke 计划扩展为 330，总计划仍为 462。
+
+## 失败恢复信息
+
+- packages/create/src/recovery.mjs：阶段错误上下文、现场保护说明、仅用于人工审阅的 argv/PowerShell 指引。
+- packages/create/bin/cli.mjs：官方模板、集成和工作区整理执行阶段标记，保留官方非零退出码。
+- packages/create/src/batch.mjs：从重建后的计划生成未执行步骤指引，失败步骤保留为人工检查。
+- packages/create/test/recovery.test.mjs、batch.test.mjs：错误原因/退出码、无自动重试、参数转义、CLI 失败文件保留及批量阶段边界。

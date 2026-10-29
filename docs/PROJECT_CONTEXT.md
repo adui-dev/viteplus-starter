@@ -350,3 +350,12 @@
 - verify-ui-build 新增本地双入口工具，专用 wx 临时配置、dist/ui-verify 产物；四套样例保留正式首页并构建验收页。Vue 使用 /ui-check/，React JS 使用 ./，React TS 工作区使用 /ui-check/。UnoCSS 多入口重复虚拟 CSS 提示保留，不修改正式样式入口来消除提示。
 - Chrome 四页具备 el-button / ant-btn / t-button 真实样式，点击 0→1；UnoCSS 绿色背景 rgb(209,250,229)、深绿色文字及 16px 内边距，Tailwind 对应 oklch 色值与 16px 内边距正常。四页 warn/error 为空。截图 ui-element-plus-acceptance.png、ui-ant-vue-acceptance.png、ui-tdesign-react-acceptance.png、ui-tdesign-workspace-ts-acceptance.png 在 D:/Workspace/adui-studio，不纳入 Git。
 - 本轮 Node 测试 193/193、文档校验及根 vp check（156 格式、116 代码文件）通过。30 个基础 UI 页面计划覆盖五种 UI × 两种语言 × 三种 CSS；只读矩阵 UI Smoke 从 132 增至 330，总计划 462，actualBuilds=0，不能替代真实构建计数。下一步进入生成失败后的明确恢复流程与 Monorepo 管理，不扩展演示功能。
+
+## 2026-10-29：生成失败后的阶段报告与人工指引
+
+- 本轮仅推进生成器可靠性，不修改 UI、大屏、引擎或模型预设。CLI 为官方模板、工作区准备/整理、UI/CSS、预设与验收页动作增加阶段上下文；失败输出目标、已完成阶段和现场检查说明。官方子进程非零退出码保留，信号失败按非零处理。
+- 批量仍重新规划预检、失败即停；error.recovery.pending 与终端输出增加尚未执行步骤的独立 argv、cwd、PowerShell 命令。失败阶段可能部分完成，不生成盲目重试命令；待执行验收页仍要求相关应用先恢复完整。所有命令均人工确认现场后运行，不自动执行或写状态文件。
+- 受控测试覆盖错误原因/退出码传递、失败动作只执行一次、PowerShell 引号与元字符、根生成/后预检/后续应用失败边界。真实 CLI 在临时 Vite+ 应用缺少 UI 依赖时退出 1，打印 UI 验收页阶段和目标，保留原文件且无新增验收文件；未破坏实际项目来制造失败。
+- 后续主线：已有 Monorepo 的只读状态检查与恢复前预检。尚未实现自动断点续跑、自定义布局或覆盖式恢复，不把人工指引称为自动恢复完成。
+
+本轮验证：node --test 196/196、文档静态校验通过、根 vp check 格式 158 文件及 lint 118 文件通过。测试使用可控执行器及真实 CLI 临时目录，未执行网络安装、破坏性失败演练或业务工程修改。预设源码与生成产物未变化，本轮不新增组件/引擎浏览器验收声明。

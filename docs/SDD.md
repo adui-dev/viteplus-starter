@@ -224,3 +224,9 @@ engine-screen-smoke 生成两引擎共用的 Vue/React 验收 App：保留独立
 ## UI Smoke 五种 UI 适配
 
 ui-smoke 内部预设表统一维护框架/UI 对应包、展示名、Vue 标签/resolver、主按钮属性和可选样式入口，生成和预检使用同一表。Vue 保留自动导入，React 组件和挂载模块继续分离。既有入口、配置及清单不修改；JS/TS、CSS 选择与输出冲突保护沿用原流程。批量配置逐应用调用该工具，不增加根级 UI 依赖。verify-ui-build 提供本地双入口构建，临时配置 wx 创建，构建成功或失败均清理，只接受指定验收 base；没有生产配置迁移或新架构选型。
+
+## 生成阶段失败与人工恢复
+
+createStageRunner 只包裹执行动作，不接管原有路径/选项预检。成功后记录阶段，失败时保留 cause、有效非零 exitCode，快照复制已完成步骤并附目标和人工检查说明。CLI 继续通过原有官方模板入口和集成函数执行，异常传播到顶层停止后续动作。
+
+批量执行仍重建并预检计划；catch 仅对当前 index 之后的未执行步骤生成 recovery.pending，包含 label/cwd/command/args 和 PowerShell 显示文本。失败阶段的局部输出不视为完成，不生成自动重试动作。PowerShell 对每个参数单独单引号转义，不把显示文本交给 shell。没有新状态文件、依赖或配置迁移。
