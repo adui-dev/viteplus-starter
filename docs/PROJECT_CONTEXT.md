@@ -330,3 +330,14 @@
 - 下一步优先完成 Vue/React 两引擎原生全屏、Cesium DPR 和卸载/重挂的浏览器补验，然后再推进其余兼容矩阵。
 
 本轮最终本地检查：node --test 189/189；文档静态校验通过；根 vp check 格式 155 文件、lint 115 文件通过。只读生成矩阵 462 个计划（actualBuilds=0，不等同于真实构建）；上述两套新样例单独执行真实构建。Monorepo 根 vp run ready 16/16 成功，随后 vp check 格式 449 文件、lint/类型 329 文件通过。临时预览服务已关闭。
+
+## 2026-10-29：大屏遗留浏览器验收收尾，转回 UI 生成主线
+
+- 复用 screen-engines-vue-ts（Vue TS 独立）与 adui-cesium-workspace/apps/screen-engines-react-js（React JS Monorepo），没有创建新应用或修改源码、依赖、密钥。React 的 index/cesium/babylon 联合构建重新通过，默认体积警告保留。
+- Cesium 两框架确认 DPR 1→2→3 的 CSS 尺寸保持 1250×703，缓冲区从 1250×703 增为 2500×1406，DPR 3 保持 2 倍上限。半宽 625×352、cover/stretch 625×811 的引擎缓冲区随之更新；none 的 HUD 单位变换，engine transform=none。React Babylon 补验相同全宽 DPR 数据与半宽更新；Vue Babylon 沿用前轮已验证数据。
+- 四个页面均实际点击进入/退出原生全屏；通过 :fullscreen 选择器确认 ad-screen，内部 4 个非缩放覆盖层按钮仍可用，退出后匹配为空并恢复容器尺寸。先清除仿真并将标签页置前台解决上轮后台请求拒绝，未禁用浏览器安全限制。
+- 四页面卸载后 canvas=0，重挂后等待点击、重新加载进入 ready；四页 warn/error 为空。不称为 GPU 堆完全回收测量或全部跨显示器环境通过。
+- 全屏证据位于 D:/Workspace/adui-studio/screen-cesium-vue-fullscreen-20261029.png、screen-cesium-react-fullscreen-20261029.png、screen-babylon-vue-fullscreen-20261029.png、screen-babylon-react-fullscreen-20261029.png，均不纳入 Git。临时仿真已清除，两个验收标签页已关闭。
+- 本轮只收尾既有验收，不扩展模型查看器功能。下一步实现 Element Plus、Ant Design Vue、React TDesign 的 UI Smoke 生成及真实组件渲染，然后回到生成失败恢复与 Monorepo 管理。大屏专项不再作为阻塞 UI 主线的未完成项。
+
+本轮本地复验：node --test 189/189、文档静态校验通过、根 vp check 格式 155 文件及 lint 115 文件通过。复用样例未改源码，未重复创建应用或安装依赖；本轮自建 4372/4373 预览服务均已停止。

@@ -68,3 +68,21 @@ React 导入 `{ AdScreen, useAdScreen }`；engine、hud/children、overlayScaled
 浏览器实测：Vue TS + Babylon 在相同 CSS 尺寸 1250×703 下，DPR 1 为 1250×703、DPR 2 为 2500×1406、DPR 3 仍为 2500×1406；半宽容器、contain/cover/stretch/none 及 engine transform=none 已核对。Cesium 原版基线确认按 1 倍 CSS 像素渲染；新 Cesium 和 React 页面已构建及静态检查，本轮其真实交互尚未验证。全屏请求被浏览器拒绝，切到前台时电脑操作工具无法确认页面地址并终止；不能计为通过。
 
 旧生成项目的源码快照仍拒绝覆盖。本次使用全新官方样例验证，未自动升级已有项目。下一次应优先补齐两个框架、两个引擎的全屏及 Cesium DPR 浏览器实测。
+
+## 大屏专项补验收尾（2026-10-29）
+
+前节的浏览器遗留项在同一组官方样例中补验完成：独立 Vue TS screen-engines-vue-ts 与 Monorepo React JS screen-engines-react-js，均使用生产多入口构建。没有修改生成器源码或增加演示功能。
+
+| 项目                             | Vue TS / Cesium | React JS / Cesium | Vue TS / Babylon | React JS / Babylon |
+| -------------------------------- | --------------- | ----------------- | ---------------- | ------------------ |
+| DPR 1/2/3 与 2 倍上限            | 本轮通过        | 本轮通过          | 前轮通过         | 本轮通过           |
+| 原生全屏进入/退出                | 本轮通过        | 本轮通过          | 本轮通过         | 本轮通过           |
+| 非缩放覆盖层控件保留             | 通过            | 通过              | 通过             | 通过               |
+| 卸载 canvas 为 0，重挂重新 ready | 通过            | 通过              | 通过             | 通过               |
+| 控制台 warn/error                | 无              | 无                | 无               | 无                 |
+
+Cesium 的同尺寸 DPR 数据：CSS 1250×703，DPR 1 缓冲区 1250×703，DPR 2 与 3 均为 2500×1406。半宽 contain 的 CSS 尺寸 625×352，缓冲区 1250×704；cover / stretch 的引擎区域为 625×811，HUD 分别等比/双轴缩放，none 的 HUD 为单位变换。引擎层始终 transform=none。React Babylon 同样确认 DPR 1、2、3 的全宽数据及半宽容器更新。
+
+上轮拒绝来自后台页面的全屏请求。本轮清除尺寸仿真、将验收标签页切到前台，再点击页面按钮；使用 :fullscreen 匹配确认原生全屏元素是 ad-screen，4 个覆盖层按钮仍在该元素内部。点击退出后匹配为空，容器恢复，Cesium 的半宽 frame/shell 均恢复为 1600 CSS 像素。没有关闭浏览器安全限制或更改系统显示设置。
+
+四张本地全屏截图保留在工作目录 screen-{cesium|babylon}-{vue|react}-fullscreen-20261029.png，不纳入仓库。结果仅覆盖上述代表组合；非整数 DPR、真实跨显示器切换、其他系统和全部语言组合没有扩大验收声明。后续转入其他 UI 库的组件生成与渲染验收。

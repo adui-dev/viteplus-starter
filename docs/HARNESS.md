@@ -159,3 +159,15 @@ Cesium 自动构建使用 verify-model-app，检查双入口/base、密文与原
 按 [BABYLON](BABYLON.md) 创建 Vue/React、TS/JS 与官方工作区，执行 check/build/ready。之后单独运行 verify-babylon-build，确认首页+验收页双入口、场景分块及 /babylon-check/、./ 部署。浏览器检查点击前无 canvas/引擎场景请求、加载后立方体、卸载画布清除、重挂等待再次点击、控制台无错误。受控测试验证初始化和帧错误后的循环/场景/引擎清理，不将其等同 GPU 堆测量或模型支持。
 
 模型自动构建另执行 node scripts/verify-model-app.mjs <应用路径> [/model-check/|./]，需 src/models 至少一个自包含 GLB。验证官方首页+model-smoke 双入口、密文数量/解密一致、无原模型/明文与 KEY 字面量；产物保留 dist/model-verify，临时配置结束删除。对 embedded 页面检查无需手动解锁即 ready；external 页面检查初始锁定、独立解锁、锁定清除模型。补验生成项目开发服务的原 GLB/env HTTP 403 与密文 200，并验证 KEY 轮换后重新构建。受控下载/授权取消用例不等同任意 GPU 内存完全回收。
+
+## Cesium/Babylon 大屏补验方法
+
+使用最新生成的 Vue/React 引擎独立验收页，先运行 node scripts/verify-multi-build.mjs <应用路径>，然后在应用目录启动 vp preview --outDir dist/multi-verify --base /multi-check/。不要与同一工作区的普通构建同时执行，普通构建会清理 dist 下的专项产物。
+
+1. 分别打开 cesium-smoke.html、babylon-smoke.html 并点击加载，核对 ready 与单个 canvas。
+2. 同一容器尺寸下测试 DPR 1→2→3，比较 canvas 的 CSS 尺寸与 width/height 绘图缓冲区；上限为 2。浏览器缩放会影响实际 DPR，记录读取的 devicePixelRatio，不能直接将仿真参数当成实际 DPR。
+3. 切换半宽、四模式，确认引擎 transform=none、缓冲区跟随容器，HUD 按对应模式变换。
+4. 清除临时尺寸/DPR 仿真，将验收标签页置于前台再实际点击进入全屏。确认 :fullscreen 匹配 ad-screen，覆盖层按钮仍能点击；退出后匹配为空且容器恢复。请求拒绝不能算通过，不修改浏览器安全策略。
+5. 卸载后 canvas=0；重挂应回到等待加载，再点击加载进入 ready。检查控制台 warn/error，保存实际全屏截图。
+
+2026-10-29 已按此流程完成 Vue TS 独立应用和 React JS Monorepo 代表组合；具体边界见 [大屏说明](SCREEN.md)。接下来优先实现其他 UI 库的组件验收入口，不增加查看器操作。

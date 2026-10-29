@@ -35,7 +35,7 @@
 
 ### FR-005 大屏可视化
 
-- 状态：P5 首期已实现分层插件、Vue/React TS/JS 适配及 CLI/批量接入；布局、原生全屏进入/退出及 Three.js Canvas 的代表组合已实机验收；其他引擎仍待验证；优先级：P1。
+- 状态：P5 首期已实现分层插件、Vue/React TS/JS 适配及 CLI/批量接入；布局、原生全屏进入/退出及 Three.js Canvas 的代表组合已实机验收；Cesium/Babylon 的 Vue TS、React JS 代表组合已补验 DPR、全屏与卸载重挂，其余组合待验收；优先级：P1。
 - 目标：按应用选择是否启用自定义大屏适配，支持设计稿尺寸及 contain / cover / stretch。
 - 验收：窗口变化、全屏、清理监听器和 3D Canvas 交互正确。
 - 首期范围：contain/cover/stretch/none、可配置引擎内缩、双轴坐标反算、缩放/非缩放浮层、监听器清理与独立页面；无额外应用依赖、无覆盖写入，详见 [SCREEN](SCREEN.md)。
@@ -128,3 +128,5 @@ FR-006：CLI --engines、JSON engines 与交互多选均已接入，保留 engin
 - 已实现：两引擎按容器 CSS 尺寸及 DPR 更新缓冲区，比例上限 2、最长边上限 8192；Babylon 考虑硬件纹理上限，隐藏容器跳过尺寸分配。独立验收页新增模式、半宽、全屏控件，不修改正式入口。
 - 本地验证：共享观察器覆盖 DPR 无事件变化、媒体查询重订阅、窗口/全屏/容器变化与卸载清理；四种框架语言生成计划均测试。Vue TS 独立应用与 React JS Monorepo 应用检查及双引擎多入口构建通过。
 - 部分浏览器验收：Vue Babylon 已验证模式、容器与 DPR；原生全屏被浏览器拒绝，电脑操作工具随后停止。Cesium 新策略及 React 真实交互、全屏仍待补验，不能标记整项验收完成。
+
+2026-10-29 补验结果：上一轮大屏专项的浏览器遗留项已在 Vue TS 独立应用、React JS Monorepo 子应用完成。Cesium 两框架和 React Babylon 的 DPR 1/2/3 均符合最高 2 倍策略（Vue Babylon 已于前轮验证）；两框架、两引擎原生全屏进入/退出、覆盖层控件、卸载 canvas=0 和重挂 ready 均通过。仅对这些代表组合有效，不扩展为全部框架/语言及显示器环境已验证。

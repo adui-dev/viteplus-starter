@@ -10,7 +10,7 @@
 | FR-002 交互       | 名称、框架、语言、UI/CSS、大屏、Three/Cesium/Babylon、模型保护与确认/取消  | 交互多选已接入                                                                           |
 | FR-003 UI         | Vue Element Plus/Ant Design Vue/TDesign，React Ant Design/TDesign 生成计划 | 实际组件渲染仅验收 Vue TDesign、React Ant Design；不把依赖安装或首页构建视为组件渲染完成 |
 | FR-004 CSS        | UnoCSS/Tailwind 配置及代表组合已验收                                       | 未逐一真实构建全部 UI/CSS 组合                                                           |
-| FR-005 大屏       | 四种模式、坐标换算、浮层、全屏及三种引擎的原生像素层                       | Cesium/Babylon 全屏与 DPR 专项仍待验收                                                   |
+| FR-005 大屏       | 四种模式、坐标换算、浮层、全屏及三种引擎的原生像素层                       | Vue TS / React JS 两引擎 DPR、全屏及卸载重挂已验收；其余组合待验收                       |
 | FR-006 引擎       | 按应用选择 none/three/cesium/babylon、按需加载、实例清理与 GLB 适配        | 三引擎模型范围各自验收；不提供同页混合运行时                                             |
 | FR-007 模型保护   | 三引擎 .adui 授权解密、自动构建与 KEY 脚本                                 | FBX/OBJ 与压缩格式待接入；客户端密钥仍可逆向提取                                         |
 | FR-008 工作区隔离 | 官方 pnpm apps/*，逐应用和批量配置、不同框架/语言/预设                     | 自定义布局与其他包管理器未支持                                                           |
@@ -52,7 +52,7 @@
 | audit-tdesign-react-js  | React JS / TDesign / UnoCSS                | 依赖安装、配置生成、检查及正式首页构建；不含 TDesign 组件渲染声明        |
 | audit-preserve-react-ts | React TS / Ant Design / Tailwind，首次补装 | 配置增量集成、检查/构建及无关文件不被格式化                              |
 
-已完成的其他代表组合与混合工作区验收见 [UI_SMOKE](UI_SMOKE.md)、[BATCH_CONFIG](BATCH_CONFIG.md)、[MODEL_BUILD](MODEL_BUILD.md) 和状态记录；不将它们扩大为全部 294 组合已实测。
+已完成的其他代表组合与混合工作区验收见 [UI_SMOKE](UI_SMOKE.md)、[BATCH_CONFIG](BATCH_CONFIG.md)、[MODEL_BUILD](MODEL_BUILD.md) 和状态记录；不将它们扩大为全部 462 组合已实测。
 
 ## 文件保护回归
 
@@ -64,6 +64,6 @@ Ant Design Vue 另补充 pnpm 的 core-js: false 构建脚本规则并定向格�
 
 ## 后续主线
 
-三引擎逐应用预设、多引擎选择、GLB/.adui 与 env 自动构建加载已接入；真实检查、构建与浏览器证据以状态记录为准，详见 [CESIUM](CESIUM.md)、[BABYLON](BABYLON.md)。下一阶段补验 Cesium/Babylon 的大屏缩放、DPR 和全屏。新增预设仍通过官方基础模板增强，不把验收页面体验当作生成器功能完成条件。
+三引擎逐应用预设、多引擎选择、GLB/.adui 与 env 自动构建加载已接入；真实检查、构建与浏览器证据以状态记录为准，详见 [CESIUM](CESIUM.md)、[BABYLON](BABYLON.md)。Cesium/Babylon 的 Vue TS、React JS 代表组合已补验大屏缩放、DPR、原生全屏和卸载重挂。下一阶段补齐 Element Plus、Ant Design Vue、React TDesign 的 UI Smoke 生成及真实组件渲染，随后推进失败恢复和 Monorepo 管理；不再扩展模型查看器体验。新增预设仍通过官方基础模板增强，不把验收页面体验当作生成器功能完成条件。
 
 2026-10-29：CLI/JSON 多引擎编排已接入，交互已支持逗号多选，联合构建与浏览器证据分开记录，见 [说明](MULTI_ENGINE.md)。
