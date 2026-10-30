@@ -6,6 +6,8 @@
 
 Windows V1 本地候选的操作说明与集中交付核对已整理：[Windows 指南](WINDOWS_GUIDE.md) 提供按执行目录组织的命令，[V1 清单](V1_ACCEPTANCE.md) 区分历史实测、本地检查和未覆盖范围。仓库仍为 0.0.0/private，未发布；后续按实际 Windows 项目试用反馈修复生成器，不自动扩大功能。
 
+2026-10-30 最新入口复核：帮助、8 个示例预览和 462 个组合计划通过；既有 normalize 工作区的 6 个预期应用检查与只读规划通过，test-vue 基础样式重复调用无写入、重复补装/验收页拒绝，149/30 项文件内容及 mtime 保持。近期补装与旧版修复保护的全量回归为 238/238；本轮未重跑实际构建或浏览器。复核范围内没有新增交付阻塞，继续实际使用与问题修复，详见 [复核记录](V1_ACCEPTANCE.md#windows-v1-入口与阻塞复核2026-10-30)。
+
 首个用户指定试用 test-vue 已创建为独立 Vue TS、默认 UI/CSS none。完整类型/首页构建与 check、开发及生产预览的计数点击通过，原模板 16 项文件哈希保持，本地 Git 初始化提交已完成；模板无测试文件，不把 passWithNoTests 计为应用测试通过。详细证据见 [V1 清单](V1_ACCEPTANCE.md#用户指定-test-vue-试用2026-10-30)。
 
 随后按用户选择，在 test-vue 首次补装 Element Plus/Tailwind CSS：正式类型/首页构建、UI 双入口构建与 check 通过，Chrome 生产验收页按钮点击 0→1、绿色区域样式正确且无 warn/error。正式入口的本地 normalize.css 仍先于 Tailwind 和原样式加载，5 项原首页/基础样式文件哈希保持；重复补装及重复生成页均拒绝，30 项文件内容与 mtime 不变。工程分两次本地提交，无远程仓库；详见 [补装记录](V1_ACCEPTANCE.md#test-vue-首次补装-element-plustailwind-css2026-10-30)。
