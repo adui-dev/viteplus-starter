@@ -534,3 +534,12 @@
 - 真实 test-vue 与 normalize 工作区 react-antd-js 分别复查 CSS 重复拒绝和基础样式跳过，30 项、149 项 Git 可见文件内容及 mtime 保持。只在临时测试夹具中模拟文件丢失，没有删除真实项目配置、安装真实依赖、新建应用、运行应用构建或浏览器验收，仓库依赖与锁文件未改。
 - Node 22.18.0 下 229/229 测试、462 组合计划、文档校验和根 check（175 格式/129 代码文件）通过；计划 actualBuilds=0。同步需求、SDD、索引及 Windows 部分配置处理说明。
 - 下一步核对 Ant Design Vue 构建策略冲突是否同样在工作区写入前拒绝，继续处理生成器的实际使用和文件保护问题。
+
+## 2026-10-30：Ant Design Vue 构建策略先预检再写入
+
+- 隔离复现 allowBuilds 使用不支持的内联映射时，补装虽拒绝，但根 YAML 此前已追加 peer 配置。临时复现目录已清理，未修改真实项目制造失败。
+- build-policy.mjs 提取只读 preflightUiBuildPolicy，定位策略普通文件并计算合并结果；preflightIntegrations 在补装预检调用，策略冲突在根 peer 写入、安装、格式化之前报错，包含具体 pnpm-workspace.yaml 路径。prepareUiBuildPolicy 显式重新读取和复查后才写入，保留中间正常追加的 peer 配置和原有定向格式化行为。
+- 新增三项测试：只读预检与显式增量准备、已有明确选择/重复调用及策略目录/链接保护；TS/JS × 五种 allowBuilds 冲突共十次真实工作区 CLI 验证“补装预检”拒绝、已完成为无、根和应用文件内容及 mtime 保持。非 Ant Design Vue 不读取策略，已有 core-js:true/false 不改写；依赖安装仍使用受控测试回调，没有放宽策略。
+- 实际 audit-antd-vue-ts 和 adui-node22-acceptance/apps/vue-ts 的正常策略只读复查均无需更新，分别四项、六项策略/清单/配置/入口文件内容及 mtime 保持。没有安装真实依赖、新建实际应用、运行应用构建或浏览器验收，仓库依赖和锁文件未改。
+- Node 22.18.0 下全量 232/232 测试、文档校验及根 check（175 格式/129 代码文件）通过，相关需求、SDD、索引和 Windows 指引同步。仍不承诺任意 YAML 转换或依赖安装失败的事务回滚。
+- 下一步核对已有 --repair-existing 修复入口的预检和失败保护，继续以 Windows 实际使用和原文件保留为主线，不增加预设或业务演示。
