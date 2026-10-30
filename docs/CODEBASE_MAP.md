@@ -51,6 +51,8 @@ integrations.mjs 的 UI 静态导入检测在 generateIntegration 中拒绝已�
 
 同一检测器扩展到 CSS 的已知静态导入及默认插件调用。file-protection 测试验证两框架/两语言/两 CSS 的文件缺失与三种残留、跨 CSS 拒绝、仅新增 UI、注释边界，以及实际 CLI 失败前后根/应用文件保持。
 
+build-policy.mjs 的 preflightUiBuildPolicy 只读检查 Ant Design Vue 构建策略，由 preflightIntegrations 调用；prepareUiBuildPolicy 显式重新校验后增量写入。build-policy/file-protection 测试覆盖只读、已有规则、策略目录/链接及 TS/JS 工作区 CLI 冲突前拒绝。
+
 UI/CSS 见 integrations；大屏核心见 packages/screen；三引擎见 packages/three、cesium、babylon；.adui 与 env 模型构建见 packages/model-security。当前使用无服务端模型保护，未创建生产授权服务，也不列为 Windows 本地交付阻塞项。
 
 ## P4 Monorepo 多应用

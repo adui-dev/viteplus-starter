@@ -1,9 +1,59 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtemp, mkdir, writeFile, readFile, rm } from "node:fs/promises";
+import { mkdtemp, mkdir, writeFile, readFile, rm, stat, symlink } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { denyCoreJsBuild, prepareUiBuildPolicy } from "../src/build-policy.mjs";
+import {
+  denyCoreJsBuild,
+  prepareUiBuildPolicy,
+  preflightUiBuildPolicy,
+} from "../src/build-policy.mjs";
+
+test("构建策略只读预检保留内容与 mtime，显式准备时才增量写入", async (t) => {
+  const root = await mkdtemp(join(tmpdir(), "ui-policy-preflight-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  const app = join(root, "apps/viewer");
+  await mkdir(app, { recursive: true });
+  const file = join(root, "pnpm-workspace.yaml");
+  const source =
+    "packages:\n  - apps/*\ncatalog:\n  vite: catalog-value\nallowBuilds:\n  esbuild: true\n";
+  await writeFile(file, source);
+  const before = (await stat(file)).mtimeMs;
+  const options = { framework: "vue", ui: "antd" };
+  const plan = await preflightUiBuildPolicy(app, options);
+  assert.equal(plan.file, file);
+  assert.match(plan.next, /core-js: false/);
+  assert.equal(await readFile(file, "utf8"), source);
+  assert.equal((await stat(file)).mtimeMs, before);
+  assert.equal(await prepareUiBuildPolicy(app, options), file);
+  const installed = await readFile(file, "utf8");
+  assert.match(installed, /esbuild: true/);
+  assert.match(installed, /vite: catalog-value/);
+  const after = (await stat(file)).mtimeMs;
+  assert.equal(await prepareUiBuildPolicy(app, options), null);
+  assert.equal((await stat(file)).mtimeMs, after);
+  for (const choice of ["true", "false"]) {
+    const chosen = "allowBuilds:\n  core-js: " + choice + "\n";
+    await writeFile(file, chosen);
+    assert.equal((await preflightUiBuildPolicy(app, options)).next, chosen);
+  }
+});
+
+test("策略目录及链接拒绝，非 Ant Design Vue 不读取或修改策略", async (t) => {
+  const root = await mkdtemp(join(tmpdir(), "ui-policy-path-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  const file = join(root, "pnpm-workspace.yaml");
+  const options = { framework: "vue", ui: "antd" };
+  await mkdir(file);
+  await assert.rejects(preflightUiBuildPolicy(root, options), /不是普通文件/);
+  await rm(file, { recursive: true });
+  const original = join(root, "original.yaml");
+  await writeFile(original, "allowBuilds: {}\n");
+  await symlink(original, file);
+  await assert.rejects(preflightUiBuildPolicy(root, options), /符号链接|junction/);
+  assert.equal(await preflightUiBuildPolicy(root, { framework: "react", ui: "antd" }), null);
+  assert.equal(await readFile(original, "utf8"), "allowBuilds: {}\n");
+});
 test("只补充 core-js:false，保留 catalog、其他规则及用户已有选择", () => {
   const original = "catalog:\n  vite: npm:@voidzero-dev/vite-plus-core@1.4.0\n";
   const added = denyCoreJsBuild(original);

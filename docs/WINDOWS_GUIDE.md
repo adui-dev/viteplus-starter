@@ -139,6 +139,8 @@ CSS 为 none 时也会检查 UI 是否已有插件/样式引用，重复或部�
 
 CSS 配置文件丢失时，也不能直接重跑补装：若 Vite 或正式入口仍保留 UnoCSS/Tailwind 的已知引用，命令会在“补装预检”阶段拒绝。先依据 Git diff 和备份人工核对、恢复配置；不要通过删除更多文件来绕过检查。已有 CSS 仅新增 UI 时使用 --css none；此入口不自动修复部分 CSS 配置或切换 CSS 框架。
 
+Ant Design Vue 的 allowBuilds 策略冲突同样在“补装预检”阶段拒绝，报错会给出实际 pnpm-workspace.yaml 路径；先人工核对该文件，不删除自定义规则重试。已明确的 core-js:true/false 保留，只有缺失时才在实际集成阶段补充 core-js:false；不会自动放开全局构建脚本权限。
+
 ## 按需启用大屏、引擎和模型保护
 
 下面是另一种独立新建选择，目标 my-three-app 须不存在：

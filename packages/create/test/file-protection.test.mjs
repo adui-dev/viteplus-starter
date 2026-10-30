@@ -79,6 +79,56 @@ const uiSelections = [
   ["react", "tdesign"],
 ];
 
+test("Ant Design Vue 构建策略冲突在补装预检拒绝，根与应用文件不写入", async (t) => {
+  const cli = fileURLToPath(new URL("../bin/cli.mjs", import.meta.url));
+  const env = Object.fromEntries(
+    Object.entries(process.env).filter(([key]) => key.toUpperCase() !== "PATH"),
+  );
+  env.PATH = "";
+  for (const language of ["ts", "js"])
+    for (const policy of [
+      "allowBuilds: {}\n",
+      "allowBuilds: *custom\n",
+      "allowBuilds:\n  core-js: null\n",
+      "allowBuilds:\n  'core-js@3': false\n",
+      "allowBuilds:\n  core-js: false\n  core-js: true\n",
+    ]) {
+      const f = await fixture(t, "vue", language, true);
+      await writeFile(join(f.app, "vite.config.js"), "export default defineConfig({plugins:[]})");
+      const policyPath = join(f.root, "pnpm-workspace.yaml");
+      await writeFile(policyPath, "packages:\n  - apps/*\n" + policy);
+      const before = await snapshot(f.root);
+      const result = spawnSync(
+        process.execPath,
+        [
+          cli,
+          "--workspace",
+          f.root,
+          "--name",
+          "app",
+          "--type",
+          "application",
+          "--framework",
+          "vue",
+          "--language",
+          language,
+          "--ui",
+          "antd",
+          "--css",
+          "none",
+          "--apply-existing",
+        ],
+        { cwd: f.root, env, encoding: "utf8", timeout: 10_000 },
+      );
+      assert.equal(result.status, 1, result.stderr);
+      assert.match(result.stderr, /阶段：补装预检/);
+      assert.match(result.stderr, /已完成：无/);
+      assert.match(result.stderr, /构建策略预检失败/);
+      assert.ok(result.stderr.includes(policyPath));
+      assert.deepEqual(await snapshot(f.root), before);
+    }
+});
+
 test("CSS 文件缺失但插件、样式或已知调用残留时拒绝补装，首次安装仍可用", async (t) => {
   for (const framework of ["vue", "react"])
     for (const language of ["ts", "js"])

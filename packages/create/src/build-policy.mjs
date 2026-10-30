@@ -31,21 +31,32 @@ export function denyCoreJsBuild(source) {
   lines.splice(end, 0, "  core-js: false");
   return lines.join("\n");
 }
-export async function prepareUiBuildPolicy(directory, options) {
+export async function preflightUiBuildPolicy(directory, options) {
   if (options.framework !== "vue" || options.ui !== "antd") return null;
   for (let current = resolve(directory); ; current = dirname(current)) {
     const file = join(current, "pnpm-workspace.yaml");
-    if (await inspectPath(file)) {
-      const source = await readFile(file, "utf8"),
-        next = denyCoreJsBuild(source);
-      if (next === source) return null;
-      await inspectPath(file);
-      if ((await readFile(file, "utf8")) !== source)
-        throw new Error("构建策略在预检后变化，拒绝覆盖");
-      await writeFile(file, next);
-      return file;
+    const info = await inspectPath(file, "构建策略");
+    if (info) {
+      if (!info.isFile()) throw new Error("构建策略文件不是普通文件：" + file);
+      const source = await readFile(file, "utf8");
+      try {
+        return { file, source, next: denyCoreJsBuild(source) };
+      } catch (cause) {
+        throw new Error("构建策略预检失败：" + file + "；" + cause.message, { cause });
+      }
     }
     if (dirname(current) === current) break;
   }
   throw new Error("Ant Design Vue 需要可确认的 pnpm-workspace.yaml 构建策略");
+}
+
+export async function prepareUiBuildPolicy(directory, options) {
+  const context = await preflightUiBuildPolicy(directory, options);
+  if (!context || context.next === context.source) return null;
+  const { file, source, next } = context;
+  await inspectPath(file, "构建策略");
+  if ((await readFile(file, "utf8")) !== source)
+    throw new Error("构建策略在预检后变化，拒绝覆盖：" + file);
+  await writeFile(file, next);
+  return file;
 }

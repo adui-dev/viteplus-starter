@@ -2,7 +2,7 @@ import { spawnSync } from "node:child_process";
 import { readFile, rename, writeFile } from "node:fs/promises";
 import { join, relative, dirname, basename } from "node:path";
 import { inspectPath } from "./safe-paths.mjs";
-import { prepareUiBuildPolicy } from "./build-policy.mjs";
+import { prepareUiBuildPolicy, preflightUiBuildPolicy } from "./build-policy.mjs";
 import { injectStarterPlugins, repairLegacyStarterConfig } from "./vite-config.mjs";
 import { ignoreGeneratedVueComponentDeclarations } from "./format-config.mjs";
 
@@ -230,6 +230,7 @@ export async function preflightIntegrations(directory, options) {
     }
   }
   await preflight();
+  await preflightUiBuildPolicy(directory, options);
   return { plan, configPath, mainPath, generated, config, preflight };
 }
 
