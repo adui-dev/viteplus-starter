@@ -112,3 +112,5 @@ node packages/create/bin/cli.mjs --execute-recovery D:/Workspace/adui-studio/adu
 - 任一步失败即停，保留部分输出和依赖现场，报告失败阶段与已返回成功的子进程。该记录不等于应用检查/构建通过。失败后重新运行可能被部分应用阻塞，必须先处理现场。
 
 执行结果包含 completed、skipped 和 validation。结构检查不替代 vp check、完整 build 和适用的浏览器验收。全部应用已存在且结构检查通过时，重复调用只返回跳过结果；没有删除、覆盖式补装、自动回滚或恢复状态文件。原 --plan-recovery 仍是只读模式。
+
+恢复子进程失败时，最外层 CLI 保留其有效非零退出码；信号退出、启动异常或没有有效码的失败使用 1，可通过 PowerShell 的 $LASTEXITCODE 查看。若部分创建后再次执行因人工阻塞而返回 1，应按本次失败阶段处理，不视为原失败已解决；命令不会记住旧退出码或自动重试。

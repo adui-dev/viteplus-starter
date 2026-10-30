@@ -1,8 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdtemp, mkdir, writeFile, readFile, readdir, rm } from "node:fs/promises";
+import { mkdtemp, mkdir, writeFile, readFile, readdir, lstat, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, dirname, basename, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 import { executeWorkspaceRecovery } from "../src/workspace-recovery-execute.mjs";
@@ -12,6 +12,8 @@ import { planUiSmoke } from "../src/ui-smoke.mjs";
 async function fixture(t, uiSmoke = false) {
   const base = await mkdtemp(join(tmpdir(), "adui-execute-")),
     root = join(base, "repo");
+  assert.equal(dirname(resolve(base)), resolve(tmpdir()));
+  assert.ok(basename(base).startsWith("adui-execute-"));
   t.after(() => rm(base, { recursive: true, force: true }));
   await mkdir(join(root, "apps"), { recursive: true });
   await writeFile(
@@ -163,3 +165,112 @@ test("子进程即使返回成功，缺失结构仍停止；CLI 缺配置/混写
   }
   assert.deepEqual(await readdir(join(root, "apps")), ["existing"]);
 });
+
+test("恢复创建与 UI 阶段保留有效退出码，拒绝无效码并保留错误上下文", async (t) => {
+  for (const [ui, code] of [
+    [false, 7],
+    [true, 9],
+    ...[undefined, 0, -1, 1.5, "9"].map((code) => [false, code]),
+  ]) {
+    const { root, config } = await fixture(t, ui);
+    const cause = Object.assign(new Error("controlled failure"), { exitCode: code });
+    const calls = [];
+    await assert.rejects(
+      executeWorkspaceRecovery(
+        root,
+        config,
+        async (step) => {
+          calls.push(step.label);
+          if (ui && step.label === "新建应用 first") await createApp(step.target, "antd");
+          else throw cause;
+        },
+        quiet,
+      ),
+      (error) => {
+        assert.equal(error.cause, cause);
+        assert.equal(error.exitCode, [7, 9].includes(code) ? code : undefined);
+        assert.equal(error.failed, ui ? "UI 验收页 first" : "新建应用 first");
+        assert.deepEqual(error.completed, ui ? ["新建应用 first"] : []);
+        assert.deepEqual(error.skipped, ["existing"]);
+        return true;
+      },
+    );
+    assert.deepEqual(calls, ui ? ["新建应用 first", "UI 验收页 first"] : ["新建应用 first"]);
+    assert.ok(!(await readdir(join(root, "apps"))).includes("second"));
+  }
+});
+
+test(
+  "Windows 恢复 CLI 保留应用退出码，已有应用不变且部分失败重试阻塞",
+  { skip: process.platform !== "win32" },
+  async (t) => {
+    const { root, config } = await fixture(t);
+    const cli = fileURLToPath(new URL("../bin/cli.mjs", import.meta.url));
+    const shim = join(dirname(root), "shims");
+    await mkdir(shim);
+    const fake = join(shim, "fake-vp.mjs"),
+      log = join(shim, "calls.jsonl");
+    await writeFile(
+      fake,
+      `
+import { mkdirSync, writeFileSync, appendFileSync } from "node:fs";
+import { join, resolve } from "node:path";
+const args=process.argv.slice(2);
+if(args[1]!=="vite:application") throw new Error("unexpected command");
+appendFileSync(${JSON.stringify(log)},JSON.stringify(args)+"\\n");
+const target=resolve(args[args.indexOf("--directory")+1]);
+mkdirSync(target,{recursive:true});
+writeFileSync(join(target,"keep.txt"),"partial");
+process.exit(13);
+`,
+    );
+    await writeFile(join(shim, "vp.cmd"), `@echo off\r\n"${process.execPath}" "${fake}" %*\r\n`);
+    const paths = [
+      config,
+      ...[
+        "package.json",
+        "pnpm-workspace.yaml",
+        "vite.config.ts",
+        "apps/existing/package.json",
+        "apps/existing/index.html",
+        "apps/existing/src/main.jsx",
+        "apps/existing/vite.config.js",
+      ].map((path) => join(root, path)),
+    ];
+    const snapshot = () =>
+      Promise.all(
+        paths.map(async (path) => ({
+          path,
+          mtime: (await lstat(path)).mtimeMs,
+          content: await readFile(path),
+        })),
+      );
+    const before = await snapshot();
+    const env = {
+      ...Object.fromEntries(
+        Object.entries(process.env).filter(([key]) => key.toUpperCase() !== "PATH"),
+      ),
+      PATH: shim,
+    };
+    const run = () =>
+      spawnSync(process.execPath, [cli, "--execute-recovery", root, "--config", config], {
+        env,
+        encoding: "utf8",
+        timeout: 10000,
+      });
+    const failed = run();
+    assert.equal(failed.status, 13, failed.stderr);
+    assert.match(failed.stderr, /恢复执行失败：新建应用 first/);
+    assert.match(failed.stderr, /已完成子进程：无/);
+    const firstLog = await readFile(log, "utf8");
+    const args = JSON.parse(firstLog.trim());
+    assert.equal(args[args.indexOf("--directory") + 1], "apps/first");
+    assert.deepEqual((await readdir(join(root, "apps"))).sort(), ["existing", "first"]);
+    assert.equal(await readFile(join(root, "apps/first/keep.txt"), "utf8"), "partial");
+    const retry = run();
+    assert.equal(retry.status, 1, retry.stderr);
+    assert.match(retry.stderr, /人工阻塞/);
+    assert.equal(await readFile(log, "utf8"), firstLog);
+    assert.deepEqual(await snapshot(), before);
+  },
+);

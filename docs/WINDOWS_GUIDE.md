@@ -123,6 +123,8 @@ node $starterCli --execute-recovery $workspacePath --config $batchConfig
 
 已有应用跳过；部分完成应用阻塞，任一步失败即停并保留现场。重复执行完整配置应 completed=[]，应用列入 skipped。结构通过与子进程成功不代替完整 ready/build 或浏览器验收。不要为重试删除未知文件。
 
+execute-recovery 保留失败子进程的有效非零退出码，PowerShell 通过 $LASTEXITCODE 查看；没有有效码或初始人工阻塞时返回 1。先核对本次报告的阶段和现场，部分创建后的重复调用可能在初始预检阻塞，不会自动沿用旧退出码或覆盖应用。
+
 已有普通应用可单独补齐 normalize 静态样式，在父目录运行以下命令，不需要安装依赖：
 
 ```powershell

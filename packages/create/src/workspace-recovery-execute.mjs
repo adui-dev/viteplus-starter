@@ -12,7 +12,9 @@ function run(step) {
   const result = spawnSync(process.execPath, step.args, { cwd: step.cwd, stdio: "inherit" });
   if (result.error) throw result.error;
   if (result.status !== 0)
-    throw new Error("子进程失败：" + (result.signal ?? result.status ?? "unknown"));
+    throw Object.assign(new Error("子进程失败：" + (result.signal ?? result.status ?? "unknown")), {
+      exitCode: result.status ?? 1,
+    });
 }
 
 export async function executeWorkspaceRecovery(
@@ -82,6 +84,7 @@ export async function executeWorkspaceRecovery(
       `恢复执行失败：${phase}；${cause?.message ?? String(cause)}\n工作区：${initial.root}\n已完成子进程：${completed.join("、") || "无"}\n${recoveryAdvice}`,
       { cause },
     );
+    if (Number.isInteger(cause?.exitCode) && cause.exitCode > 0) error.exitCode = cause.exitCode;
     Object.assign(error, {
       failed: phase,
       completed: [...completed],

@@ -269,6 +269,8 @@ workspace-recovery-execute 仅读取一次校验后的原配置，使用 planRec
 
 创建后以同一应用 uiSmoke=false 核对基础/预设结构，再通过提取的只读 preflightUiSmoke 检查验收页依赖、配置及文件冲突；CLI 实际写入时仍重检并使用原文件保护。验收页创建后再核对完整结构。已存在应用完全跳过；completed 记录成功返回的子进程，后续结构失败仍作为失败报告，不称为构建成功。注入 runner 仅用于受控生命周期验证，CLI 不提供自定义执行器。
 
+恢复 run 将子进程 status 放入 error.exitCode，executeWorkspaceRecovery 包装错误时只复制有效正整数，沿原 CLI 出口返回；无有效码的失败回退为 1。failed/completed/skipped、原始 cause 和现场保护说明保留。部分失败导致下次初始预检阻塞时返回 1，不将先前子进程退出码当作恢复状态保存，也不增加自动重试或覆盖路径。
+
 ## V1 示例与文档检查
 
 verify-examples 在仓库外新建独立临时目录，逐个以 Node argv 调用真实 CLI --config --dry-run，检查官方 Monorepo 阶段、应用数量及临时目录无输出，最后清理临时目录；输出计划计数与 actualBuilds=0。没有安装、构建或发布路径。node --test 同步覆盖这项示例兼容检查。
