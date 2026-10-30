@@ -25,6 +25,7 @@ import {
 } from "../src/model-protection.mjs";
 import {
   applyIntegrations,
+  preflightIntegrations,
   planIntegrations,
   repairExistingIntegrations,
 } from "../src/integrations.mjs";
@@ -253,20 +254,18 @@ async function main() {
     if (args.dryRun) throw new Error("--apply-existing 与 --dry-run 不能同时使用");
     if (options.type !== "application") throw new Error("只能向已存在的 Application 补装插件");
     if (!existsSync(target)) throw new Error("目标目录不存在，无法补装");
-    const manifest = JSON.parse(await readFile(join(target, "package.json"), "utf8"));
-    const dependencies = { ...manifest.dependencies, ...manifest.devDependencies };
-    if (!dependencies["vite-plus"] || !dependencies[options.framework]) {
-      throw new Error("现有目录不是所选 Vite+ Vue/React 应用，拒绝修改");
-    }
-    await preflightBaseStyles(target, options);
-    if (options.screen) await preflightScreenPreset(target, await planScreenPreset(options));
-    if (options.engine === "cesium") await preflightCesium(target, options, !options.screen);
-    if (options.engine === "babylon") await preflightBabylon(target, options, !options.screen);
-    if (options.engine === "three") {
-      await preflightThreeSmoke(target, await planThreeSmoke(options));
-      await validateThreeTarget(target, options, !options.screen);
-    }
-    await preflightModelProtection(target, options);
+    await stage("补装预检", async () => {
+      await preflightBaseStyles(target, options);
+      await preflightIntegrations(target, options);
+      if (options.screen) await preflightScreenPreset(target, await planScreenPreset(options));
+      if (options.engine === "cesium") await preflightCesium(target, options, !options.screen);
+      if (options.engine === "babylon") await preflightBabylon(target, options, !options.screen);
+      if (options.engine === "three") {
+        await preflightThreeSmoke(target, await planThreeSmoke(options));
+        await validateThreeTarget(target, options, !options.screen);
+      }
+      await preflightModelProtection(target, options);
+    });
     if (workspace) await stage("工作区依赖准备", () => prepareWorkspacePeerExtensions(workspace));
     await stage("UI/CSS 集成", () => applyIntegrations(target, options));
     await stage("基础样式集成", () => addBaseStyles(target, options));

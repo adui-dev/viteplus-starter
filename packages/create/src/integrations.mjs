@@ -156,14 +156,9 @@ async function resolveApplicationPaths(directory, options) {
   return { configPath: existing[0], mainPath };
 }
 
-export async function applyIntegrations(
-  directory,
-  options,
-  installer = install,
-  formatter = format,
-) {
+export async function preflightIntegrations(directory, options) {
   const plan = planIntegrations(options);
-  if (!plan.dependencies.length && !plan.devDependencies.length) return false;
+  if (!plan.dependencies.length && !plan.devDependencies.length) return null;
   const { configPath, mainPath } = await resolveApplicationPaths(directory, options);
   const [config, entry] = await Promise.all([
     readFile(configPath, "utf8"),
@@ -185,6 +180,18 @@ export async function applyIntegrations(
     }
   }
   await preflight();
+  return { plan, configPath, mainPath, generated, config, preflight };
+}
+
+export async function applyIntegrations(
+  directory,
+  options,
+  installer = install,
+  formatter = format,
+) {
+  const context = await preflightIntegrations(directory, options);
+  if (!context) return false;
+  const { plan, configPath, mainPath, generated, config, preflight } = context;
   const policyPath = await prepareUiBuildPolicy(directory, options);
   await installer(directory, plan.dependencies, false);
   await installer(directory, plan.devDependencies, true);

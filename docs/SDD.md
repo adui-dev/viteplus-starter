@@ -30,6 +30,7 @@ assets 保存指定 URL 的 8.0.1 固定快照、MIT 许可和来源/SHA256 记�
 
 - `generateIntegration` 在 `vite.config.ts` 内联 Vite 插件的 import 和工厂调用，避免 `starter.plugins.ts` 跨文件导入；兼容普通数组、`lazyPlugins` 及无插件字段的 Vite+ 配置。
 - `applyIntegrations` 在写入后只格式化本次修改的应用文件；共享根构建策略在其所属目录单独格式化，不向应用格式化命令传递父目录路径，不得跳过失败。
+- `preflightIntegrations` 提取 UI/CSS 计划、入口/唯一 Vite 配置识别、配置生成与输出占用检查，整个过程只读。--apply-existing 在“补装预检”中与基础样式、所选预设预检一起调用，全部通过后才写工作区 peer 配置；应用清单校验复用基础样式预检，不再提前裸 JSON.parse。applyIntegrations 自身仍重新预检，安装完成后再核对捕获的入口/配置内容、路径和输出占用，保留已有失败保护。
 - `--repair-existing` 仅用于符合已知 Starter 旧格式的现有 Vue/React Application：先验证项目类型、旧插件文件及配置形态，再替换旧导入并将 `starter.plugins.ts` 备份为 `starter.plugins.ts.bak`，随后格式化；**不安装依赖，也不重建项目**。
 - 此功能不是通用任意 TypeScript 配置的转换器，无法识别的结构必须拒绝修改；旧项目 Windows 修复证据见 [项目状态](PROJECT_CONTEXT.md)，不自动升级其他旧快照。
 

@@ -133,6 +133,8 @@ node $starterCli --name my-react-app --type application --framework react --lang
 
 已知基础样式已存在时不会重复写入；文件内容被修改、同名占用或部分完成时拒绝覆盖。--apply-existing 安装可选 UI/CSS 等预设仍要求确认相应预设尚未写入；--repair-existing 只修已知旧 starter.plugins 引用。二者不是通用覆盖式恢复入口，详见 [Harness](HARNESS.md)。
 
+补装的已知配置和输出冲突会在“补装预检”阶段报告，UI/CSS 预检通过后才准备工作区 peer 配置及安装依赖。遇到未知 Vite 插件写法或已有输出时先检查报错对应文件，不删除未知文件重试；安装阶段或其他后续失败仍可能保留已发生的依赖/配置变化。
+
 ## 按需启用大屏、引擎和模型保护
 
 下面是另一种独立新建选择，目标 my-three-app 须不存在：

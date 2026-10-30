@@ -45,6 +45,8 @@ options.mjs 的 validateProjectName 统一安全名称和 Windows 保留名称�
 
 create CLI 与 recovery.mjs/workspace-recovery-execute.mjs 的后续提示区分应用完整脚本 vp run build 和工作区根 vp run ready；不自动运行提示中的命令，不修改用户 scripts。verify-*-build 的专用 --config 构建独立维护。
 
+integrations.mjs 的 preflightIntegrations 提供只读 UI/CSS 预检；CLI 的“补装预检”先执行它，再写工作区 peer 配置。file-protection.test.mjs 验证合法四入口预检不写入、未知 Vite/输出占用前拒绝且根配置保持，以及清单错误定位和原文不回显。
+
 UI/CSS 见 integrations；大屏核心见 packages/screen；三引擎见 packages/three、cesium、babylon；.adui 与 env 模型构建见 packages/model-security。当前使用无服务端模型保护，未创建生产授权服务，也不列为 Windows 本地交付阻塞项。
 
 ## P4 Monorepo 多应用
