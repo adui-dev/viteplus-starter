@@ -9,7 +9,9 @@ node .\viteplus-starter\packages\create\bin\cli.mjs --name starter-vue-p3 --type
 node .\viteplus-starter\packages\create\bin\cli.mjs --name starter-react-p3 --type application --framework react --ui antd --css tailwindcss --repair-existing
 ```
 
-上述命令不重新安装依赖，备份旧插件文件为 `starter.plugins.ts.bak`，仅对 `vite.config.ts` 执行 `vp fmt vite.config.ts --write`。再分别在两个应用执行 `vp check` 和 `vp build`。用户已在 Windows 完成旧项目修复：React `vp check` 直接通过、Vue `vp check --fix` 处理 `src/components.d.ts` 后通过，两组 `vp build` 均通过。
+上述命令不重新安装依赖，备份旧插件文件为 `starter.plugins.ts.bak`，仅对 `vite.config.ts` 执行 `vp fmt vite.config.ts --write`。再分别在两个应用执行 `vp check` 和 `vp run build`。用户已在 Windows 完成旧项目修复：React `vp check` 直接通过、Vue `vp check --fix` 处理 `src/components.d.ts` 后通过，两组 `vp build` 均通过。
+
+当前应用构建一律按 package.json 的完整 build 脚本验证，即 vp run build，TS 模板会执行 vue-tsc/tsc；vp build 是 Vite 内置构建，不能代替脚本中的类型检查。官方工作区根使用 vp run ready。失败提示里的命令须在修复现场后于对应目录执行；专项 vp build --config 验收保留专用入口，并另跑应用完整脚本。
 
 本项目**不使用 CI/CD**。所有检查由开发者本地手动执行。
 
@@ -32,7 +34,7 @@ node .\viteplus-starter\packages\create\bin\cli.mjs --name react-ts-check --type
 node .\viteplus-starter\packages\create\bin\cli.mjs --name react-js-check --type application --framework react --language js --ui antd --css tailwindcss
 ```
 
-进入每个新项目执行 `vp check` 和 `vp build`，并确认 Vue JS 项目生成 `src/main.js`、React JS 项目生成 `src/main.jsx`；JavaScript 项目不应因生成器产生 TypeScript 专属的组件声明。其中 Vue/React JavaScript + UI/CSS 两组已由用户在 Windows 实机创建，并直接通过 `vp build`、`vp check`。其余指定新目录的完整矩阵及实际组件渲染仍待验证。
+进入每个新项目执行 `vp check` 和 `vp run build`，并确认 Vue JS 项目生成 `src/main.js`、React JS 项目生成 `src/main.jsx`；JavaScript 项目不应因生成器产生 TypeScript 专属的组件声明。其中 Vue/React JavaScript + UI/CSS 两组已由用户在 Windows 实机创建，并直接通过 `vp build`、`vp check`。其余指定新目录的完整矩阵及实际组件渲染仍待验证。
 
 ## 环境
 
@@ -71,7 +73,7 @@ node packages/create/bin/cli.mjs --name demo-vue --type application --framework 
 node packages/create/bin/cli.mjs --name demo-react --type application --framework react
 ```
 
-在两个生成目录的 package.json 分别核对 Vue/React 依赖，再运行 `vp check`、`vp build` 和 `vp dev`。Monorepo 使用 `--type monorepo` 单独验证。目标目录必须不存在；创建完成后在生成项目中运行官方提供的本地检查、测试与构建命令。测试结束前不要删除非本工具创建的目录。
+在两个生成目录的 package.json 分别核对 Vue/React 依赖，再运行 `vp check`、`vp run build` 和 `vp dev`。Monorepo 使用 `--type monorepo` 单独验证，在根运行 `vp run ready`。目标目录必须不存在；创建完成后在生成项目中运行官方提供的本地检查、测试与构建命令。测试结束前不要删除非本工具创建的目录。
 
 ## UI/CSS 真实集成验收（待运行）
 
@@ -82,7 +84,7 @@ node .\viteplus-starter\packages\create\bin\cli.mjs --name p3-vue --type applica
 node .\viteplus-starter\packages\create\bin\cli.mjs --name p3-react --type application --framework react --ui antd --css tailwindcss
 ```
 
-分别进入两个目录执行 `vp check`、`vp build` 和 `vp dev`，确认组件库样式、`vite.config.ts` 中的插件配置、`uno.config.ts` 或 `src/starter.tailwind.css` 可用。若安装依赖失败，项目目录可能已创建；检查后处理，禁止在生成器里自动删除现有用户文件。
+分别进入两个目录执行 `vp check`、`vp run build` 和 `vp dev`，确认组件库样式、`vite.config.ts` 中的插件配置、`uno.config.ts` 或 `src/starter.tailwind.css` 可用。若安装依赖失败，项目目录可能已创建；检查后处理，禁止在生成器里自动删除现有用户文件。
 
 ## 处理官方模板生成成功但集成失败
 
@@ -92,7 +94,7 @@ node .\viteplus-starter\packages\create\bin\cli.mjs --name p3-react --type appli
 node .\viteplus-starter\packages\create\bin\cli.mjs --name starter-vue-p3 --type application --framework vue --ui tdesign --css unocss --apply-existing
 cd starter-vue-p3
 vp check
-vp build
+vp run build
 ```
 
 补装会先检查目录、Vite+ 和 Vue/React 类型，以及已有 Starter 配置。失败时保留现有文件；并不提供可保证回滚所有已安装依赖的事务能力。
@@ -105,7 +107,7 @@ vp build
 
 新版 Vue UI 项目在 Vite+ `vite.config.ts` 写入 `fmt.ignorePatterns: ['src/components.d.ts']`（与现有规则合并）。这只排除自动生成类型声明的格式检查，TypeScript 仍应照常执行。
 
-对**新创建**的 Vue + UI 项目，先执行 `vp build` 触发声明生成，再运行 `vp check`；不应再次因 `src/components.d.ts` 格式失败。用户已经修好的旧项目不需要重新执行 `--repair-existing`，如以后再次出现该问题，可手动将路径加入现有 `fmt.ignorePatterns`。
+对**新创建**的 Vue + UI 项目，执行 `vp run build` 进行完整构建并触发声明生成，再运行 `vp check`；不应再次因 `src/components.d.ts` 格式失败。用户已经修好的旧项目不需要重新执行 `--repair-existing`，如以后再次出现该问题，可手动将路径加入现有 `fmt.ignorePatterns`。
 
 ## 已知环境限制
 

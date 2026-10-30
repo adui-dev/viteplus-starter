@@ -43,6 +43,8 @@
 
 options.mjs 的 validateProjectName 统一安全名称和 Windows 保留名称拒绝；options/cli/batch 测试覆盖保留名、相似合法名、交互重试及真实 CLI 在创建/维护前退出且不写目标。batch.mjs 复用公共校验，不单独维护保留名列表。
 
+create CLI 与 recovery.mjs/workspace-recovery-execute.mjs 的后续提示区分应用完整脚本 vp run build 和工作区根 vp run ready；不自动运行提示中的命令，不修改用户 scripts。verify-*-build 的专用 --config 构建独立维护。
+
 UI/CSS 见 integrations；大屏核心见 packages/screen；三引擎见 packages/three、cesium、babylon；.adui 与 env 模型构建见 packages/model-security。当前使用无服务端模型保护，未创建生产授权服务，也不列为 Windows 本地交付阻塞项。
 
 ## P4 Monorepo 多应用

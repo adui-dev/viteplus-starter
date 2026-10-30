@@ -95,6 +95,7 @@ export async function executeWorkspaceRecovery(
     mode: "create-missing-only",
     completed,
     skipped,
-    validation: "已进行结构检查；请另行运行 vp check、完整 build 及适用的页面验收。",
+    validation:
+      "已进行结构检查；请在各应用目录另行运行 vp check、vp run build 及适用的页面验收；工作区根使用 vp run ready。",
   };
 }

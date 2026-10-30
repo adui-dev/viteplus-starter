@@ -77,7 +77,7 @@ node .\viteplus-starter\packages\create\bin\cli.mjs --name starter-vue-p3 --type
 node .\viteplus-starter\packages\create\bin\cli.mjs --name starter-react-p3 --type application --framework react --ui antd --css tailwindcss --repair-existing
 ```
 
-修复会将旧插件文件备份为 `starter.plugins.ts.bak`，且只格式化 `vite.config.ts`。分别在项目目录执行 `vp check` 和 `vp build`。**两组旧项目已在 Windows 实机修复并通过构建及类型检查；Vue 首次需格式化自动生成的 `src/components.d.ts`。**
+修复会将旧插件文件备份为 `starter.plugins.ts.bak`，且只格式化 `vite.config.ts`。分别在应用目录执行 `vp check` 和 `vp run build`，后者运行 package.json 的完整构建脚本，包含模板提供的类型检查。**两组旧项目已在 Windows 实机修复并通过构建及类型检查；Vue 首次需格式化自动生成的 `src/components.d.ts`。**
 
 基于 **Vite+ 官方模板**的多框架项目初始化与可选功能集成工具。
 

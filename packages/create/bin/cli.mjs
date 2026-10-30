@@ -214,7 +214,9 @@ async function main() {
     const result = await stage("Three 集成", () => addThreeSmoke(target, options));
     await finishWorkspaceIntegration();
     console.log("Three.js 验收页已生成：" + result.previewPath);
-    console.log("运行 vp check、vp dev；验证真实 WebGL、DPR、拾取与卸载清理");
+    console.log(
+      "进入应用目录运行 vp check 和 vp run build；独立页运行 vp dev，验证真实 WebGL、DPR、拾取与卸载清理",
+    );
     return;
   }
   if (args.uiSmoke) {
@@ -224,7 +226,10 @@ async function main() {
     if (!existsSync(target)) throw new Error("目标目录不存在，请先创建 Application");
     const result = await stage("UI 验收页", () => addUiSmoke(target, options));
     console.log("UI Smoke 验证页已生成：" + result.previewPath);
-    console.log("进入项目运行 vp dev，访问 http://localhost:5173" + result.previewPath);
+    console.log(
+      "进入应用目录运行 vp check 和 vp run build；独立页运行 vp dev，使用终端地址访问 " +
+        result.previewPath,
+    );
     console.log("确认组件按钮可见、点击计数增加，以及 CSS 区域显示预期颜色");
     return;
   }
@@ -241,7 +246,7 @@ async function main() {
       throw new Error("目标项目与所选 Vue/React 不匹配，拒绝修复");
     }
     await stage("旧配置修复", () => repairExistingIntegrations(target, options));
-    console.log("旧版插件引用修复完成，旧文件已备份，请运行 vp check 和 vp build");
+    console.log("旧版插件引用修复完成，旧文件已备份，请在应用目录运行 vp check 和 vp run build");
     return;
   }
   if (args.applyExisting) {
@@ -272,7 +277,7 @@ async function main() {
       await stage("Babylon 集成", () => addBabylon(target, options));
     await stage("模型保护集成", () => addModelProtection(target, options));
     await finishWorkspaceIntegration();
-    console.log("补装完成，请在项目中执行 vp check 和 vp build");
+    console.log("补装完成，请在应用目录执行 vp check 和 vp run build");
     return;
   }
   if (existsSync(target) && !args.dryRun) {
@@ -355,7 +360,7 @@ async function main() {
   ) {
     console.log("正在安装和配置所选 UI/CSS 插件...");
     await stage("UI/CSS 集成", () => applyIntegrations(target, options));
-    console.log("UI/CSS 插件配置已写入，请运行 vp check 和 vp build 验证");
+    console.log("UI/CSS 插件配置已写入，请在应用目录运行 vp check 和 vp run build 验证");
   }
   if (result.status === 0 && options.type === "application")
     await stage("基础样式集成", () => addBaseStyles(target, options));
@@ -383,6 +388,13 @@ async function main() {
     process.exitCode = 1;
   } else if (result.status !== 0) {
     process.exitCode = result.status ?? 1;
+  }
+  if (result.status === 0) {
+    console.log(
+      options.type === "monorepo"
+        ? "创建完成，请在工作区根运行 vp run ready；页面效果仍需浏览器验收"
+        : "创建完成，请在应用目录运行 vp check 和 vp run build；页面效果另用 vp dev 验证",
+    );
   }
 }
 

@@ -51,6 +51,7 @@ assets 保存指定 URL 的 8.0.1 固定快照、MIT 许可和来源/SHA256 记�
 - 交互缺失选项可从终端读取，支持默认值与二次确认；取消时不调用 Vite+；非 TTY 必须显式传参。
 - 已存在目标目录立即拒绝；仅执行白名单参数，不使用用户输入拼接 shell 命令字符串。
 - 委托 `vp` 创建并传递退出状态；Application 向 `vite:application` 转发 `-- --template vue|vue-ts|react|react-ts`。Windows 官方命令的参数仅来自白名单；批量/恢复的 Node 子进程用 argv 传路径。中文、空格路径下的官方创建和恢复已有实测记录。
+- 创建成功、补装、旧配置修复及验收页提示使用应用目录的 vp check/vp run build，Monorepo 根使用 vp run ready。recovery.mjs 失败指引要求先修复现场，再对已完整生成的应用执行完整构建；workspace-recovery-execute 的 validation 保留“仅结构检查”边界并列出实际命令。提示不自动执行这些命令，不更改项目 scripts；专项 --config 构建保持独立。
 
 ## UI/CSS 可选集成
 
