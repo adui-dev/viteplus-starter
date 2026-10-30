@@ -1,6 +1,40 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { buildVpCommand, validateProjectOptions } from "../src/options.mjs";
+import { buildVpCommand, validateProjectName, validateProjectOptions } from "../src/options.mjs";
+
+test("Windows 保留名称在公共入口拒绝，带前后缀的普通名称保留", () => {
+  const reserved = [
+    "con",
+    "prn",
+    "aux",
+    "nul",
+    ...Array.from({ length: 9 }, (_, index) => "com" + (index + 1)),
+    ...Array.from({ length: 9 }, (_, index) => "lpt" + (index + 1)),
+  ];
+  for (const name of reserved) {
+    assert.throws(() => validateProjectName(name), /Windows 保留名称/);
+    for (const options of [
+      { type: "application", framework: "vue" },
+      { type: "application", framework: "react", workspace: "./workspace" },
+      { type: "monorepo" },
+    ])
+      assert.throws(() => buildVpCommand({ ...options, name }), /Windows 保留名称/);
+  }
+  for (const name of [
+    "console",
+    "auxiliary",
+    "null",
+    "con-app",
+    "my-nul",
+    "com1-app",
+    "lpt9-tools",
+    "com10",
+    "lpt10",
+  ]) {
+    assert.equal(validateProjectName(name), name);
+    assert.ok(buildVpCommand({ name, type: "application", framework: "vue" }).args.includes(name));
+  }
+});
 
 test("Vue Application 使用官方 vite:application 和 vue-ts", () => {
   const result = buildVpCommand({ name: "my-vue-app", type: "application", framework: "vue" });

@@ -23,6 +23,8 @@ vp check
 
 逐条确认命令退出码；前一步失败先处理原因。已有未提交修改时先查看 git status，不覆盖用户修改。不要用依赖升级代替冻结安装。父目录可以含中文和空格，项目及应用 name 仍须用安全的小写 kebab-case。
 
+名称须以小写字母开头，最长 64 字符；不能使用 con/prn/aux/nul、com1–com9、lpt1–lpt9 等 [Windows 保留名称](https://learn.microsoft.com/en-us/windows/desktop/fileio/naming-a-file)。例如 con 会在调用官方生成器前被拒绝，con-app、console 可以使用。单应用、工作区、交互及批量配置执行同一规则。
+
 ## 新建单应用
 
 先切换到生成器仓库外；下面每个目标目录必须不存在。Vue 默认 TypeScript，React 示例显式选择 JavaScript：

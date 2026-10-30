@@ -22,16 +22,10 @@ function fields(value, allowed, label) {
   }
 }
 
-function portableName(name) {
-  validateProjectName(name);
-  if (/^(?:con|prn|aux|nul|com[1-9]|lpt[1-9])$/.test(name))
-    throw new Error("不能使用 Windows 保留名称：" + name);
-}
-
 export function validateBatchConfig(input) {
   fields(input, ["version", "name", "apps"], "批量配置");
   if (input.version !== 1) throw new Error("批量配置 version 必须为 1");
-  portableName(input.name);
+  validateProjectName(input.name);
   if (["website", "utils"].includes(input.name))
     throw new Error("工作区名称与官方默认包冲突：" + input.name);
   if (!Array.isArray(input.apps) || input.apps.length < 1 || input.apps.length > 32) {
@@ -56,7 +50,7 @@ export function validateBatchConfig(input) {
       ],
       label,
     );
-    portableName(app.name);
+    validateProjectName(app.name);
     if (names.has(app.name)) throw new Error("应用重名或与工作区/官方默认包冲突：" + app.name);
     names.add(app.name);
     for (const key of ["framework", "language", "ui", "css", "engine", "modelProtection"]) {

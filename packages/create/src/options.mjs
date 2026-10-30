@@ -17,6 +17,9 @@ export function validateProjectName(name) {
   ) {
     throw new Error("项目名只能使用小写字母、数字和中划线，须以字母开头，长度不超过 64");
   }
+  if (/^(?:con|prn|aux|nul|com[1-9]|lpt[1-9])$/.test(name)) {
+    throw new Error("不能使用 Windows 保留名称：" + name);
+  }
   return name;
 }
 

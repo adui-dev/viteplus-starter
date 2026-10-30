@@ -37,7 +37,8 @@ assets 保存指定 URL 的 8.0.1 固定快照、MIT 许可和来源/SHA256 记�
 
 `packages/create/src/options.mjs`:
 
-- `validateProjectOptions({name,type,framework})`：名称限制为安全的小写 kebab-case；Application 强制 vue/react，Monorepo 不接受根框架参数。
+- `validateProjectName(name)`：安全的小写 kebab-case 与 Windows 保留名称统一校验，拒绝 con/prn/aux/nul、com1–com9、lpt1–lpt9 的完整名称；带前后缀的普通名称保持可用。批量根/子应用、选项归一化与交互共用此函数，不在批量模块另设规则。
+- `validateProjectOptions({name,type,framework})`：在目标路径检查、官方命令执行前校验名称；Application 强制 vue/react，Monorepo 不接受根框架参数。
 - `buildVpCommand(options)`：组装 Vite+ 官方模板创建命令，不执行命令。
 
 `packages/create/src/cli-args.mjs`：参数白名单、缺值和重复参数校验。

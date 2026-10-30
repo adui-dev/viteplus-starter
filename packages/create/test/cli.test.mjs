@@ -1,5 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { spawnSync } from "node:child_process";
+import { mkdtemp, readdir, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { parseCliArgs } from "../src/cli-args.mjs";
 import { collectProjectOptions } from "../src/prompts.mjs";
 
@@ -57,6 +62,80 @@ test("输入非法名称后重新输入", async () => {
   assert.equal(result.name, "valid-app");
   assert.equal(result.framework, "react");
   assert.equal(messages.length, 1);
+});
+
+test("交互拒绝 Windows 保留名称后重新询问，普通名称仍可确认", async () => {
+  const messages = [];
+  const answers = ["con", "com1", "con-app", "2", "y"];
+  const result = await collectProjectOptions(
+    {},
+    async () => {
+      assert.ok(answers.length, "不应多询问");
+      return answers.shift();
+    },
+    (message) => messages.push(message),
+  );
+  assert.deepEqual(result, { name: "con-app", type: "monorepo" });
+  assert.equal(messages.length, 2);
+  assert.ok(messages.every((message) => message.includes("Windows 保留名称")));
+});
+
+test("真实 CLI 在创建、预览和维护模式提前拒绝保留名且不写目标", async (t) => {
+  const cwd = await mkdtemp(join(tmpdir(), "vp-reserved-name-"));
+  t.after(() => rm(cwd, { recursive: true, force: true }));
+  const cli = fileURLToPath(new URL("../bin/cli.mjs", import.meta.url));
+  // Even if validation regresses, tests must not invoke an installed generator.
+  const env = Object.fromEntries(
+    Object.entries(process.env).filter(([key]) => key.toUpperCase() !== "PATH"),
+  );
+  env.PATH = "";
+  for (const args of [
+    ["--name", "con", "--type", "application", "--framework", "vue"],
+    ["--name", "nul", "--type", "application", "--framework", "react", "--dry-run"],
+    ["--name", "prn", "--type", "monorepo"],
+    ["--name", "lpt9", "--type", "monorepo", "--dry-run"],
+    [
+      "--name",
+      "com1",
+      "--type",
+      "application",
+      "--framework",
+      "vue",
+      "--workspace",
+      join(cwd, "missing-workspace"),
+    ],
+    ["--name", "aux", "--type", "application", "--framework", "react", "--apply-existing"],
+    [
+      "--name",
+      "nul",
+      "--type",
+      "application",
+      "--framework",
+      "vue",
+      "--ui",
+      "element-plus",
+      "--ui-smoke",
+    ],
+  ]) {
+    const result = spawnSync(process.execPath, [cli, ...args], {
+      cwd,
+      env,
+      encoding: "utf8",
+      timeout: 10_000,
+    });
+    assert.equal(result.status, 1, result.stderr);
+    assert.match(result.stderr, /不能使用 Windows 保留名称/);
+    assert.equal(result.stdout, "");
+    assert.deepEqual(await readdir(cwd), []);
+  }
+  const valid = spawnSync(
+    process.execPath,
+    [cli, "--name", "con-app", "--type", "application", "--framework", "vue", "--dry-run"],
+    { cwd, env, encoding: "utf8", timeout: 10_000 },
+  );
+  assert.equal(valid.status, 0, valid.stderr);
+  assert.equal(JSON.parse(valid.stdout).args[3], "con-app");
+  assert.deepEqual(await readdir(cwd), []);
 });
 
 test("取消交互不会生成项目参数", async () => {

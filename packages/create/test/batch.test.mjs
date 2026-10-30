@@ -83,6 +83,17 @@ test("批量配置严格校验版本、字段类型、重名及框架组合，�
     },
   ];
   for (const input of bad) assert.throws(() => validateBatchConfig(input));
+  for (const name of ["con", "prn", "aux", "nul", "com1", "com9", "lpt1", "lpt9"]) {
+    assert.throws(() => validateBatchConfig({ ...config, name }), /Windows 保留名称/);
+    assert.throws(
+      () => validateBatchConfig({ ...config, apps: [{ name, framework: "vue" }] }),
+      /Windows 保留名称/,
+    );
+  }
+  assert.equal(
+    validateBatchConfig({ ...config, apps: [{ name: "con-app", framework: "vue" }] }).apps[0].name,
+    "con-app",
+  );
 });
 
 test("dry-run 计划包含官方命令、应用依赖和验收文件，不写目标目录", async (t) => {
