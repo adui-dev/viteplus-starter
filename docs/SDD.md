@@ -107,6 +107,7 @@ assets 保存指定 URL 的 8.0.1 固定快照、MIT 许可和来源/SHA256 记�
 
 - `--workspace <path>` 仅适用于 Application；路径仅用于 Node 文件 API 和子进程 cwd，不拼入 shell 命令。`buildVpCommand` 仍委托 `vite:application`，目录固定为安全的 `apps/<name>`，不传 `--git/--no-git`。
 - `workspace.mjs` 预检 private Vite+ 根、官方 pnpm packages 块列表、apps 目录、唯一根 Vite 配置及其他成员同名包；拒绝 apps/目标/根配置的符号链接与 junction、路径遍历和未知 glob。预检不写文件。
+- workspace-json.mjs 提取工作区检查原有的 JSON 读取器，复用 inspectPath，限制普通文件/1 MiB、去除 UTF-8 BOM 并排除 null/数组，错误只带文件路径。workspace-inspect 的根/成员/预期配置和 resolveWorkspaceApplication 的根及已发现成员复用它，保持私有根、作用域名和重复包名校验仍由调用者负责。只统一读取，不重写清单或执行其脚本；缺失成员清单的既有处理规则保留。
 - 保留默认 `apps/website`、`packages/utils`。依赖安装与 Vite 插件/样式增强仅作用于新应用；根锁文件和 catalog 的更新由官方生成器与 pnpm 管理。
 - Vue TS + UI 的 `src/components.d.ts` 仍在应用内生成；子配置不添加根专属 fmt。根增量合并 `apps/<name>/src/components.d.ts` 忽略规则，保留其他 fmt 和 run 配置。JS/React 不新增该规则。
 - 兼容官方成员模板仍从 vite 导入 defineConfig 的情况：新应用生成后仅对其 Vite 配置执行官方 `vp lint --fix` 与 `vp fmt`，不处理已有同级应用。

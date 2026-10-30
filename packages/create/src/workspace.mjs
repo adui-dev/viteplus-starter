@@ -3,6 +3,7 @@ import { join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { validateProjectOptions } from "./options.mjs";
 import { ignoreGeneratedVueComponentDeclarations } from "./format-config.mjs";
+import { readWorkspaceJson } from "./workspace-json.mjs";
 
 async function inspect(path) {
   try {
@@ -116,9 +117,9 @@ export async function resolveWorkspaceApplication(input, cwd = process.cwd()) {
   const root = await realpath(resolve(cwd, options.workspace));
   for (const filename of ["package.json", "pnpm-workspace.yaml"]) {
     if (!(await inspect(join(root, filename)))?.isFile())
-      throw new Error("缺少工作区文件：" + filename);
+      throw new Error("缺少工作区文件：" + join(root, filename));
   }
-  const manifest = JSON.parse(await readFile(join(root, "package.json"), "utf8"));
+  const manifest = await readWorkspaceJson(join(root, "package.json"));
   if (
     manifest.private !== true ||
     !(manifest.devDependencies?.["vite-plus"] ?? manifest.dependencies?.["vite-plus"])
@@ -143,8 +144,8 @@ export async function resolveWorkspaceApplication(input, cwd = process.cwd()) {
       const directory = join(parentPath, entry.name);
       if (directory === target || !entry.isDirectory() || entry.isSymbolicLink()) continue;
       const packagePath = join(directory, "package.json");
-      if ((await inspect(packagePath))?.isFile()) {
-        const pkg = JSON.parse(await readFile(packagePath, "utf8"));
+      if (await inspect(packagePath)) {
+        const pkg = await readWorkspaceJson(packagePath);
         if (pkg.name === packageName) throw new Error("工作区已有同名包：" + packageName);
       }
     }

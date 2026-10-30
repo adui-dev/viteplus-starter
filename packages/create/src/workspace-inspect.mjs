@@ -8,19 +8,7 @@ import { planUiSmoke } from "./ui-smoke.mjs";
 import { planScreenPreset } from "./screen.mjs";
 import { planEngine } from "./engine.mjs";
 import { planModelProtection } from "./model-protection.mjs";
-
-async function json(path) {
-  const metadata = await inspectPath(path, "工作区检查");
-  if (!metadata?.isFile() || metadata.size > 1024 * 1024)
-    throw new Error("缺少或过大的 JSON 文件：" + path);
-  try {
-    const value = JSON.parse((await readFile(path, "utf8")).replace(/^\uFEFF/, ""));
-    if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error();
-    return value;
-  } catch {
-    throw new Error("无效 JSON 对象：" + path);
-  }
-}
+import { readWorkspaceJson as json } from "./workspace-json.mjs";
 
 async function configs(directory) {
   const found = [];
