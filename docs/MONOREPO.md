@@ -16,6 +16,8 @@ node ./viteplus-starter/packages/create/bin/cli.mjs --workspace ./my-workspace -
 
 得到 Vue TS 的 `apps/admin` 和 React JS 的 `apps/portal`；可分别指定 `--language ts|js`，默认 TS。UI/CSS 依赖和插件写入各自应用，根共享锁文件和 catalog 由官方流程及 pnpm 管理。Vue TS 自动生成声明的格式排除规则按应用路径合并到根配置。
 
+每个新增 Vue/React 应用默认带本地 `src/styles/normalize.css` 与 MIT 许可，正式入口在 UI/CSS 及原应用样式之前导入；不安装 normalize.css npm 包。根目录、官方默认 website/utils 和既有兄弟应用不批量改写。向已有工作区添加应用时，不要并发执行创建、安装或构建。
+
 生成器会对新应用 Vite 配置运行官方 lint 的定向修复。选用 Vue 自动导入或 UnoCSS 时，还会在根 `packageExtensions` 中补充相应包缺失的 Vite peer 声明，使插件类型解析到所在应用的 Vite 实例；这不会给根添加 UI/CSS 依赖，也不会更改各应用选择的语言版本。已有冲突的扩展配置会明确报错。
 
 ## 预览与检查
@@ -34,7 +36,7 @@ vp dev
 
 使用 `vp run build` 执行官方应用的完整 build 脚本，包含模板提供的 vue-tsc/tsc 等前置检查；`vp build` 单独运行 Vite 构建。根默认 dev 脚本继续指向官方 website；请在需要的应用目录执行 `vp dev`。
 
-支持的 TDesign/Ant Design 应用还可在原生成命令追加 `--ui-smoke`（不要同时添加 dry-run 或 apply-existing），然后访问开发服务器的 `/ui-smoke.html`。见 [UI Smoke](UI_SMOKE.md)。
+Vue 的 Element Plus/Ant Design Vue/TDesign、React 的 Ant Design/TDesign 应用，还可在原生成命令追加 `--ui-smoke`（不要同时添加 dry-run 或 apply-existing），然后访问开发服务器的 `/ui-smoke.html`。独立验收页保持自身入口，不自动沿用正式 main 的 normalize 导入。见 [UI Smoke](UI_SMOKE.md)。
 
 ## 保护与限制
 
