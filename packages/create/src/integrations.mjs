@@ -5,6 +5,7 @@ import { inspectPath } from "./safe-paths.mjs";
 import { prepareUiBuildPolicy, preflightUiBuildPolicy } from "./build-policy.mjs";
 import { injectStarterPlugins, repairLegacyStarterConfig } from "./vite-config.mjs";
 import { ignoreGeneratedVueComponentDeclarations } from "./format-config.mjs";
+import { matchesLegacyPlugins } from "./legacy-integrations.mjs";
 
 const UI = {
   none: [[], []],
@@ -302,9 +303,30 @@ export async function repairExistingIntegrations(directory, options, formatter =
     readFile(configPath, "utf8"),
     readFile(oldFile, "utf8"),
   ]);
-  if (!/export\s+function\s+starterPlugins\s*\(/.test(legacySource)) {
-    throw new Error("旧插件文件不是已知 Starter 生成格式，拒绝自动修改");
-  }
+  if (!matchesLegacyPlugins(options, legacySource))
+    throw new Error("旧插件 UI/CSS 与参数不匹配或不是已知 Starter 格式，拒绝修复：" + oldFile);
+  const mainPath = join(directory, "src", options.framework === "vue" ? "main.ts" : "main.tsx");
+  if (!(await inspectPath(mainPath, "旧配置修复"))?.isFile())
+    throw new Error("旧配置修复缺少普通文件：" + mainPath);
+  const main = await readFile(mainPath, "utf8");
+  const styles = [
+    ["tdesign-vue-next/es/style/index.css", options.framework === "vue" && plan.ui === "tdesign"],
+    ["antd/dist/reset.css", options.framework === "react" && plan.ui === "antd"],
+    ["tdesign-react/es/style/index.css", options.framework === "react" && plan.ui === "tdesign"],
+    ["virtual:uno.css", plan.css === "unocss"],
+    ["./starter.tailwind.css", plan.css === "tailwindcss"],
+  ];
+  if (
+    styles.some(([module, required]) => hasIntegrationImport(main, new Set([module])) !== required)
+  )
+    throw new Error("入口 UI/CSS 样式与修复参数不匹配，拒绝修复：" + mainPath);
+  const missing = [...plan.dependencies, ...plan.devDependencies].filter(
+    (name) => typeof dependencies[name] !== "string" || !dependencies[name].trim(),
+  );
+  if (missing.length)
+    throw new Error(
+      "旧配置修复缺少所选 UI/CSS 依赖（" + missing.join(", ") + "），拒绝修复：" + manifestPath,
+    );
   const generated = generateIntegration(options, config, "", { repair: true });
   for (const path of [configPath, oldFile]) await inspectPath(path);
   if (await inspectPath(backupFile)) throw new Error("旧插件备份已存在，拒绝覆盖");

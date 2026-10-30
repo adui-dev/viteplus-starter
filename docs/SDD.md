@@ -36,6 +36,7 @@ assets 保存指定 URL 的 8.0.1 固定快照、MIT 许可和来源/SHA256 记�
 - build-policy.mjs 分离 preflightUiBuildPolicy 与 prepareUiBuildPolicy。前者只读定位策略普通文件、计算合并结果，错误带文件路径，由 preflightIntegrations 在补装预检中调用；后者重新读取当前策略并在写入前复查，因而保留中间正常追加的工作区 peer 配置。仅 Ant Design Vue 进入此路径，已有 core-js:true/false 继续保留；不是任意 YAML 转换或事务回滚。
 - `--repair-existing` 仅用于符合已知 Starter 旧格式的现有 Vue/React Application：先验证项目类型、旧插件文件及配置形态，再替换旧导入并将 `starter.plugins.ts` 备份为 `starter.plugins.ts.bak`，随后格式化；**不安装依赖，也不重建项目**。
 - 清单读取和框架核对由 repairExistingIntegrations 在阶段内部完成：先检查路径/普通文件，再去 BOM 解析对象，错误仅带文件路径。配置和旧插件也要求普通文件，已有备份继续拒绝覆盖；格式化回调通过 await 等待，异步失败不再提前返回成功。迁移写入/备份后的失败保留现场，不提供事务回滚或通用旧项目升级。
+- legacy-integrations.mjs 按 23184ed 历史 TS 模板比较完整旧插件 token，接受单双引号、CRLF、注释、已知语句分号及尾逗号；别名、自定义选项、额外代码与无法识别内容拒绝，不执行或通用解析用户代码。修复同时只读检查正式 main 普通文件中的已知 UI/CSS 样式、所选依赖声明（允许 catalog/workspace 等非空字符串）；React UI 从入口样式核对，不能仅凭插件或已安装的其他库推断。上述检查均发生在写配置和重命名备份前；无插件的旧 React UI-only 组合不提供迁移。
 - 此功能不是通用任意 TypeScript 配置的转换器，无法识别的结构必须拒绝修改；旧项目 Windows 修复证据见 [项目状态](PROJECT_CONTEXT.md)，不自动升级其他旧快照。
 
 ## 当前可用模块

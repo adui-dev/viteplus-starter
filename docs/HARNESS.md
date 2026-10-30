@@ -11,6 +11,8 @@ node .\viteplus-starter\packages\create\bin\cli.mjs --name starter-react-p3 --ty
 
 上述命令不重新安装依赖，备份旧插件文件为 `starter.plugins.ts.bak`，仅对 `vite.config.ts` 执行 `vp fmt vite.config.ts --write`。再分别在两个应用执行 `vp check` 和 `vp run build`。用户已在 Windows 完成旧项目修复：React `vp check` 直接通过、Vue `vp check --fix` 处理 `src/components.d.ts` 后通过，两组 `vp build` 均通过。
 
+--ui/--css 须与旧插件和正式入口的已有样式匹配，所需依赖须已声明；修复不承担切换组合或自动补装。未知旧插件、自定义选项或部分文件缺失会在写入与备份前拒绝。当前本地回归通过历史纯生成函数快照构造隔离夹具，不会重修已完成迁移的实际工程。
+
 当前应用构建一律按 package.json 的完整 build 脚本验证，即 vp run build，TS 模板会执行 vue-tsc/tsc；vp build 是 Vite 内置构建，不能代替脚本中的类型检查。官方工作区根使用 vp run ready。失败提示里的命令须在修复现场后于对应目录执行；专项 vp build --config 验收保留专用入口，并另跑应用完整脚本。
 
 本项目**不使用 CI/CD**。所有检查由开发者本地手动执行。
