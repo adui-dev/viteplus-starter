@@ -464,3 +464,13 @@
 - 新增 base-styles 计划/预检/写入模块，覆盖 Vue/React TS/JS 的正式 main。官方生成后复制 src/styles/normalize.css 与 normalize.LICENSE.txt，UI/CSS 写入之后整理到其他样式之前，保留原入口内容、App、配置和依赖。根工作区及旧成员不自动改写，独立验收页沿用原有入口规则。
 - 单应用、逐应用、批量和多引擎共用原 CLI；计划展示 baseStyles，矩阵纳入静态路径冲突验证。--apply-existing 可在无 UI/CSS 选择时单独补齐，已知匹配文件重复跳过；未知同名文件、被修改/部分输出与链接拒绝覆盖，失败保留现场。
 - 七项新增测试覆盖四入口、许可与无远程 CSS 引用、原文件保留、后续 UI/CSS 导入顺序、重复写入、冲突/链接和 BOM/hashbang/注释。最低 Node 22.18.0 已通过 217/217 测试，实际创建与浏览器证据将在本轮验收记录补齐。
+
+## 2026-10-30：默认 normalize.css 实机验收与 test-vue 补齐
+
+- test-vue 使用无 UI/CSS 参数的 --apply-existing 补齐本地 CSS、许可和 main.ts 首条样式导入；完整 build 2/2、vp check 16 格式/5 代码文件通过。package、锁、Vite 配置、App、原样式、HelloWorld 共 6 项文件哈希保持，重复调用三个目标文件的内容及 mtime 不变。工程本地提交 e318c84，官方 hook 通过，无远程仓库。
+- 新建官方 adui-normalize-validation-20261030，包含 Vue/React × TS/JS 四个无可选 UI/CSS 框架应用。Node 22.18.0、pnpm 12.16.1、Vite+ 1.4.0 下根+四应用共五阶段全部成功，四种正式入口与本地静态快照/许可均生成，manifest 与锁文件没有 normalize.css npm 包。
+- 根 vp run --no-cache ready 11/11 成功，包含四应用完整类型/首页构建及官方默认成员测试/构建；最终 check 65 格式/22 代码文件通过。四份生产 CSS 都包含先于原应用样式的 normalize 规则，默认 website/utils 未强制加入应用基础样式；保留 TypeScript 7 API 实验性提示。
+- Chrome 检查 test-vue 与新 React JS 开发页面的真实 style 标签，normalize 来自各自 src/styles 本地文件且位于原样式之前；两页点击计数 0→1，warn/error 为空。截图 D:/Workspace/adui-studio/test-vue-normalize-20261030.jpg 保留在仓库外；没有新增生产浏览器或全部增强组合验收声明。
+- 更新需求 FR-012、架构/SDD、ADR、索引、README、Windows/批量说明与验收范围，明确静态快照、CSS none 语义、优先顺序、幂等与拒绝覆盖。生成器主功能提交 2b12d60；库版本和锁文件未改变，无新增依赖、CI/CD 或发布。
+- 本轮 217 项 Node 测试、文档检查、8 示例/20 应用及 462 组合计划、根 vp check 175 格式/129 代码文件通过；计划 actualBuilds 均为 0。验证工程和产物保留，临时哈希、JSON、测试日志与两项浏览器服务已清理。
+- 下一步仍按 test-vue 的实际需求选择 UI/CSS，使用首次补装并确认基础样式仍优先；未选择前保持无额外框架，不扩展业务页面或查看器。

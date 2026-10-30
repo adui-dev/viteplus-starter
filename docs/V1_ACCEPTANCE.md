@@ -126,3 +126,15 @@ inspect 找到六个成员、四个应用 present；plan 均为 validate-existin
 Chrome 分别验证开发服务和正式构建预览：首页渲染正确，Count is 0 点击变为 Count is 1，两页捕获的 warn/error 均为空。没有修改 App/main 或宣称 HMR 编辑测试。16 项清单、配置、入口及源码的 SHA256 在检查、构建和 Git hooks 后一致；模板 Vue 依赖保留，没有额外 UI/CSS 包。生产页面截图 D:/Workspace/adui-studio/test-vue-acceptance-20261030.jpg 保留在仓库外。
 
 试用工程本地初始化提交 c3d9194，默认 Git hooks 已执行通过，工作区干净；未配置远程仓库，未新建 GitHub 仓库或发布。默认结构与 dist 产物保留，临时 4395/4396 服务、两个验收标签页及哈希文件已清理。此项覆盖用户指定的默认 Vue TS 工程，不扩大为额外预设已安装或业务功能已开发。
+
+## 默认本地 normalize.css 验收（2026-10-30）
+
+按用户要求，Vue/React 正式入口默认加入本地 normalize.css，不使用 npm 包。快照为指定 URL 的 8.0.1，保留 MIT 许可与版本注释；仅统一排版，来源及原始/格式化哈希见 [记录](../packages/create/assets/normalize.SOURCE.md)。生成和浏览器无需访问该 URL。已有工程显式 --apply-existing 可只补齐这项基础样式；旧成员及独立验收页不自动迁移。
+
+在 test-vue 实际补装：只新增 src/styles/normalize.css、normalize.LICENSE.txt 和 main.ts 的优先导入。原 package、锁文件、Vite 配置、App、style.css 与 HelloWorld 共 6 项 SHA256 保持。重复调用不写入，三个目标文件的内容及 mtime 一致。完整 build 2/2、check 16 格式/5 代码文件通过，本地提交 e318c84 的默认 Git hook 通过；该工程仍没有远程仓库。
+
+另实际批量创建 D:/Workspace/adui-studio/adui-normalize-validation-20261030，含官方根和 Vue TS、Vue JS、React TS、React JS 四个无额外 UI/CSS 框架应用。Node 22.18.0、pnpm 12.16.1、Vite+ 1.4.0 下五阶段成功，每个 main.ts/js/tsx/jsx 均自动导入本地快照与许可；没有 normalize.css 依赖，根/default website/utils 保持官方范围。无缓存 ready 11/11、最终 check 65 格式/22 代码文件通过，四应用 dist CSS 均包含先于原应用样式的 normalize 规则。保留官方 TypeScript 7 API 实验性提示。
+
+Chrome 开发服务验证 test-vue 和上述 React JS 应用，style[data-vite-dev-id] 显示本地 normalize.css 在原 style.css/index.css/App.css 之前，按钮均从 0 点击为 1，warn/error 为空。截图 D:/Workspace/adui-studio/test-vue-normalize-20261030.jpg 在仓库外；没有把此项称为新增生产浏览器、所有 UI/CSS/引擎组合或旧独立页已验证。
+
+217 项 Node 测试覆盖新增七项基础样式用例；8 个 JSON/20 应用预览、462 组合计划及文档/根检查通过，计划计数不当作真实构建。验证工作区、test-vue 与构建产物保留，临时配置/哈希/测试日志、两个标签及本轮 4395/4396 服务已清理。
