@@ -4,6 +4,20 @@
 
 当前交付验收平台为 Windows（用户于 2026-10-30 明确）；Linux/macOS 不在本阶段要求内，也未验证，不作为 Windows 交付的阻塞条件。
 
+## BOM 工作区真实工具链验收（2026-10-30）
+
+隔离目录 D:/Workspace/adui-studio/adui-bom-validation-20261030 由官方 vite:monorepo 创建，使用 Node 22.18.0、pnpm 12.16.1、Vite+ 1.4.0。保留默认 website/utils，在根 JSON 和首行为 allowBuilds/core-js:false 的 YAML 中加入 BOM，验证生成器之外的真实工具链。
+
+首次 Vue 调用在官方模板阶段报 expected value at line 1 column 1，应用目录尚未生成，但旧顺序已准备 peer。仅在该隔离目录人工去除根 package.json BOM、保留 YAML BOM 后重试，官方 Vue TS/Ant Design Vue/UnoCSS 创建及 UI 页成功；不称为首次无干预全链路成功。此发现补充了编码预检：根 JSON 带 BOM 且目标缺失时，直接创建与恢复规划提前拒绝，不写 peer 或自动转换用户清单；只读检查和全部已有应用跳过继续可用。
+
+随后用带 BOM 的预期 JSON 规划并执行恢复，仅新建 React JS/Ant Design/Tailwind 及 UI 页，Vue 跳过。YAML BOM 在 Vue 集成、React 恢复及最终检查后均保留，allowBuilds/packageExtensions 各一个块，core-js:false 保持，根无框架/UI/CSS 直接依赖。两应用的本地 normalize 仍是正式入口首条导入，未添加 normalize npm 包。
+
+无缓存 vp run --no-cache ready 8/8 成功，包含默认库测试、Vue 类型检查与两应用完整构建；Vue /ui-check/、React ./ 两组首页+UI 双入口构建通过，最终 vp check 为 49 格式/20 代码文件通过。保留 TypeScript 7 API 实验性、UnoCSS 多入口和构建性能提示，没有关闭检查规则。本轮没有浏览器渲染或点击验收。
+
+官方默认成员 19 项文件及恢复前 Vue 的 25 项文件内容与 mtime 保持；最终检查/规划/重复恢复均通过，恢复 completed=[]、skipped=2。两组重复创建与重复 UI 页共四次拒绝，维护前后 74 项 Git 可见文件内容及 mtime 一致，临时构建配置均清理。工作区及构建产物保留，临时预期 JSON/哈希记录清理；原 test-vue 与其他既有工作区未改。
+
+生成器全量 252/252 测试、文档校验和根 vp check 通过；新增回归确认根 BOM 的新建限制发生在共享配置写入前。以上证据覆盖 YAML BOM 的这两组实际路径，JSON BOM 的安全读取与官方创建限制分别记录，不推广为所有 BOM/预设组合均可构建。
+
 日常创建、添加应用、验收页、模型与恢复命令集中在 [Windows 操作指南](WINDOWS_GUIDE.md)。本清单记录验收层次与证据；后面的日期记录是历史实测，不代表每次文档更新都重新生成或验证全部项目。
 
 ## 本地交付核对

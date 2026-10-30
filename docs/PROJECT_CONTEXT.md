@@ -611,3 +611,12 @@
 - 新增三项测试：首行 packages/peer/allowBuilds、LF/CRLF 无改动路径、补充及幂等、已有 true/false、冲突 peer/内联策略/合并键/多文档拒绝。五次真实 CLI 覆盖检查、规划、全部跳过的恢复、逐应用预览和缺失应用规划；受控恢复回调确认进入新建步骤，未启动官方工具。显式 peer/策略准备保留 BOM、catalog 和注释，其他文件内容及 mtime 保持，冲突拒绝不写入。
 - Node 22.18.0 下定向 21/21、全量 251/251 测试（无跳过）、文档校验和根 vp check（183 格式/137 代码文件）通过。需求、SDD、索引和 Monorepo 说明已同步；未安装依赖、修改实际工程、运行应用构建或浏览器验收，依赖与锁文件未变。
 - 下一步在隔离 Windows 工作区复验 BOM 配置下的官方创建与完整检查/构建，补充真实工具链证据；不将本轮预检与合并回归当作实际生成或构建通过，不扩大预设或业务功能。
+
+## 2026-10-30：BOM 配置的官方工具链实测与编码限制
+
+- 新建隔离 adui-bom-validation-20261030，根由官方 vite:monorepo 生成，Node 22.18.0/pnpm 12.16.1/Vite+ 1.4.0。根 JSON 与首行 allowBuilds YAML 加 BOM 后，首次官方 Vue 创建报 expected value at line 1 column 1，尚无应用目录，但旧流程已准备 peer；没有删除失败现场。
+- 仅人工去除隔离根 package.json BOM、保留 YAML BOM 后，官方 Vue TS/Ant Design Vue/UnoCSS 及 UI 页创建通过。用 BOM 预期 JSON 经检查/规划/恢复仅新建 React JS/Ant Design/Tailwind 和 UI 页，Vue 跳过；YAML BOM 保留，两个增量块不重复、core-js:false 不变，根无框架/UI/CSS 直接依赖。不能称为首次无干预生成成功。
+- 据真实失败补充 resolveWorkspaceApplication 编码预检：待新建成员遇根 JSON BOM 提前拒绝，报告路径并要求人工保存为无 BOM，恢复规划 manual-review；不自动转换根或先写 peer。新增回归与原测试调整明确区分“JSON 可安全读取”和“官方创建可用”，全部已有应用仍可读取/跳过。
+- 无缓存 ready 8/8、Vue /ui-check/ 与 React ./ 双入口构建、最终 check 49 格式/20 代码文件通过，保留 TypeScript 7、UnoCSS 多入口及性能提示。默认成员 19 项、恢复前 Vue 25 项文件内容及 mtime 保持；重复恢复 completed=[]/skipped=2，四次重复创建/验收页拒绝，维护前后 74 项文件内容及 mtime 一致。
+- 生成器全量 252/252 测试、文档校验和根 check（183 格式/137 代码文件）通过。需求、设计、索引、Windows/Monorepo 指南、V1 证据与能力表同步；实际工作区和产物保留，临时配置/哈希记录清理。没有浏览器验收，没有改 test-vue、其他旧工作区、生成器依赖或锁文件。
+- 下一步回到实际 Windows 项目使用与具体问题修复；本轮编码边界与真实工具链证据已收尾，不自动扩展预设、业务演示或发布流程。
