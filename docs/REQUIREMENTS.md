@@ -24,6 +24,7 @@
 
 - 状态：Vue TS/JS + TDesign/UnoCSS、React TS/JS + Ant Design/Tailwind 四种代表组合，以及 Vue JS Element Plus/Tailwind、Vue TS Ant Design Vue/UnoCSS、React JS/TS TDesign/UnoCSS 已有真实组件验收；其余组合待验收；优先级：P1。
 - 2026-10-28 补验：Vue JS Element Plus/Tailwind、Vue TS Ant Design Vue/UnoCSS、React JS TDesign/UnoCSS 已通过生成、检查和首页构建；这些补验不含组件渲染。Ant Design Vue 安装仅补充 core-js 的显式禁用构建脚本规则，保留已有用户策略。
+- 2026-10-30 用户指定 test-vue（Vue TS）首次补装 Element Plus/Tailwind CSS，完整类型/首页及 UI 双入口构建、check 和生产组件点击/CSS 验收通过；本地 normalize.css 保持首条导入，原首页文件保持。重复补装与重复生成验收页均拒绝，详见 [V1 记录](V1_ACCEPTANCE.md#test-vue-首次补装-element-plustailwind-css2026-10-30)。
 - 目标：None / Element Plus（Vue 专属）/ Ant Design（Vue 为 ant-design-vue，React 为 antd）/ TDesign（对应框架包），单选。
 - 验收：生成后组件正常加载、类型检查和构建成功；React 不出现 Element Plus。
 

@@ -8,6 +8,8 @@ Windows V1 本地候选的操作说明与集中交付核对已整理：[Windows 
 
 首个用户指定试用 test-vue 已创建为独立 Vue TS、默认 UI/CSS none。完整类型/首页构建与 check、开发及生产预览的计数点击通过，原模板 16 项文件哈希保持，本地 Git 初始化提交已完成；模板无测试文件，不把 passWithNoTests 计为应用测试通过。详细证据见 [V1 清单](V1_ACCEPTANCE.md#用户指定-test-vue-试用2026-10-30)。
 
+随后按用户选择，在 test-vue 首次补装 Element Plus/Tailwind CSS：正式类型/首页构建、UI 双入口构建与 check 通过，Chrome 生产验收页按钮点击 0→1、绿色区域样式正确且无 warn/error。正式入口的本地 normalize.css 仍先于 Tailwind 和原样式加载，5 项原首页/基础样式文件哈希保持；重复补装及重复生成页均拒绝，30 项文件内容与 mtime 不变。工程分两次本地提交，无远程仓库；详见 [补装记录](V1_ACCEPTANCE.md#test-vue-首次补装-element-plustailwind-css2026-10-30)。
+
 ## 需求核对
 
 | 需求              | 当前能力                                                                    | 尚未完成或范围限制                                                   |

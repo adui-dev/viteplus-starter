@@ -474,3 +474,11 @@
 - 更新需求 FR-012、架构/SDD、ADR、索引、README、Windows/批量说明与验收范围，明确静态快照、CSS none 语义、优先顺序、幂等与拒绝覆盖。生成器主功能提交 2b12d60；库版本和锁文件未改变，无新增依赖、CI/CD 或发布。
 - 本轮 217 项 Node 测试、文档检查、8 示例/20 应用及 462 组合计划、根 vp check 175 格式/129 代码文件通过；计划 actualBuilds 均为 0。验证工程和产物保留，临时哈希、JSON、测试日志与两项浏览器服务已清理。
 - 下一步仍按 test-vue 的实际需求选择 UI/CSS，使用首次补装并确认基础样式仍优先；未选择前保持无额外框架，不扩展业务页面或查看器。
+
+## 2026-10-30：test-vue 按用户选择首次补装 Element Plus/Tailwind
+
+- 用户明确选用 Element Plus + Tailwind CSS。对既有 Vue TS 工程执行 --apply-existing，随后 --ui-smoke 生成独立页；没有重建官方模板或修改原首页。进程选择 Node 22.18.0 与官方 shim，pnpm 12.16.1 安装 Element Plus 2.14.7、Tailwind/@tailwindcss/vite 4.3.3 和 unplugin-vue-components 32.1.0，原 Vue/TypeScript/Vite+ 版本保留。
+- lazyPlugins 增量加入 resolver/Tailwind，main.ts 的 normalize 导入仍优先。App、HelloWorld、原 style 与 normalize/许可共 5 项 SHA256 保持；重复补装和验收页生成均预检拒绝，30 项文件内容及 mtime 保持。没有 normalize npm 包，生成器依赖及锁文件未变。
+- 完整类型/首页构建 2/2、/ui-check/ 首页+验收页构建、最终 check 20 格式/8 代码文件均通过，保留构建性能提示。Chrome 开发首页本地样式顺序正确；生产验收页为真实 Element Plus 主按钮，计数 0→1，Tailwind 绿色区域、8px 圆角与 16px 内边距正确，两页 warn/error 为空。
+- 截图 D:/Workspace/adui-studio/test-vue-element-plus-20261030.jpg 在仓库外；临时配置、两个标签与本轮服务已清理，工程和产物保留。test-vue 本地分步提交 a664ce1、0325b9c，默认 hooks 通过，工作区干净，无远程仓库；生成器只同步实测文档。
+- 本轮生成器 217/217 Node 测试、文档校验与根 vp check（175 格式/129 代码文件）通过。下一步补验本地 normalize.css 与 UI/CSS 在官方 Monorepo 子应用中的联用和隔离，保持根及兄弟应用不受影响；继续生成器兼容性验收，不扩展业务功能。

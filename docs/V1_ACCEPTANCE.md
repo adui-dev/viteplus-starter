@@ -138,3 +138,15 @@ Chrome 分别验证开发服务和正式构建预览：首页渲染正确，Coun
 Chrome 开发服务验证 test-vue 和上述 React JS 应用，style[data-vite-dev-id] 显示本地 normalize.css 在原 style.css/index.css/App.css 之前，按钮均从 0 点击为 1，warn/error 为空。截图 D:/Workspace/adui-studio/test-vue-normalize-20261030.jpg 在仓库外；没有把此项称为新增生产浏览器、所有 UI/CSS/引擎组合或旧独立页已验证。
 
 217 项 Node 测试覆盖新增七项基础样式用例；8 个 JSON/20 应用预览、462 组合计划及文档/根检查通过，计划计数不当作真实构建。验证工作区、test-vue 与构建产物保留，临时配置/哈希/测试日志、两个标签及本轮 4395/4396 服务已清理。
+
+## test-vue 首次补装 Element Plus/Tailwind CSS（2026-10-30）
+
+用户明确选择 Element Plus + Tailwind CSS，在既有 D:/Workspace/adui-studio/test-vue 上执行 --apply-existing，再以 --ui-smoke 添加独立验收页。使用进程级 VP_NODE_VERSION=22.18.0 及前置官方 shim PATH，pnpm 12.16.1 安装 Element Plus 2.14.7、Tailwind CSS/@tailwindcss/vite 4.3.3、unplugin-vue-components 32.1.0；原 Vue、TypeScript 和 Vite+ 版本未升级。生成器源码、依赖及锁文件未改。
+
+原 lazyPlugins 配置增量加入组件 resolver 与 Tailwind 插件，Vue 声明只排除格式检查。main.ts 仍以本地 normalize.css 开头，其后是 Tailwind 和原应用样式；没有 normalize.css npm 依赖。App.vue、HelloWorld.vue、style.css、normalize.css、normalize.LICENSE.txt 共 5 项 SHA256 与补装前一致。UI Smoke 仍为独立入口，不宣称其自动导入 normalize。
+
+完整 vp run build 的 vue-tsc -b 和正式首页构建 2/2 成功；verify-ui-build.mjs 的 /ui-check/ 双入口构建成功，保留构建性能提示，临时配置已清理。最终 vp check 20 格式/8 代码文件通过，无警告、lint 或类型错误。重复 --apply-existing 与 --ui-smoke 均在预检拒绝，30 项 Git 可见文件内容及 mtime 一致，没有重装或覆盖。
+
+Chrome 开发首页 Count is 0→1，style 标签顺序为本地 normalize.css、starter.tailwind.css、style.css；生产 /ui-check/ui-smoke.html 的真实 el-button 主按钮点击 0→1。Tailwind 区域为浅绿色背景、深绿色文字、8px 圆角及 16px 内边距；两页 warn/error 为空。生产截图 D:/Workspace/adui-studio/test-vue-element-plus-20261030.jpg 位于仓库外；两个标签及本轮 4395/4396 服务已关闭，工程和构建产物保留。
+
+test-vue 分步本地提交 a664ce1（集成 UI/CSS）、0325b9c（独立验收页），默认 Git hooks 均通过，工作区干净；该工程没有远程仓库。生成器仓库本轮 217/217 Node 测试、文档校验和根 vp check（175 格式/129 代码文件）通过。此轮只补齐用户选择的首次集成证据，没有新增业务页面、大屏或引擎功能。
