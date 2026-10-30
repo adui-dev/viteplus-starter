@@ -18,7 +18,7 @@ async function inspect(path) {
 
 // Only the official block-list layout is supported; do not guess at custom YAML/globs.
 export function validateWorkspacePackages(source) {
-  const lines = source.split(/\r?\n/);
+  const lines = source.replace(/^\uFEFF/, "").split(/\r?\n/);
   if (lines.some((line) => /^(?:<<\s*:|---\s*$|\.\.\.\s*$)/.test(line))) {
     throw new Error("不支持 YAML 合并键或多个文档");
   }
@@ -43,6 +43,11 @@ export function validateWorkspacePackages(source) {
 }
 
 export function planWorkspacePeerExtensions(source, options) {
+  const bom = source.startsWith("\uFEFF") ? "\uFEFF" : "";
+  return bom + mergeWorkspacePeerExtensions(source.slice(bom.length), options);
+}
+
+function mergeWorkspacePeerExtensions(source, options) {
   const packages = [
     ...(options.framework === "vue" && (options.ui ?? "none") !== "none"
       ? ["unplugin-vue-components"]

@@ -2,6 +2,11 @@ import { readFile, writeFile } from "node:fs/promises";
 import { resolve, dirname, join } from "node:path";
 import { inspectPath } from "./safe-paths.mjs";
 export function denyCoreJsBuild(source) {
+  const bom = source.startsWith("\uFEFF") ? "\uFEFF" : "";
+  return bom + mergeCoreJsBuildPolicy(source.slice(bom.length));
+}
+
+function mergeCoreJsBuildPolicy(source) {
   const lines = source.split(/\r?\n/),
     headers = lines.flatMap((line, index) =>
       /^(?:allowBuilds|'allowBuilds'|"allowBuilds")\s*:/.test(line) ? [index] : [],

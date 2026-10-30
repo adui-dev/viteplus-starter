@@ -65,6 +65,7 @@ UI/CSS 见 integrations；大屏核心见 packages/screen；三引擎见 package
 - `packages/create/src/workspace-json.mjs`：工作区根/成员与预期配置的共享只读 JSON 校验，BOM/1 MiB/普通文件/对象检查及安全报错；由 workspace 和 workspace-inspect 共用。
 - `packages/create/test/workspace.test.mjs`：官方命令参数、配置隔离、目录与 junction 保护、真实 CLI dry-run/覆盖拒绝。
 - `packages/create/test/workspace-json.test.mjs`：根与成员 BOM、大小边界、检查/规划/受控恢复及重复跳过、作用域重名、坏清单的 CLI 预检与文件保护。
+- `packages/create/test/workspace-yaml-bom.test.mjs`：YAML 首行 BOM、peer/allowBuilds 合并与幂等、LF/CRLF 无改动路径、冲突拒绝、真实 CLI 只读入口及显式准备的原文件保护。
 - `docs/MONOREPO.md`：逐应用创建、检查及边界说明。
 - `packages/create/src/batch.mjs`：JSON 严格校验、无写入批量计划、官方顺序执行与失败摘要。
 - `packages/create/test/batch.test.mjs`：真实 CLI dry-run、冲突与路径保护、顺序执行及失败保留现场测试。
