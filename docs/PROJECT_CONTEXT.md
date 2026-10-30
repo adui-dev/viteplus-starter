@@ -447,3 +447,13 @@
 - 复查既有 Windows 路径验收工作区：两个应用 present，计划均为 validate-existing；重复执行 completed=[]、skipped=2，33 项根/应用文件哈希一致。临时预览目录已清理，没有新建应用、重装依赖、运行普通/专项构建或打开浏览器。
 - 文档静态检查将 Windows 指南列为必要文件。最终 210/210 Node 测试、文档检查、8 个 JSON/20 个应用计划、462 组合计划和根 vp check（171 格式/127 代码文件）通过；示例与组合工具 actualBuilds 均为 0。仓库依赖声明与锁文件、已有验证工程及业务工程未改。
 - Windows V1 现有范围的本地交付文档已齐备。下一步进入实际 Windows 项目试用并按反馈修复；不自动创建业务工程、增加演示功能或推进其他系统、CI/CD、部署及发布。真实项目的目标和配置由用户明确后再落地。
+
+## 2026-10-30：用户指定 test-vue 默认 Vue TS 试用
+
+- 用户回复试用项目名 test-vue。确认 D:/Workspace/adui-studio/test-vue 不存在后，以默认 Vue TypeScript、UI/CSS none 创建独立 Application；未自行选择组件库、大屏、引擎或模型预设。先 dry-run 确认官方 vite:application 和 vue-ts，再由原 CLI 实际创建。
+- 外层系统 Node 24.18.0；官方创建使用托管 Node 26.13.0、pnpm 12.16.1 和 Vite+ 1.4.0，依赖安装成功，未切换全局默认。试用工程保留官方 App/main、Git hooks 与目录结构。
+- 完整 vp run build 执行 vue-tsc -b 及 vp build，2/2 成功；vp check 15 格式/5 代码文件无警告或类型错误。官方模板没有测试文件，vp test --passWithNoTests 退出 0，不称为应用单测通过，也没有为绿色结果添加镜像测试。
+- Chrome 分别在开发 4395 和生产预览 4396 验证官方首页，Count is 0 点击为 Count is 1，两页 warn/error 为空。未编辑源码或声明 HMR 编辑测试。原生截图首轮后台捕获超时，将自建预览页置前台后保存成功；没有调整安全或隐私设置。
+- 原清单、锁文件、Vite 配置、首页和 src 等 16 项文件 SHA256 在构建、检查与提交 hooks 后一致，没有额外 UI/CSS 依赖。生产截图 D:/Workspace/adui-studio/test-vue-acceptance-20261030.jpg 在仓库外；试用工程和 dist 保留，临时哈希、两个浏览器标签及本轮服务清理。
+- test-vue 本地初始化提交 c3d9194（中文 emoji），官方 vp check --fix hook 正常执行，工作区干净。新工程无远程仓库，不替用户创建远程或把试用源码推到生成器仓库；生成器只记录本次真实试用证据，没有运行逻辑修改。
+- 生成器另执行 210/210 Node 测试；文档与根检查按本轮修改完成。当前试用基线可用，下一步由 test-vue 的实际需求确定 UI/CSS 等选项，再验证已有工程的首次补装；未明确前保持当前默认配置，不扩展业务页面或模型查看器。

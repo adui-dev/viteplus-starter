@@ -116,3 +116,13 @@ inspect 找到六个成员、四个应用 present；plan 均为 validate-existin
 完成后 inspect 识别四个成员、两个应用 present；plan 均为 validate-existing；重复 execute completed=[]、skipped=2。重复批量创建与重复生成两页均拒绝，维护与拒绝期间 33 项根/应用文件哈希一致；恢复前保存的 14 项 admin 文件和 19 项官方 website/utils 原文件直到最终检查仍一致。共享锁文件/catalog 因添加 portal 的正常更新不计为原应用文件修改，根无框架/UI/CSS 直接依赖。
 
 两个专项产物保留于各 dist/ui-verify，临时构建配置已移除；原始及恢复 JSON 与测试工作区保留，可按 [Harness](HARNESS.md#windows-中文与空格路径) 复查。仓库外临时哈希记录已清理。本轮未发现需修改生成器源码的问题，仅同步 Windows 范围、路径说明和批量文档中的过时字段描述。
+
+## 用户指定 test-vue 试用（2026-10-30）
+
+用户指定项目名 test-vue，目标 D:/Workspace/adui-studio/test-vue 创建前不存在。按 CLI 默认选项创建独立 Vue TypeScript 应用，UI/CSS 为 none；不启用大屏、引擎和模型保护。预览确认官方 vite:application 转发 vue-ts，随后实际创建、安装成功；外层 Node 24.18.0，官方工具日志 Node 26.13.0、pnpm 12.16.1、Vite+ 1.4.0，未更改全局运行时。
+
+完整 vp run build 执行 vue-tsc -b 与正式首页构建，2/2 任务成功；vp check 15 格式/5 代码文件通过。模板没有测试文件，vp test --passWithNoTests 退出 0 仅确认该状态，不计作应用测试通过；生成器仓库另运行 210/210 Node 测试。
+
+Chrome 分别验证开发服务和正式构建预览：首页渲染正确，Count is 0 点击变为 Count is 1，两页捕获的 warn/error 均为空。没有修改 App/main 或宣称 HMR 编辑测试。16 项清单、配置、入口及源码的 SHA256 在检查、构建和 Git hooks 后一致；模板 Vue 依赖保留，没有额外 UI/CSS 包。生产页面截图 D:/Workspace/adui-studio/test-vue-acceptance-20261030.jpg 保留在仓库外。
+
+试用工程本地初始化提交 c3d9194，默认 Git hooks 已执行通过，工作区干净；未配置远程仓库，未新建 GitHub 仓库或发布。默认结构与 dist 产物保留，临时 4395/4396 服务、两个验收标签页及哈希文件已清理。此项覆盖用户指定的默认 Vue TS 工程，不扩大为额外预设已安装或业务功能已开发。

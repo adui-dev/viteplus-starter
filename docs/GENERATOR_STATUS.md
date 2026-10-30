@@ -6,6 +6,8 @@
 
 Windows V1 本地候选的操作说明与集中交付核对已整理：[Windows 指南](WINDOWS_GUIDE.md) 提供按执行目录组织的命令，[V1 清单](V1_ACCEPTANCE.md) 区分历史实测、本地检查和未覆盖范围。仓库仍为 0.0.0/private，未发布；后续按实际 Windows 项目试用反馈修复生成器，不自动扩大功能。
 
+首个用户指定试用 test-vue 已创建为独立 Vue TS、默认 UI/CSS none。完整类型/首页构建与 check、开发及生产预览的计数点击通过，原模板 16 项文件哈希保持，本地 Git 初始化提交已完成；模板无测试文件，不把 passWithNoTests 计为应用测试通过。详细证据见 [V1 清单](V1_ACCEPTANCE.md#用户指定-test-vue-试用2026-10-30)。
+
 ## 需求核对
 
 | 需求              | 当前能力                                                                   | 尚未完成或范围限制                                                   |
