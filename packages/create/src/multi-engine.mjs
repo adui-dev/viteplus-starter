@@ -5,6 +5,7 @@ import { validateProjectOptions, buildVpCommand, modelEngine } from "./options.m
 import { planEngine } from "./engine.mjs";
 import { resolveWorkspaceApplication } from "./workspace.mjs";
 import { inspectPath } from "./safe-paths.mjs";
+import { planBaseStyles, preflightBaseStyles } from "./base-styles.mjs";
 import { preflightCesium } from "./cesium.mjs";
 import { preflightBabylon } from "./babylon.mjs";
 import { planThreeSmoke, preflightThreeSmoke, validateThreeTarget } from "./three-smoke.mjs";
@@ -28,6 +29,7 @@ export async function runMultiEngine(args, runner = run) {
     modelProtection: engine === modelEngine(options) ? options.modelProtection : "none",
   }));
   if (args.applyExisting) {
+    await preflightBaseStyles(target, options);
     await preflightModelProtection(target, options);
     for (const selection of selections) {
       if (selection.engine === "three") {
@@ -42,6 +44,7 @@ export async function runMultiEngine(args, runner = run) {
   if (args.dryRun)
     return {
       official: buildVpCommand(options),
+      baseStyles: planBaseStyles(options),
       engine: plan,
       modelProtection: planModelProtection(options),
     };

@@ -4,6 +4,16 @@
 
 根 Vite+ fmt 统一自有源码、测试与文档格式；仅排除原样保存的第三方 `.agents/skills/git-commit/**`、`.agents/skills/gitmoji/**`，保留其上游指令与安装哈希。没有关闭源码检查、lint 规则或 Git hooks。
 
+## 默认 normalize.css 静态样式
+
+base-styles.mjs 独立于可选 UI/CSS 依赖计划。planBaseStyles 为四种正式 main 入口列出本地静态 CSS、许可、来源与版本，不返回 npm 依赖；Monorepo 根返回 null。单应用、逐应用、批量和多引擎复用原 CLI，dry-run/批量计划展示 baseStyles。矩阵将默认静态路径加入 462 个组合的冲突检查，实际构建计数仍为 0。
+
+preflightBaseStyles 校验 Vite+ 与所选框架、入口、目标及祖先链接。未知同名文件、部分输出/导入、修改过的快照拒绝覆盖；已知匹配文件兼容 CRLF，正常重复调用不写入。addBaseStyles 使用 wx 写新文件，写入口前再次核对原内容，只改正式入口的 normalize 导入位置，生成时保留 BOM、hashbang、前置注释和原模块内容，再遵循项目格式化规则。文件失败可保留部分现场，不承诺事务回滚或抵御恶意并发替换。
+
+新建时在官方模板生成后预检，在可选 UI/CSS 写入后添加/整理基础导入，保证顺序先于库样式、UnoCSS/Tailwind 和原应用样式；不改 App、Vite 配置或依赖。--apply-existing 无需额外选项即可补齐，后续 UI/CSS 首次安装仍重新整理顺序。独立验收页保留各自入口规则，不批量改写旧页面或工作区默认成员。
+
+assets 保存指定 URL 的 8.0.1 固定快照、MIT 许可和来源/SHA256 记录；仅对 CSS 统一排版。复制发生在本地，创建和浏览器不访问该 URL，也不安装 normalize.css 包。单测验证四入口、导入顺序、许可/原文件保留、幂等与链接/同名冲突；真实证据见 V1 清单。
+
 ## 官方模板语言选择
 
 - Application 的 `--language ts|js` 默认 `ts`。Vue 选 `vue-ts` 或 `vue`；React 选 `react-ts` 或 `react`，全部使用 Vite+ 官方 `vite:application`，不再自行运行其他生成器。

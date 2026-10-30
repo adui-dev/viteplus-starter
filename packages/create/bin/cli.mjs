@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { executeWorkspaceRecovery } from "../src/workspace-recovery-execute.mjs";
+import { addBaseStyles, planBaseStyles, preflightBaseStyles } from "../src/base-styles.mjs";
 import { planWorkspaceRecovery } from "../src/workspace-recovery.mjs";
 import { inspectWorkspace } from "../src/workspace-inspect.mjs";
 import { createStageRunner } from "../src/recovery.mjs";
@@ -85,6 +86,8 @@ const usage = `ADui Vite+ Starter（Application / Monorepo）
   无参数时交互选择名称、形态、框架、语言、UI/CSS、大屏、引擎和模型保护，并二次确认。
   --dry-run 只输出命令；必须提供全部必需参数，且不创建文件。
   UI/CSS 集成支持 None、Element Plus、Ant Design、TDesign、UnoCSS、Tailwind CSS。
+  Vue/React TS/JS 默认复制本地 normalize.css 静态文件并优先导入，不安装 normalize.css npm 包。
+  已有应用可使用 --apply-existing 单独补齐基础样式；已安装且未修改时不重复写入。
   --apply-existing 用于首次补装；--repair-existing 用于修复旧版 starter.plugins 跨文件引用。
   旧插件文件会备份成 starter.plugins.ts.bak；两种模式不重装基础模板。
   --ui-smoke 为已有应用创建独立的 /ui-smoke.html，支持 Vue 三种 UI / React 两种 UI，不修改正式首页。
@@ -250,14 +253,7 @@ async function main() {
     if (!dependencies["vite-plus"] || !dependencies[options.framework]) {
       throw new Error("现有目录不是所选 Vite+ Vue/React 应用，拒绝修改");
     }
-    if (
-      !integrations.dependencies.length &&
-      !integrations.devDependencies.length &&
-      !options.screen &&
-      !options.engine
-    ) {
-      throw new Error("未选择需要安装的 UI/CSS 集成");
-    }
+    await preflightBaseStyles(target, options);
     if (options.screen) await preflightScreenPreset(target, await planScreenPreset(options));
     if (options.engine === "cesium") await preflightCesium(target, options, !options.screen);
     if (options.engine === "babylon") await preflightBabylon(target, options, !options.screen);
@@ -268,6 +264,7 @@ async function main() {
     await preflightModelProtection(target, options);
     if (workspace) await stage("工作区依赖准备", () => prepareWorkspacePeerExtensions(workspace));
     await stage("UI/CSS 集成", () => applyIntegrations(target, options));
+    await stage("基础样式集成", () => addBaseStyles(target, options));
     if (options.screen) await stage("大屏集成", () => addScreenPreset(target, options));
     if (options.engine === "three") await stage("Three 集成", () => addThreeSmoke(target, options));
     if (options.engine === "cesium") await stage("Cesium 集成", () => addCesium(target, options));
@@ -290,6 +287,7 @@ async function main() {
           args: vpArgs,
           ...(workspace ? { cwd: commandCwd, target } : {}),
           integrations,
+          ...(planBaseStyles(options) ? { baseStyles: planBaseStyles(options) } : {}),
           ...(planModelProtection(options)
             ? { modelProtection: planModelProtection(options) }
             : {}),
@@ -349,6 +347,8 @@ async function main() {
     await stage("工作区应用规范化", () =>
       normalizeNewWorkspaceApplication(workspace, undefined, options),
     );
+  if (result.status === 0 && options.type === "application")
+    await preflightBaseStyles(target, options);
   if (
     result.status === 0 &&
     (integrations.dependencies.length || integrations.devDependencies.length)
@@ -357,6 +357,8 @@ async function main() {
     await stage("UI/CSS 集成", () => applyIntegrations(target, options));
     console.log("UI/CSS 插件配置已写入，请运行 vp check 和 vp build 验证");
   }
+  if (result.status === 0 && options.type === "application")
+    await stage("基础样式集成", () => addBaseStyles(target, options));
   if (result.status === 0) await finishWorkspaceIntegration();
   if (result.status === 0 && options.screen) {
     await stage("大屏集成", () => addScreenPreset(target, options));

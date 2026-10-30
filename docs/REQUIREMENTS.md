@@ -85,6 +85,14 @@
 
 ## V1.0 范围与依赖
 
+### FR-012 默认本地基础样式
+
+- 状态：已实现；优先级：P1。用户要求 Vue/React 默认导入指定 normalize.css 静态文件，不使用 npm 包。
+- Application 的 Vue/React × TS/JS、独立应用和 Monorepo 子应用均默认复制 src/styles/normalize.css 与 normalize.LICENSE.txt，在正式 main 入口优先导入；CSS none 表示未选择 CSS 框架，仍带此基础样式。官方根及默认成员不批量改写。
+- 来源为 https://necolas.github.io/normalize.css/latest/normalize.css，本地固定 8.0.1 快照，保留 MIT 许可与版本注释，仅统一排版；生成和浏览器运行不下载该地址，不添加 normalize.css 依赖。
+- 已有应用可单独使用 --apply-existing 补齐，不要求选择 UI/CSS。已知快照和入口已就绪时跳过写入，UI/CSS 后续首次补装后仍将 normalize 放在其样式之前。未知同名文件、被修改的快照、部分文件/引用或链接拒绝覆盖，不自动迁移旧快照。
+- 验收：四种官方模板与工作区真实创建/完整构建；已存在 test-vue 补装、无依赖/配置变更、重复调用和同名保护；Vue/React 浏览器确认本地样式加载顺序、原按钮点击和无 warn/error。详见 [V1](V1_ACCEPTANCE.md)。
+
 按顺序推进：官方基础模板（Vue/React × TS/JS 创建及构建已验证）→ CLI 交互和框架选择 → UI/CSS → 大屏 → 3D → 模型安全 → 跨组合验收。外部依赖版本、Vite+ 框架选项自动化及 npm scope 均需实际验证，不能推定。
 
 ## 变更记录

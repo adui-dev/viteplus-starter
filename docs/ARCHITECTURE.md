@@ -27,6 +27,7 @@ flowchart TD
 - `packages/babylon` 提供按需场景、Engine/Scene 生命周期和 GLB/.adui AssetContainer 适配；create/babylon 增量安装 core/loaders 及四组合独立页面。与 Three 共用格式检查、授权解密、env 构建插件和 KEY 脚本；保护默认启用，配置备份后增量写入，关闭时不改 Vite 配置。多引擎只选择一个模型适配器；create/engine 同时编排其计划。
 - `scripts/validate-docs.mjs`：本地文档静态校验；不是 CI。
 - 官方 Vite+ 负责应用模板、基础工具链；不得偷偷替换官方模板。
+- base-styles 在官方 Application 生成后默认复制本地 normalize.css/MIT 许可并增量导入正式入口，不安装依赖或改 Vite 配置。它在 UI/CSS 写入后整理入口，确保基础样式优先；Monorepo 根不应用。显式 --apply-existing 复用同一路径预检和已知快照校验，旧工程不会被批量改写。
 - `workspace.mjs` 预检已有官方 pnpm 根、成员路径与同名包；子应用仍交给 `vite:application`，以工作区根为 cwd，不传 Git 初始化参数。UI/CSS 安装在子应用中，官方管理共享锁文件和 catalog；Vue TS 声明格式忽略规则仅在根增量合并。
 - `batch.mjs` 将严格 JSON 转成顺序阶段计划；根直接调用官方 `vite:monorepo`，应用和验收页通过 argv 子进程复用单应用 CLI，沿用路径保护与 UI/CSS 兼容处理；配置不提供自定义命令或脚本。
 - 混合工作区的插件 peer 兼容修复在根 packageExtensions 增量记录，避免缺失 Vite peer 时从提升目录解析到另一应用的类型实例；拒绝覆盖冲突的用户配置。

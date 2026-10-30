@@ -97,3 +97,7 @@ Cesium 使用公开 Model.fromGltfAsync({url}) 接收受控 Blob URL，复用共
 ## 2026-10-29：引擎绘图比例和 DPR 无事件兜底
 
 Cesium/Babylon 采用与现有 Three 相同的最高 2 倍 DPR、最长边 8192 策略；Babylon 再限制硬件最大纹理尺寸。使用引擎公开 API，维持引擎层 CSS 像素与 HUD 设计像素分离。Chrome 实测 DPR 仿真可能不发送 resize/媒体查询事件，因此保留事件监听并增加逐帧标量检查；仅变化时触发尺寸刷新，卸载取消待执行帧。共享模块按引擎复制而非要求升级旧 adui-screen 源码；继续执行已有文件拒绝覆盖策略。原生全屏拒绝与工具中止如实记录为待验收。
+
+## 2026-10-30：默认基础样式采用本地静态快照
+
+按用户指定的 normalize.css URL 保存 8.0.1 固定快照与 MIT 许可，在 Vite+ 官方生成完成后增量加入应用入口。不引入 normalize.css npm 包或创建/运行时远程下载，不替代官方 Vue/React 模板。先执行可选 UI/CSS，再将基础样式整理到前面；同名未知文件及修改过的快照拒绝覆盖。版本、原始/格式化 SHA256 见 [来源记录](../../packages/create/assets/normalize.SOURCE.md)。

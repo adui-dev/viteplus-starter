@@ -12,6 +12,15 @@
 
 > 本文件列出当前主要模块，后续章节补充各子系统路径。实现与实测范围分别见需求和能力表，不将规划模块视为已存在。
 
+## 默认静态基础样式
+
+- packages/create/src/base-styles.mjs：四种入口的计划、预检、默认复制、优先导入、已有快照校验与无覆盖写入。
+- packages/create/assets/normalize.css、normalize.LICENSE.txt、normalize.SOURCE.md：固定 8.0.1 CSS、MIT 许可和来源记录。
+- packages/create/test/base-styles.test.mjs：TS/JS 两框架、样式顺序、原文件保留、重复调用、同名/部分文件与链接保护。
+- create CLI、batch/multi-engine 与 verify-generator-matrix：默认流程和只读计划接入，不修改官方模板入口来源。
+
+## 核心入口
+
 | 路径                                                 | 作用                                                                  |
 | ---------------------------------------------------- | --------------------------------------------------------------------- |
 | `package.json`                                       | 工作区根信息及本地检查入口                                            |

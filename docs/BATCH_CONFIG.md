@@ -40,6 +40,8 @@ apps[].screen 支持大屏预设，apps[].engine 支持 three/cesium/babylon，a
 
 uiSmoke 的 Vue UI 为 Element Plus、Ant Design Vue、TDesign，React UI 为 Ant Design、TDesign；TS/JS 均支持。生成独立页的边界见 [UI Smoke](UI_SMOKE.md)。
 
+每个 Vue/React 应用默认复制本地 normalize.css 及 MIT 许可并在正式入口优先导入，无需 JSON 字段，也不安装 npm 包。none 仅关闭可选 UI/CSS 框架；dry-run 的应用阶段通过 baseStyles 展示默认文件和入口。根不生成这些应用文件，旧工作区成员不自动改写。
+
 未知字段、null/错误类型会报错，不忽略拼错的选项。根不允许设置 framework/language/UI/CSS。名称不允许路径或 Windows 保留设备名称；根也不能与默认 website/utils 包重名。仅支持最大 1 MiB 的 JSON，接受 UTF-8 BOM。
 
 ## 预览与执行

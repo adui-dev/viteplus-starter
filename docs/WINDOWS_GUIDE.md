@@ -38,6 +38,8 @@ Vue/React 委托官方 vite:application，按框架与语言选择 vue/vue-ts/re
 
 Vue 可选 Element Plus、Ant Design Vue、TDesign；React 可选 Ant Design、TDesign。CLI 值分别为 element-plus/antd/tdesign，均可选 none；CSS 为 none/unocss/tailwindcss。进入每个生成应用，执行完整脚本：
 
+所有 Vue/React TS/JS 应用即使 UI/CSS 为 none，也默认复制 src/styles/normalize.css 8.0.1 静态文件及 MIT 许可，并在正式 main 中优先导入；不安装 normalize.css npm 包，不在运行时访问外网。原 App、原应用样式与 Vite 配置保留。
+
 ```powershell
 Set-Location -LiteralPath (Join-Path $projectsRoot 'my-vue-app')
 vp run build
@@ -119,7 +121,15 @@ node $starterCli --execute-recovery $workspacePath --config $batchConfig
 
 已有应用跳过；部分完成应用阻塞，任一步失败即停并保留现场。重复执行完整配置应 completed=[]，应用列入 skipped。结构通过与子进程成功不代替完整 ready/build 或浏览器验收。不要为重试删除未知文件。
 
---apply-existing 只用于确认相应预设尚未写入的已有官方应用；--repair-existing 只修已知旧 starter.plugins 引用。二者都不是通用恢复入口，详见 [Harness](HARNESS.md)。
+已有普通应用可单独补齐 normalize 静态样式，在父目录运行以下命令，不需要安装依赖：
+
+```powershell
+Set-Location -LiteralPath $projectsRoot
+node $starterCli --name my-vue-app --type application --framework vue --apply-existing
+node $starterCli --name my-react-app --type application --framework react --language js --apply-existing
+```
+
+已知基础样式已存在时不会重复写入；文件内容被修改、同名占用或部分完成时拒绝覆盖。--apply-existing 安装可选 UI/CSS 等预设仍要求确认相应预设尚未写入；--repair-existing 只修已知旧 starter.plugins 引用。二者不是通用覆盖式恢复入口，详见 [Harness](HARNESS.md)。
 
 ## 按需启用大屏、引擎和模型保护
 

@@ -9,6 +9,7 @@ import { planThreeSmoke } from "../packages/create/src/three-smoke.mjs";
 import { planCesium } from "../packages/create/src/cesium.mjs";
 import { planBabylon } from "../packages/create/src/babylon.mjs";
 import { planModelProtection } from "../packages/create/src/model-protection.mjs";
+import { planBaseStyles } from "../packages/create/src/base-styles.mjs";
 export async function verifyGeneratorMatrix() {
   let cases = 0,
     uiSmoke = 0,
@@ -71,6 +72,13 @@ export async function verifyGeneratorMatrix() {
                 files.push(path);
               }
             }
+            const baseStyles = planBaseStyles(options);
+            assert.equal(
+              baseStyles.entry,
+              `src/main.${language}${framework === "react" ? "x" : ""}`,
+            );
+            assert.deepEqual(baseStyles.dependencies, []);
+            add(baseStyles.files);
             add(
               Object.keys(generated?.files ?? {}).filter((path) => !path.startsWith("src/main.")),
             );

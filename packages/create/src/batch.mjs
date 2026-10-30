@@ -5,6 +5,7 @@ import { dirname, join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 import { buildVpCommand, validateProjectName, validateProjectOptions } from "./options.mjs";
 import { planIntegrations } from "./integrations.mjs";
+import { planBaseStyles } from "./base-styles.mjs";
 import { planUiSmoke } from "./ui-smoke.mjs";
 import { planScreenPreset } from "./screen.mjs";
 import { planEngine } from "./engine.mjs";
@@ -142,6 +143,7 @@ export async function createBatchPlan(input, cwd = process.cwd()) {
       args,
       official: { ...buildVpCommand(options), cwd: workspaceRoot },
       integrations: planIntegrations(options),
+      baseStyles: planBaseStyles(options),
       ...(planModelProtection(options) ? { modelProtection: planModelProtection(options) } : {}),
       ...(app.engine || app.engines
         ? {
