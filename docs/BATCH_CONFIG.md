@@ -48,6 +48,8 @@ uiSmoke 的 Vue UI 为 Element Plus、Ant Design Vue、TDesign，React UI 为 An
 
 在仓库上级目录执行，输出为**当前目录下的配置 name**，与配置文件所在目录无关；目标必须不存在，不能在已有 workspace 内嵌套创建。
 
+目标预检也会检查当前目录及各级祖先的 package.json：存在时须为不超过 1 MiB 的普通 JSON 对象文件，接受 UTF-8 BOM；目录、符号链接、悬空链接、超限或损坏清单均拒绝。错误给出对应路径，不显示清单内容；先人工核对该文件，不删除未知祖先文件来重试。普通非工作区清单可继续规划，workspace 标记仍禁止嵌套；预览后再执行也会重新检查。
+
 ```powershell
 cd D:\Workspace\adui-studio
 node ./viteplus-starter/packages/create/bin/cli.mjs --config ./viteplus-starter/examples/monorepo.batch.json --dry-run

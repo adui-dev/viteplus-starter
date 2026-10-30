@@ -11,6 +11,7 @@ import { planScreenPreset } from "./screen.mjs";
 import { planEngine } from "./engine.mjs";
 import { planModelProtection } from "./model-protection.mjs";
 import { resolveWorkspaceApplication, runWorkspaceVp } from "./workspace.mjs";
+import { inspectPath } from "./safe-paths.mjs";
 
 const maxConfigBytes = 1024 * 1024;
 
@@ -100,9 +101,21 @@ async function checkDestination(cwd, root) {
       throw new Error("批量新建工作区须在已有工作区之外执行，请切换到仓库上级目录");
     }
     const manifestPath = join(current, "package.json");
-    if (await exists(manifestPath)) {
-      const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
-      if (manifest.workspaces) throw new Error("不能在已有 workspace 内批量新建 Monorepo");
+    const metadata = await inspectPath(manifestPath, "批量目标预检");
+    if (metadata) {
+      if (!metadata.isFile() || metadata.size > maxConfigBytes)
+        throw new Error(
+          "批量目标祖先 package.json 必须是小于等于 1 MiB 的普通文件：" + manifestPath,
+        );
+      let manifest;
+      try {
+        manifest = JSON.parse((await readFile(manifestPath, "utf8")).replace(/^\uFEFF/, ""));
+        if (!manifest || typeof manifest !== "object" || Array.isArray(manifest)) throw new Error();
+      } catch {
+        throw new Error("批量目标祖先 package.json 不是有效 JSON 对象：" + manifestPath);
+      }
+      if (manifest.workspaces)
+        throw new Error("不能在已有 workspace 内批量新建 Monorepo：" + manifestPath);
     }
     if (dirname(current) === current) break;
   }

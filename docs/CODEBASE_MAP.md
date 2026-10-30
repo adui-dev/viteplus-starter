@@ -66,6 +66,7 @@ UI/CSS 见 integrations；大屏核心见 packages/screen；三引擎见 package
 - `docs/MONOREPO.md`：逐应用创建、检查及边界说明。
 - `packages/create/src/batch.mjs`：JSON 严格校验、无写入批量计划、官方顺序执行与失败摘要。
 - `packages/create/test/batch.test.mjs`：真实 CLI dry-run、冲突与路径保护、顺序执行及失败保留现场测试。
+- `packages/create/test/batch-destination.test.mjs`：批量祖先清单的 BOM/1 MiB 边界、JSON 对象/普通文件/链接保护、真实 CLI 预览和执行前拒绝、内容不回显及原文件保持。
 - `examples/monorepo.batch.json`、`docs/BATCH_CONFIG.md`：可执行配置样例与字段/运行说明。
 
 ## UI Smoke 验收工具

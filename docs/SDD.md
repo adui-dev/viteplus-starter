@@ -121,6 +121,7 @@ assets 保存指定 URL 的 8.0.1 固定快照、MIT 许可和来源/SHA256 记�
 - `--config` 在单项目交互前分流，仅允许同时指定 `--dry-run`，不沿用模糊的单项目默认值。顶层仅接受 version/name/apps，应用仅接受 name/framework/language/ui/css/uiSmoke/screen；必填版本为 1，框架显式选择，语言默认 ts、UI/CSS 默认 none。
 - `validateBatchConfig` 先校验全部应用，再接触输出目录：最多 32 个，拒绝未知字段与错误类型、遍历、重名、Windows 设备名称、与工作区名或默认 website/utils 冲突；uiSmoke 预先调用既有组合校验。
 - `createBatchPlan` 使用真实 cwd 为父目录，输出固定为 cwd/name；已有目标含悬空链接拒绝，逐级检查祖先 workspace 标记，禁止嵌套。配置读取限制为 1 MiB，接受 UTF-8 BOM；只解析 JSON，不执行配置代码。
+- checkDestination 使用 inspectPath 检查 cwd/祖先的 package.json，要求普通文件且不超过 1 MiB，再去 BOM 解析为 JSON 对象（排除 null 和数组）；解析错误仅带路径，不传出原始异常片段。workspace 清单与 pnpm 标记仍拒绝嵌套。executeBatch 原有重建计划流程复用该检查，拒绝发生在 runner/官方工具调用前；不改变已存在目标保护及后续失败保留现场规则。
 - dry-run 展示规范化选项、根官方命令、每应用的 CLI argv 与官方模板命令、依赖计划、可选验收页路径/文件；不写目录。执行前重新从规范化配置构建计划，避免使用过期或被修改的阶段命令。
 - 根调用带 --no-interactive 的官方 monorepo；生成后再次统一预检全部应用，检查新根非 junction/符号链接。随后按应用顺序串行调用既有 CLI，验收页紧随对应应用；Node 子进程使用 argv，不把路径拼入 shell。没有复制框架模板或替代迁移流程。
 - `executeBatch` 记录成功阶段；任一步失败抛出包含 completed/failed/pending/workspaceRoot 的错误，并给用户可读摘要，保留部分生成目录及安装。它不提供事务回滚或自动恢复，根生成失败也不会删除现场。
