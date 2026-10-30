@@ -100,6 +100,8 @@ node $starterCli --workspace $workspacePath --name reports --type application --
 
 应用位于 apps/reports；UI/CSS/引擎按应用选择，根锁文件/catalog 可随安装更新。当前支持官方 pnpm `apps/*`、`packages/*`、`tools/*` 布局，细节见 [Monorepo](MONOREPO.md) 与 [批量配置](BATCH_CONFIG.md)。
 
+添加成员前，根 package.json 应保存为 UTF-8 无 BOM：当前官方 Vite+ 1.4.0 创建入口不能读取其 BOM。生成器会在写 peer 和调用官方工具前拒绝并报告路径，恢复计划对应 manual-review；先人工确认并转换该文件，不删除或覆盖工作区。pnpm-workspace.yaml 的 BOM 可由现有预检和增量合并处理。
+
 ## 检查和恢复已有工作区
 
 预期 JSON 应包含希望对照的全部应用；如需 reports 也参与对照，将原 JSON 复制到自己保存的配置文件，在副本追加应用，并把 $batchConfig 指向该副本，不直接修改仓库示例。inspect 缺失或阻塞时退出 1，代表需要处理现场。先检查、再审阅计划：

@@ -140,6 +140,11 @@ export async function resolveWorkspaceApplication(input, cwd = process.cwd()) {
   const target = join(root, "apps", options.name);
   const existing = await inspect(target);
   if (existing && !existing.isDirectory()) throw new Error("应用目标不是目录");
+  if (!existing && (await readFile(join(root, "package.json"), "utf8")).startsWith("\uFEFF"))
+    throw new Error(
+      "当前 Vite+ 官方模板不支持工作区根 package.json 的 BOM，请先人工保存为 UTF-8 无 BOM：" +
+        join(root, "package.json"),
+    );
   const scope = manifest.name?.startsWith("@") ? manifest.name.split("/")[0] : null;
   const packageName = scope ? scope + "/" + options.name : options.name;
   for (const parent of ["apps", "packages", "tools"]) {

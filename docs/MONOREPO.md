@@ -82,6 +82,8 @@ JSON 报告包含 root、readOnly、ok、issues、members、apps 和 limitations
 
 工作区根及成员的 JSON 清单支持 UTF-8 BOM，检查、逐应用新增预检和恢复入口使用相同读取规则，不会为去 BOM 重写原文件。清单须为不超过 1 MiB 的普通 JSON 对象文件；损坏、超限、目录或链接在相应预检拒绝，错误不显示清单内容。BOM 不影响作用域包名和重复包名检测，也不代表依赖或构建已验证。
 
+官方创建另有编码限制：实测 Vite+ 1.4.0 的 Application 模板遇到带 BOM 的根 package.json 会失败。新建成员（包括恢复缺失应用）会提前拒绝并给出根清单路径，请人工保存为 UTF-8 无 BOM 后重新规划；生成器不自动转换或先写 peer。只读检查、已有结构的规划和全部跳过的恢复不受此限制；JSON BOM 的可读性不能代替官方工具链兼容性。
+
 pnpm-workspace.yaml 同样支持文件头 UTF-8 BOM：packages 和既有 peer/构建策略能够正确识别；读取和规划不为去 BOM 写文件，显式增量合并保留 BOM 与其他配置，后续仍遵循原定向格式化规则。已有明确 core-js:true/false 不覆盖，不重复追加 packageExtensions/allowBuilds；未知 glob、内联策略、冲突 peer、合并键或多文档仍须人工处理。
 
 ## 逐应用恢复操作计划（只读）

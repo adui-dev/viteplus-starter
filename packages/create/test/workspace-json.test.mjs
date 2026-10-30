@@ -89,7 +89,7 @@ const run = (f, args) =>
     timeout: 10000,
   });
 
-test("根及成员 BOM 清单在检查、规划和恢复一致，读取不改原文件", async (t) => {
+test("BOM 清单只读可查，根转为无 BOM 后成员清单仍参与规划和恢复", async (t) => {
   const f = await fixture(t);
   for (const file of [
     "package.json",
@@ -105,12 +105,27 @@ test("根及成员 BOM 清单在检查、规划和恢复一致，读取不改原
         : source,
     );
   }
-  const before = await snapshot(f.base);
+  const initial = await snapshot(f.base);
   const inspection = await inspectWorkspace(f.root, f.config);
   assert.deepEqual(
     inspection.apps.map((a) => a.status),
     ["present", "not-created"],
   );
+  assert.equal(
+    (
+      await resolveWorkspaceApplication({
+        ...options(f.root),
+        name: "existing",
+        framework: "react",
+        language: "js",
+      })
+    ).exists,
+    true,
+  );
+  assert.deepEqual(await snapshot(f.base), initial);
+  const rootManifest = join(f.root, "package.json");
+  await writeFile(rootManifest, (await readFile(rootManifest, "utf8")).slice(1));
+  const before = await snapshot(f.base);
   const plan = await planWorkspaceRecovery(f.root, f.config);
   assert.equal(plan.ok, true, JSON.stringify(plan.apps));
   assert.deepEqual(
@@ -159,6 +174,63 @@ test("根及成员 BOM 清单在检查、规划和恢复一致，读取不改原
   ]);
   assert.equal(preview.status, 0, preview.stderr);
   assert.deepEqual(await snapshot(f.base), afterCreation);
+});
+
+test("官方模板不支持根 BOM 时提前阻塞新建，不写 peer 或自动转换清单", async (t) => {
+  const f = await fixture(t);
+  const manifest = join(f.root, "package.json");
+  await writeFile(manifest, "\uFEFF" + (await readFile(manifest, "utf8")));
+  const before = await snapshot(f.base);
+  const plan = await planWorkspaceRecovery(f.root, f.config);
+  assert.equal(plan.ok, false);
+  assert.deepEqual(
+    plan.apps.map((app) => app.action),
+    ["validate-existing", "manual-review"],
+  );
+  assert.ok(
+    plan.apps[1].reasons.some((reason) => reason.includes("官方模板") && reason.includes(manifest)),
+  );
+  await assert.rejects(
+    executeWorkspaceRecovery(f.root, f.config, () => assert.fail("不得启动子进程")),
+    /人工阻塞/,
+  );
+  const create = run(f, [
+    "--workspace",
+    f.root,
+    "--name",
+    "fresh",
+    "--type",
+    "application",
+    "--framework",
+    "vue",
+    "--ui",
+    "antd",
+    "--css",
+    "unocss",
+  ]);
+  assert.equal(create.status, 1);
+  assert.ok(create.stderr.includes(manifest));
+  assert.match(create.stderr, /官方模板.*BOM/);
+  for (const mode of ["--plan-recovery", "--execute-recovery"]) {
+    const output = run(f, [mode, f.root, "--config", f.config]);
+    assert.equal(output.status, 1, output.stderr);
+  }
+  await writeFile(
+    f.config,
+    JSON.stringify({
+      version: 1,
+      name: "repo",
+      apps: [{ name: "existing", framework: "react", language: "js" }],
+    }),
+  );
+  const skipped = run(f, ["--execute-recovery", f.root, "--config", f.config]);
+  assert.equal(skipped.status, 0, skipped.stderr);
+  assert.deepEqual(JSON.parse(skipped.stdout).skipped, ["existing"]);
+  const originalFiles = before.filter((item) => !item.path.endsWith("expected.json"));
+  assert.deepEqual(
+    (await snapshot(f.base)).filter((item) => !item.path.endsWith("expected.json")),
+    originalFiles,
+  );
 });
 
 test("BOM 成员仍参与作用域重名检测，不通过 BOM 绕过冲突", async (t) => {
