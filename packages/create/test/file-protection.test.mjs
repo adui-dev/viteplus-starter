@@ -79,6 +79,149 @@ const uiSelections = [
   ["react", "tdesign"],
 ];
 
+test("CSS 文件缺失但插件、样式或已知调用残留时拒绝补装，首次安装仍可用", async (t) => {
+  for (const framework of ["vue", "react"])
+    for (const language of ["ts", "js"])
+      for (const css of ["unocss", "tailwindcss"]) {
+        const f = await fixture(t, framework, language);
+        const options = { ...f.options, ui: "none", css };
+        const bare = "export default defineConfig({plugins:[]})";
+        await writeFile(join(f.app, "vite.config.js"), bare);
+        assert.equal(
+          await applyIntegrations(
+            f.app,
+            options,
+            () => {},
+            () => {},
+          ),
+          true,
+        );
+        const config = await readFile(join(f.app, "vite.config.js"), "utf8");
+        const main = await readFile(join(f.app, f.main), "utf8");
+        await rm(
+          join(f.app, css === "unocss" ? `uno.config.${language}` : "src/starter.tailwind.css"),
+        );
+        for (const partial of ["plugin", "style", "call"]) {
+          await writeFile(
+            join(f.app, "vite.config.js"),
+            partial === "plugin"
+              ? config
+              : partial === "call"
+                ? `export default defineConfig({plugins:[${css === "unocss" ? "UnoCSS" : "tailwindcss"}()]})`
+                : bare,
+          );
+          await writeFile(join(f.app, f.main), partial === "style" ? main : f.entry);
+          const before = await snapshot(f.root);
+          const unexpected = () => {
+            throw new Error("残留 CSS 配置时不应安装或格式化");
+          };
+          await assert.rejects(
+            applyIntegrations(f.app, options, unexpected, unexpected),
+            /CSS 插件或样式引用已存在/,
+          );
+          await assert.rejects(
+            applyIntegrations(
+              f.app,
+              { ...options, css: css === "unocss" ? "tailwindcss" : "unocss" },
+              unexpected,
+              unexpected,
+            ),
+            /CSS 插件或样式引用已存在/,
+          );
+          assert.deepEqual(await snapshot(f.root), before);
+        }
+      }
+});
+
+test("CSS 导入别名与调用检测忽略注释/示例，保留仅新增 UI 和旧版修复", () => {
+  const bare = "export default defineConfig({plugins:[]})";
+  const notes =
+    '// UnoCSS()\n/* import U from "unocss/vite"; tailwindcss() */\nconst note = `import "virtual:uno.css"`;\nconst text = "tailwindcss()";\n';
+  for (const css of ["unocss", "tailwindcss"]) {
+    const options = { framework: "vue", ui: "none", css };
+    const generated = generateIntegration(options, notes + bare, notes);
+    assert.ok(generated);
+    assert.ok(
+      generateIntegration(
+        { framework: "vue", ui: "element-plus", css: "none" },
+        generated.config,
+        generated.files["src/main.ts"],
+      ),
+    );
+  }
+  assert.throws(
+    () =>
+      generateIntegration(
+        { framework: "react", css: "unocss" },
+        'import {default as U} from "unocss/vite";\n' + bare,
+        "",
+      ),
+    /CSS 插件或样式引用已存在/,
+  );
+  const legacy =
+    "import { starterPlugins } from './starter.plugins'\nexport default defineConfig({plugins:starterPlugins()})";
+  assert.ok(
+    generateIntegration({ framework: "vue", css: "unocss" }, legacy, 'import "virtual:uno.css";', {
+      repair: true,
+    }),
+  );
+});
+
+test("真实 CLI 工作区 CSS 部分配置在预检拒绝，不补文件或修改根配置", async (t) => {
+  const cli = fileURLToPath(new URL("../bin/cli.mjs", import.meta.url));
+  const env = Object.fromEntries(
+    Object.entries(process.env).filter(([key]) => key.toUpperCase() !== "PATH"),
+  );
+  env.PATH = "";
+  for (const [framework, language, css, partial] of [
+    ["vue", "js", "unocss", "plugin"],
+    ["react", "ts", "tailwindcss", "style"],
+    ["vue", "ts", "tailwindcss", "call"],
+    ["react", "js", "unocss", "call"],
+  ]) {
+    const f = await fixture(t, framework, language, true);
+    const options = { ...f.options, ui: "none", css, workspace: f.root };
+    const bare = "export default defineConfig({plugins:[]})";
+    const generated = generateIntegration(options, bare, f.entry);
+    await writeFile(
+      join(f.app, "vite.config.js"),
+      partial === "plugin"
+        ? generated.config
+        : partial === "call"
+          ? `export default defineConfig({plugins:[${css === "unocss" ? "UnoCSS" : "tailwindcss"}()]})`
+          : bare,
+    );
+    await writeFile(join(f.app, f.main), partial === "style" ? generated.files[f.main] : f.entry);
+    const before = await snapshot(f.root);
+    const result = spawnSync(
+      process.execPath,
+      [
+        cli,
+        "--workspace",
+        f.root,
+        "--name",
+        "app",
+        "--type",
+        "application",
+        "--framework",
+        framework,
+        "--language",
+        language,
+        "--ui",
+        "none",
+        "--css",
+        css,
+        "--apply-existing",
+      ],
+      { cwd: f.root, env, encoding: "utf8", timeout: 10_000 },
+    );
+    assert.equal(result.status, 1, result.stderr);
+    assert.match(result.stderr, /阶段：补装预检/);
+    assert.match(result.stderr, /CSS 插件或样式引用已存在/);
+    assert.deepEqual(await snapshot(f.root), before);
+  }
+});
+
 test("五种 UI 在 TS/JS 下首次无 CSS 补装成功，重复补装不安装、不格式化、不写文件", async (t) => {
   for (const [framework, ui] of uiSelections)
     for (const language of ["ts", "js"]) {
@@ -217,6 +360,7 @@ test("UI/CSS 只读预检保留四种入口和文件，未选择集成时不访�
   for (const framework of ["vue", "react"])
     for (const language of ["ts", "js"]) {
       const f = await fixture(t, framework, language);
+      await writeFile(join(f.app, "vite.config.js"), "export default defineConfig({plugins:[]})");
       const before = await snapshot(f.root);
       assert.ok(await preflightIntegrations(f.app, f.options));
       assert.deepEqual(await snapshot(f.root), before);
@@ -242,7 +386,13 @@ test("真实 CLI 工作区补装在修改共享配置前拒绝未知 Vite 结构
             join(f.app, "vite.config.js"),
             "export default defineConfig({plugins:customPlugins()})",
           );
-        else await writeFile(join(f.app, `uno.config.${language}`), "user configuration");
+        else {
+          await writeFile(
+            join(f.app, "vite.config.js"),
+            "export default defineConfig({plugins:[]})",
+          );
+          await writeFile(join(f.app, `uno.config.${language}`), "user configuration");
+        }
         const before = await snapshot(f.root);
         const result = spawnSync(
           process.execPath,
@@ -366,6 +516,8 @@ test("UI/CSS 入口父目录 junction 在依赖安装前拒绝", async (t) => {
 test("安装期间创建冲突文件或改动入口，拒绝覆盖且不写其他配置", async (t) => {
   for (const change of ["output", "entry", "config", "link"]) {
     const f = await fixture(t);
+    f.config = "export default defineConfig({plugins:[]})";
+    await writeFile(join(f.app, "vite.config.js"), f.config);
     let calls = 0;
     await assert.rejects(
       applyIntegrations(

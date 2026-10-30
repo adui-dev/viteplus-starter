@@ -18,7 +18,7 @@ const UI = {
 
 // Recognize the plain static imports emitted by this generator, including aliases
 // and multiline bindings. Ignore comment examples and unrelated string contents.
-function hasIntegrationImport(source, modules) {
+function hasIntegrationImport(source, modules, calls = []) {
   let code = "";
   for (let index = 0; index < source.length;) {
     if (source.startsWith("//", index) || source.startsWith("/*", index)) {
@@ -45,7 +45,7 @@ function hasIntegrationImport(source, modules) {
       index = end + 1;
     } else code += source[index++];
   }
-  return false;
+  return calls.some((name) => new RegExp("(?:^|[^\\w$.])" + name + "\\s*\\(").test(code));
 }
 
 export function planIntegrations({ type, framework, ui = "none", css = "none" }) {
@@ -121,6 +121,19 @@ export function generateIntegration(options, viteConfig, mainSource, { repair = 
     const modules = new Set([...imports, ...mainImports].map((line) => /'([^']+)'/.exec(line)[1]));
     if (hasIntegrationImport(viteConfig, modules) || hasIntegrationImport(mainSource, modules))
       throw new Error("UI 配置或样式导入已存在，拒绝重复补装；仅新增 CSS 时请使用 --ui none");
+  }
+  if (!repair && css !== "none") {
+    const modules = new Set([
+      "unocss/vite",
+      "virtual:uno.css",
+      "@tailwindcss/vite",
+      "./starter.tailwind.css",
+    ]);
+    if (
+      hasIntegrationImport(viteConfig, modules, ["UnoCSS", "tailwindcss"]) ||
+      hasIntegrationImport(mainSource, modules)
+    )
+      throw new Error("CSS 插件或样式引用已存在，拒绝补装；请先核对已有或部分完成的配置");
   }
   if (css === "unocss") {
     imports.push("import UnoCSS from 'unocss/vite'");

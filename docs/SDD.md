@@ -32,6 +32,7 @@ assets 保存指定 URL 的 8.0.1 固定快照、MIT 许可和来源/SHA256 记�
 - `applyIntegrations` 在写入后只格式化本次修改的应用文件；共享根构建策略在其所属目录单独格式化，不向应用格式化命令传递父目录路径，不得跳过失败。
 - `preflightIntegrations` 提取 UI/CSS 计划、入口/唯一 Vite 配置识别、配置生成与输出占用检查，整个过程只读。--apply-existing 在“补装预检”中与基础样式、所选预设预检一起调用，全部通过后才写工作区 peer 配置；应用清单校验复用基础样式预检，不再提前裸 JSON.parse。applyIntegrations 自身仍重新预检，安装完成后再核对捕获的入口/配置内容、路径和输出占用，保留已有失败保护。
 - `generateIntegration` 在非旧版修复模式检查已选择 UI 所需模块的已有静态导入，防止 css=none 时没有输出文件可作重复检测而再次插入 Components/resolver 或库样式。识别生成器的普通单双引号导入、别名和多行绑定，忽略注释及示例字符串；已有部分引用保守拒绝，不自动迁移手写配置。不是通用 JS/TS 解析器。ui=none 的后续 CSS 集成和 repair=true 的已知旧版迁移保留原路径。
+- 选择 CSS 时同一检测器还检查 UnoCSS/Tailwind 的已知插件/入口静态导入，并在屏蔽注释与字符串后的内容中识别默认 UnoCSS()/tailwindcss() 调用。任一框架的引用残留均拒绝重复或替换式补装，文件缺失不等于未集成。css=none 不进入此检查，旧版修复沿用显式迁移；不识别任意手写调用别名或动态配置。
 - `--repair-existing` 仅用于符合已知 Starter 旧格式的现有 Vue/React Application：先验证项目类型、旧插件文件及配置形态，再替换旧导入并将 `starter.plugins.ts` 备份为 `starter.plugins.ts.bak`，随后格式化；**不安装依赖，也不重建项目**。
 - 此功能不是通用任意 TypeScript 配置的转换器，无法识别的结构必须拒绝修改；旧项目 Windows 修复证据见 [项目状态](PROJECT_CONTEXT.md)，不自动升级其他旧快照。
 

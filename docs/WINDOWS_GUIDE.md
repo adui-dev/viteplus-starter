@@ -137,6 +137,8 @@ node $starterCli --name my-react-app --type application --framework react --lang
 
 CSS 为 none 时也会检查 UI 是否已有插件/样式引用，重复或部分集成不会自动再插入。组件库依赖已安装、相关配置尚未写入时仍可首次补装；已有 UI 仅需追加 CSS 时，使用 --ui none 配合所需 --css，不再次选择该 UI。此入口不用于替换已有组件库或自动整理任意手写配置。
 
+CSS 配置文件丢失时，也不能直接重跑补装：若 Vite 或正式入口仍保留 UnoCSS/Tailwind 的已知引用，命令会在“补装预检”阶段拒绝。先依据 Git diff 和备份人工核对、恢复配置；不要通过删除更多文件来绕过检查。已有 CSS 仅新增 UI 时使用 --css none；此入口不自动修复部分 CSS 配置或切换 CSS 框架。
+
 ## 按需启用大屏、引擎和模型保护
 
 下面是另一种独立新建选择，目标 my-three-app 须不存在：
