@@ -6,8 +6,7 @@ import { inspectWorkspace } from "../src/workspace-inspect.mjs";
 import { createStageRunner } from "../src/recovery.mjs";
 import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
-import { readFile } from "node:fs/promises";
-import { basename, join, resolve } from "node:path";
+import { basename, resolve } from "node:path";
 import { stdin, stdout } from "node:process";
 import { createInterface } from "node:readline/promises";
 import { parseCliArgs } from "../src/cli-args.mjs";
@@ -241,11 +240,6 @@ async function main() {
     if (args.dryRun) throw new Error("--repair-existing 与 --dry-run 不能同时使用");
     if (options.type !== "application") throw new Error("仅支持 Application 的旧版配置修复");
     if (!existsSync(target)) throw new Error("目标目录不存在，无法修复");
-    const manifest = JSON.parse(await readFile(join(target, "package.json"), "utf8"));
-    const dependencies = { ...manifest.dependencies, ...manifest.devDependencies };
-    if (!dependencies["vite-plus"] || !dependencies[options.framework]) {
-      throw new Error("目标项目与所选 Vue/React 不匹配，拒绝修复");
-    }
     await stage("旧配置修复", () => repairExistingIntegrations(target, options));
     console.log("旧版插件引用修复完成，旧文件已备份，请在应用目录运行 vp check 和 vp run build");
     return;

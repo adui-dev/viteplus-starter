@@ -278,10 +278,25 @@ export async function repairExistingIntegrations(directory, options, formatter =
   if (!plan.dependencies.length && !plan.devDependencies.length) {
     throw new Error("未选择 UI/CSS，无需修复");
   }
+  const manifestPath = join(directory, "package.json");
+  if (!(await inspectPath(manifestPath, "旧配置修复"))?.isFile())
+    throw new Error("旧配置修复缺少普通文件：" + manifestPath);
+  let manifest;
+  try {
+    manifest = JSON.parse((await readFile(manifestPath, "utf8")).replace(/^\uFEFF/, ""));
+    if (!manifest || typeof manifest !== "object" || Array.isArray(manifest)) throw new Error();
+  } catch {
+    throw new Error("旧配置修复 package.json 无效：" + manifestPath);
+  }
+  const dependencies = { ...manifest.dependencies, ...manifest.devDependencies };
+  if (!dependencies["vite-plus"] || !dependencies[options.framework])
+    throw new Error("目标项目与所选 Vue/React 不匹配，拒绝修复：" + manifestPath);
   const configPath = join(directory, "vite.config.ts");
   const oldFile = join(directory, "starter.plugins.ts");
   const backupFile = join(directory, "starter.plugins.ts.bak");
-  for (const path of [configPath, oldFile]) await inspectPath(path);
+  for (const path of [configPath, oldFile])
+    if (!(await inspectPath(path, "旧配置修复"))?.isFile())
+      throw new Error("旧配置修复缺少普通文件：" + path);
   if (await inspectPath(backupFile)) throw new Error("旧插件备份已存在，请先人工检查，拒绝覆盖");
   const [config, legacySource] = await Promise.all([
     readFile(configPath, "utf8"),
@@ -295,6 +310,6 @@ export async function repairExistingIntegrations(directory, options, formatter =
   if (await inspectPath(backupFile)) throw new Error("旧插件备份已存在，拒绝覆盖");
   await writeFile(configPath, generated.config);
   await rename(oldFile, backupFile);
-  formatter(directory, "vite.config.ts");
+  await formatter(directory, "vite.config.ts");
   return true;
 }

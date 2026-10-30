@@ -141,6 +141,8 @@ CSS 配置文件丢失时，也不能直接重跑补装：若 Vite 或正式入�
 
 Ant Design Vue 的 allowBuilds 策略冲突同样在“补装预检”阶段拒绝，报错会给出实际 pnpm-workspace.yaml 路径；先人工核对该文件，不删除自定义规则重试。已明确的 core-js:true/false 保留，只有缺失时才在实际集成阶段补充 core-js:false；不会自动放开全局构建脚本权限。
 
+旧版 --repair-existing 的清单、框架、旧文件和备份问题会在“旧配置修复”阶段报告；只支持已知 TS 旧格式。预检失败不改原文件，已有 starter.plugins.ts.bak 不会被覆盖。若迁移后格式化失败，先查看 Git diff 和保留的备份再处理，不直接删除备份重跑，也不将该失败视为自动回滚完成。
+
 ## 按需启用大屏、引擎和模型保护
 
 下面是另一种独立新建选择，目标 my-three-app 须不存在：
