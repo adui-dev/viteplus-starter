@@ -16,6 +16,38 @@ const UI = {
   ],
 };
 
+// Recognize the plain static imports emitted by this generator, including aliases
+// and multiline bindings. Ignore comment examples and unrelated string contents.
+function hasIntegrationImport(source, modules) {
+  let code = "";
+  for (let index = 0; index < source.length;) {
+    if (source.startsWith("//", index) || source.startsWith("/*", index)) {
+      const line = source.startsWith("//", index);
+      const end = source.indexOf(line ? "\n" : "*/", index + 2);
+      const next = end < 0 ? source.length : end + (line ? 0 : 2);
+      code += source.slice(index, next).replace(/[^\n]/g, " ");
+      index = next;
+    } else if (["'", '"', "`"].includes(source[index])) {
+      const quote = source[index];
+      let end = index + 1;
+      for (; end < source.length; end++) {
+        if (source[end] === "\\") end++;
+        else if (source[end] === quote) break;
+      }
+      const module = source.slice(index + 1, end);
+      if (
+        quote !== "`" &&
+        modules.has(module) &&
+        /(?:^|[;\n])\s*import\b\s*(?:[\w${},*\s]+\bfrom\s*)?$/.test(code)
+      )
+        return true;
+      code += source.slice(index, Math.min(end + 1, source.length)).replace(/[^\n]/g, " ");
+      index = end + 1;
+    } else code += source[index++];
+  }
+  return false;
+}
+
 export function planIntegrations({ type, framework, ui = "none", css = "none" }) {
   if (
     !["none", "element-plus", "antd", "tdesign"].includes(ui) ||
@@ -85,6 +117,11 @@ export function generateIntegration(options, viteConfig, mainSource, { repair = 
   if (framework === "react" && ui === "antd") mainImports.push("import 'antd/dist/reset.css'");
   if (framework === "react" && ui === "tdesign")
     mainImports.push("import 'tdesign-react/es/style/index.css'");
+  if (!repair && ui !== "none") {
+    const modules = new Set([...imports, ...mainImports].map((line) => /'([^']+)'/.exec(line)[1]));
+    if (hasIntegrationImport(viteConfig, modules) || hasIntegrationImport(mainSource, modules))
+      throw new Error("UI 配置或样式导入已存在，拒绝重复补装；仅新增 CSS 时请使用 --ui none");
+  }
   if (css === "unocss") {
     imports.push("import UnoCSS from 'unocss/vite'");
     plugins.push("UnoCSS()");

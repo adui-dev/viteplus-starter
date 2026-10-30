@@ -6,7 +6,12 @@ import { tmpdir } from "node:os";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { addUiSmoke } from "../src/ui-smoke.mjs";
-import { applyIntegrations, preflightIntegrations } from "../src/integrations.mjs";
+import {
+  applyIntegrations,
+  preflightIntegrations,
+  generateIntegration,
+  planIntegrations,
+} from "../src/integrations.mjs";
 import { addScreenPreset } from "../src/screen.mjs";
 import { inspectPath } from "../src/safe-paths.mjs";
 async function fixture(t, framework = "vue", language = "js", workspace = false) {
@@ -65,6 +70,148 @@ async function snapshot(root) {
     }),
   );
 }
+
+const uiSelections = [
+  ["vue", "element-plus"],
+  ["vue", "antd"],
+  ["vue", "tdesign"],
+  ["react", "antd"],
+  ["react", "tdesign"],
+];
+
+test("五种 UI 在 TS/JS 下首次无 CSS 补装成功，重复补装不安装、不格式化、不写文件", async (t) => {
+  for (const [framework, ui] of uiSelections)
+    for (const language of ["ts", "js"]) {
+      const f = await fixture(t, framework, language);
+      const options = { ...f.options, ui, css: "none" };
+      const config = "export default defineConfig({plugins:[]})";
+      await writeFile(join(f.app, "vite.config.js"), config);
+      if (framework === "vue" && ui === "antd")
+        await writeFile(join(f.app, "pnpm-workspace.yaml"), "allowBuilds:\n  core-js: false\n");
+      await writeFile(
+        join(f.app, "package.json"),
+        JSON.stringify({
+          dependencies: {
+            [framework]: "1",
+            "vite-plus": "1",
+            ...Object.fromEntries(
+              planIntegrations(options).dependencies.map((name) => [name, "1"]),
+            ),
+          },
+        }),
+      );
+      let installs = 0,
+        formats = 0;
+      assert.equal(
+        await applyIntegrations(
+          f.app,
+          options,
+          () => installs++,
+          () => formats++,
+        ),
+        true,
+      );
+      assert.equal(installs, 2);
+      assert.equal(formats, 1);
+      const before = await snapshot(f.root);
+      const unexpected = () => {
+        throw new Error("重复补装不应调用安装或格式化");
+      };
+      await assert.rejects(
+        applyIntegrations(f.app, options, unexpected, unexpected),
+        /UI 配置或样式导入已存在/,
+      );
+      assert.deepEqual(await snapshot(f.root), before);
+      assert.equal(
+        await applyIntegrations(
+          f.app,
+          { ...options, ui: "none", css: "unocss" },
+          () => {},
+          () => {},
+        ),
+        true,
+      );
+      assert.ok(
+        (await readFile(join(f.app, `uno.config.${language}`), "utf8")).includes("presetWind3"),
+      );
+    }
+});
+
+test("已有 UI 静态导入的别名、多行和部分配置拒绝，注释和示例字符串保留", () => {
+  const config = "export default defineConfig({plugins:[]})";
+  const examples =
+    '/*\nimport C from "unplugin-vue-components/vite";\n*/\n// import "antd/dist/reset.css"\nconst note = `import "antd/dist/reset.css"`;\nconst text = "import C from \'unplugin-vue-components/vite\'";\n';
+  for (const [framework, ui] of uiSelections) {
+    const options = { framework, ui, css: "none" };
+    assert.ok(generateIntegration(options, examples + config, examples));
+  }
+  for (const source of [
+    'import AutoComponents from "unplugin-vue-components/vite";\n',
+    'import {\n default as AutoComponents\n} /* comment */ from "unplugin-vue-components/vite";\n',
+  ])
+    assert.throws(
+      () => generateIntegration({ framework: "vue", ui: "element-plus" }, source + config, ""),
+      /UI 配置或样式导入已存在/,
+    );
+  assert.throws(
+    () =>
+      generateIntegration(
+        { framework: "react", ui: "antd" },
+        config,
+        '/* header */ import/* reason */"antd/dist/reset.css";',
+      ),
+    /UI 配置或样式导入已存在/,
+  );
+});
+
+test("真实 CLI 工作区中无 CSS 的重复 UI 补装在预检拒绝，根配置和文件保持", async (t) => {
+  const cli = fileURLToPath(new URL("../bin/cli.mjs", import.meta.url));
+  const env = Object.fromEntries(
+    Object.entries(process.env).filter(([key]) => key.toUpperCase() !== "PATH"),
+  );
+  env.PATH = "";
+  for (const [framework, ui, language] of [
+    ["vue", "element-plus", "ts"],
+    ["react", "tdesign", "js"],
+  ]) {
+    const f = await fixture(t, framework, language, true);
+    const options = { ...f.options, ui, css: "none", workspace: f.root };
+    await writeFile(join(f.app, "vite.config.js"), "export default defineConfig({plugins:[]})");
+    await applyIntegrations(
+      f.app,
+      options,
+      () => {},
+      () => {},
+    );
+    const before = await snapshot(f.root);
+    const result = spawnSync(
+      process.execPath,
+      [
+        cli,
+        "--workspace",
+        f.root,
+        "--name",
+        "app",
+        "--type",
+        "application",
+        "--framework",
+        framework,
+        "--language",
+        language,
+        "--ui",
+        ui,
+        "--css",
+        "none",
+        "--apply-existing",
+      ],
+      { cwd: f.root, env, encoding: "utf8", timeout: 10_000 },
+    );
+    assert.equal(result.status, 1, result.stderr);
+    assert.match(result.stderr, /阶段：补装预检/);
+    assert.match(result.stderr, /UI 配置或样式导入已存在/);
+    assert.deepEqual(await snapshot(f.root), before);
+  }
+});
 
 test("UI/CSS 只读预检保留四种入口和文件，未选择集成时不访问目标", async (t) => {
   for (const framework of ["vue", "react"])
