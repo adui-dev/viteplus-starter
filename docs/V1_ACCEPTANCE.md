@@ -150,3 +150,17 @@ Chrome 开发服务验证 test-vue 和上述 React JS 应用，style[data-vite-d
 Chrome 开发首页 Count is 0→1，style 标签顺序为本地 normalize.css、starter.tailwind.css、style.css；生产 /ui-check/ui-smoke.html 的真实 el-button 主按钮点击 0→1。Tailwind 区域为浅绿色背景、深绿色文字、8px 圆角及 16px 内边距；两页 warn/error 为空。生产截图 D:/Workspace/adui-studio/test-vue-element-plus-20261030.jpg 位于仓库外；两个标签及本轮 4395/4396 服务已关闭，工程和构建产物保留。
 
 test-vue 分步本地提交 a664ce1（集成 UI/CSS）、0325b9c（独立验收页），默认 Git hooks 均通过，工作区干净；该工程没有远程仓库。生成器仓库本轮 217/217 Node 测试、文档校验和根 vp check（175 格式/129 代码文件）通过。此轮只补齐用户选择的首次集成证据，没有新增业务页面、大屏或引擎功能。
+
+## Monorepo 基础样式与 UI/CSS 隔离补验（2026-10-30）
+
+复用既有官方 D:/Workspace/adui-studio/adui-normalize-validation-20261030，新增 apps/vue-element-ts（Vue TS/Element Plus/Tailwind）与 apps/react-antd-js（React JS/Ant Design/UnoCSS），保留原四个无可选 UI/CSS 应用及默认 website/utils。两次创建仍委托官方 vite:application 的 vue-ts/react，两次独立 --ui-smoke 不安装依赖。两组 dry-run 只核对官方参数、路径与 baseStyles 计划，不计为真实生成证据。
+
+进程环境使用 VP_NODE_VERSION=22.18.0 与前置官方 shim PATH，官方日志确认为 Node 22.18.0、pnpm 12.16.1；现有 Vite+ 1.4.0 保留。实际安装 Element Plus 2.14.7、Tailwind/@tailwindcss/vite 4.3.3、unplugin-vue-components 32.1.0、Ant Design 6.6.8、UnoCSS 66.12.0。生成器源码、依赖和锁文件未变。
+
+根 vp run --no-cache ready 14/14 成功，包含 utils 测试、默认成员、四个原应用及两个新增应用的完整构建；Vue/React TS 保留类型检查，TypeScript 7 API 实验性提示保留。Vue /ui-check/ 与 React ./ 的首页+组件页构建成功；UnoCSS 多入口及构建性能提示保留。最终根 vp check 96 格式/36 代码文件通过，无警告、lint 或类型错误。专项产物保留于各 dist/ui-verify，临时配置已清理。
+
+两组正式入口以本地 normalize.css 开头，静态 CSS 与许可均和生成器快照一致，没有 normalize.css npm 包。根 package.json 未增加框架/UI/CSS 直接依赖；共享 catalog 正常新增六项版本，packageExtensions 只增加 unocss/unplugin-vue-components 的 Vite peer，根 Vite 配置只增加该 Vue 应用声明的格式排除。三个根共享文件为预期变化；原其余 100 项文件的 SHA256 与 mtime 保持，涵盖四个原应用和默认 website/utils。两新应用的直接依赖各自隔离，正式 App 与原样式分别和对应无 UI 应用的三项文件一致。
+
+Chrome 两个开发首页 Count is 0→1；Vue 样式顺序为 normalize、Tailwind、原样式，React 为 normalize、Ant Design reset、UnoCSS、原样式。两个生产组件页均为真实库主按钮，计数 0→1；Tailwind/UnoCSS 浅绿色区域、深绿色文字、8px 圆角及 16px 内边距正确，四次页面观察的 warn/error 均为空。独立组件页保持自身入口，不宣称自动继承 normalize。截图 monorepo-vue-normalize-ui-20261030.jpg、monorepo-react-normalize-ui-20261030.jpg 保留在 D:/Workspace/adui-studio 仓库外。
+
+两组重复创建、重复 --ui-smoke 均退出 1；不带 UI/CSS 参数的 --apply-existing 均退出 0 并跳过基础样式写入。六次调用前后 149 项 Git 可见文件的内容和 mtime 一致，没有重新安装依赖。两个验收标签和本轮 4395–4398 服务已关闭，测试工作区原有未提交文件保留，未将其纳入生成器提交。此轮未发现需要修复的运行逻辑，仅同步代表实测范围和 Monorepo 说明，不扩大为全部组合已验证。

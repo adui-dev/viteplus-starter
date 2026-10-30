@@ -93,6 +93,7 @@
 - 来源为 https://necolas.github.io/normalize.css/latest/normalize.css，本地固定 8.0.1 快照，保留 MIT 许可与版本注释，仅统一排版；生成和浏览器运行不下载该地址，不添加 normalize.css 依赖。
 - 已有应用可单独使用 --apply-existing 补齐，不要求选择 UI/CSS。已知快照和入口已就绪时跳过写入，UI/CSS 后续首次补装后仍将 normalize 放在其样式之前。未知同名文件、被修改的快照、部分文件/引用或链接拒绝覆盖，不自动迁移旧快照。
 - 验收：四种官方模板与工作区真实创建/完整构建；已存在 test-vue 补装、无依赖/配置变更、重复调用和同名保护；Vue/React 浏览器确认本地样式加载顺序、原按钮点击和无 warn/error。详见 [V1](V1_ACCEPTANCE.md)。
+- 2026-10-30 补验：既有官方工作区新增 Vue TS/Element Plus/Tailwind 与 React JS/Ant Design/UnoCSS，两组自动生成本地基础样式，根无缓存 ready 14/14、双入口构建、检查与浏览器验收通过。原 100 项文件保持，仅共享版本/peer、锁及声明排除按规则变化；重复创建/验收页拒绝，基础样式重复补齐不写入，149 项文件内容及 mtime 保持。
 
 按顺序推进：官方基础模板（Vue/React × TS/JS 创建及构建已验证）→ CLI 交互和框架选择 → UI/CSS → 大屏 → 3D → 模型安全 → 跨组合验收。外部依赖版本、Vite+ 框架选项自动化及 npm scope 均需实际验证，不能推定。
 

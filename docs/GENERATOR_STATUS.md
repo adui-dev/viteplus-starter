@@ -36,6 +36,8 @@ Windows V1 本地候选的操作说明与集中交付核对已整理：[Windows 
 
 2026-10-30 默认基础样式已补验：Node 22.18.0 下新建官方工作区及 Vue/React TS/JS 四应用，静态文件与正式入口自动生成，根无缓存 ready 11/11、check 65 格式/22 代码文件通过；四应用产物均包含位于原样式之前的 normalize 规则。test-vue 已补齐，6 项原配置/样式/依赖文件哈希一致，重复补装的三个目标文件内容和 mtime 均不变。Vue/React 开发浏览器确认本地 CSS 加载顺序与点击，无 warn/error；详见 [V1](V1_ACCEPTANCE.md#默认本地-normalizecss-验收2026-10-30)。
 
+该官方工作区另新增 Vue TS/Element Plus/Tailwind、React JS/Ant Design/UnoCSS，补齐基础样式与可选 UI/CSS 的联用：无缓存 ready 14/14、两组 UI 双入口构建、最终 check 96 格式/36 代码文件通过。开发首页确认 normalize 优先，生产组件点击和绿色 CSS 区域正确，无 warn/error；原 100 项文件及两新应用依赖隔离已核对。重复创建/验收页拒绝、基础样式重复补齐跳过写入，149 项文件内容与 mtime 保持；详见 [隔离验收](V1_ACCEPTANCE.md#monorepo-基础样式与-uicss-隔离补验2026-10-30)。
+
 根与 create 包已将原 >=22 修正为当前锁定 Vite+ 1.4.0 的 `^22.18.0 || ^24.11.0 || >=26.0.0`。Windows Node 22.18.0 已通过 210 项测试、文档校验、8 个示例/20 个应用预览、462 个组合计划及根 vp check；计划工具的实际构建计数仍为 0。共享模型插件另用原 DamagedHelmet 验证 embedded/external 真实构建解密、HTTP 拦截及变更失效通过，不能据此称全部引擎页面已在此版本渲染。
 
 复验步骤见 [Harness](HARNESS.md#node-22-最低版本复验)，实际生成项目与环境边界见 [V1 清单](V1_ACCEPTANCE.md)。不将声明范围等同于所有运行时版本均已穷举验证；其他系统不在当前交付范围。

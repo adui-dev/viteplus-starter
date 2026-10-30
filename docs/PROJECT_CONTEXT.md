@@ -482,3 +482,12 @@
 - 完整类型/首页构建 2/2、/ui-check/ 首页+验收页构建、最终 check 20 格式/8 代码文件均通过，保留构建性能提示。Chrome 开发首页本地样式顺序正确；生产验收页为真实 Element Plus 主按钮，计数 0→1，Tailwind 绿色区域、8px 圆角与 16px 内边距正确，两页 warn/error 为空。
 - 截图 D:/Workspace/adui-studio/test-vue-element-plus-20261030.jpg 在仓库外；临时配置、两个标签与本轮服务已清理，工程和产物保留。test-vue 本地分步提交 a664ce1、0325b9c，默认 hooks 通过，工作区干净，无远程仓库；生成器只同步实测文档。
 - 本轮生成器 217/217 Node 测试、文档校验与根 vp check（175 格式/129 代码文件）通过。下一步补验本地 normalize.css 与 UI/CSS 在官方 Monorepo 子应用中的联用和隔离，保持根及兄弟应用不受影响；继续生成器兼容性验收，不扩展业务功能。
+
+## 2026-10-30：Monorepo 基础样式与 UI/CSS 联用隔离验收
+
+- 在既有官方 adui-normalize-validation-20261030 新增 Vue TS/Element Plus/Tailwind 的 vue-element-ts、React JS/Ant Design/UnoCSS 的 react-antd-js，分别通过官方 Application 创建和 UI Smoke 生成。使用 Node 22.18.0、pnpm 12.16.1、Vite+ 1.4.0；没有修改 test-vue 或原四个无可选 UI/CSS 的应用。
+- 原 103 项文件中，仅共享锁、YAML catalog/peer 与根 Vue 声明排除配置按规则变化；其余 100 项文件的 SHA256 和 mtime 保持。根无框架/UI/CSS 直接依赖，两新应用各自依赖隔离；本地 normalize/许可匹配快照并优先导入，两组正式 App/原样式保持官方内容。
+- 根无缓存 ready 14/14、Vue /ui-check/ 与 React ./ 双入口构建、最终 check 96 格式/36 代码文件通过。保留官方 TypeScript 7 API、UnoCSS 多入口及构建性能提示，没有关闭检查规则。
+- Chrome 两开发首页确认本地 normalize 在组件库/CSS 及原样式之前，原计数正常；两生产组件页真实主按钮点击 0→1，绿色 CSS 区域、8px 圆角及 16px 内边距正确，四次页面观察 warn/error 为空。两份原生截图位于 D:/Workspace/adui-studio/monorepo-vue-normalize-ui-20261030.jpg 与 monorepo-react-normalize-ui-20261030.jpg，验收标签及本轮 4395–4398 服务已关闭。
+- 两组重复创建/验收页均拒绝，重复补齐已存在基础样式均跳过写入，六次调用前后 149 项文件内容与 mtime 保持。原验证工作区未提交文件及构建产物保留，临时哈希记录清理。生成器未改源码、依赖或锁文件，只更新需求、状态、验收证据与 Monorepo 说明；本轮 Node 测试 217/217、文档校验和根 check（175 格式/129 代码文件）通过。
+- 本地 normalize 与 UI/CSS 的独立应用、官方工作区代表路径已补齐。下一步进入 Windows V1 实际使用反馈与问题修复；已有能力按 Windows 指南使用，不为继续开发重复扩张组合或新增业务演示功能。
