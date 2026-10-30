@@ -34,9 +34,11 @@
 | apps[].language  | 否   | ts / js，默认 ts                                                           |
 | apps[].ui        | 否   | none / element-plus / antd / tdesign，默认 none；React 不支持 element-plus |
 | apps[].css       | 否   | none / unocss / tailwindcss，默认 none                                     |
-| apps[].uiSmoke   | 否   | 布尔值，默认 false；true 仅支持 Vue/TDesign、React/Ant Design              |
+| apps[].uiSmoke   | 否   | 布尔值，默认 false；true 支持 Vue 三种 UI、React 两种 UI，须选择相应 UI    |
 
-apps[].screen 支持大屏预设，apps[].engine 支持 three/cesium/babylon，apps[].modelProtection 支持 embedded/external/none；Three 默认 embedded，Cesium/Babylon 暂不接入模型保护，显式 embedded/external 拒绝。根不能统一设置模型保护。示例见 [模型五应用配置](../examples/models.batch.json)、[Cesium 配置](../examples/cesium.batch.json)。
+apps[].screen 支持大屏预设，apps[].engine 支持 three/cesium/babylon，apps[].modelProtection 支持 embedded/external/none；三引擎默认 embedded，多引擎只配置一套模型保护，按 Three → Babylon → Cesium 选择适配器。根不能统一设置模型保护。示例见 [模型五应用配置](../examples/models.batch.json)、[Cesium 配置](../examples/cesium.batch.json)，多引擎规则见 [说明](MULTI_ENGINE.md)。
+
+uiSmoke 的 Vue UI 为 Element Plus、Ant Design Vue、TDesign，React UI 为 Ant Design、TDesign；TS/JS 均支持。生成独立页的边界见 [UI Smoke](UI_SMOKE.md)。
 
 未知字段、null/错误类型会报错，不忽略拼错的选项。根不允许设置 framework/language/UI/CSS。名称不允许路径或 Windows 保留设备名称；根也不能与默认 website/utils 包重名。仅支持最大 1 MiB 的 JSON，接受 UTF-8 BOM。
 
@@ -50,7 +52,7 @@ node ./viteplus-starter/packages/create/bin/cli.mjs --config ./viteplus-starter/
 node ./viteplus-starter/packages/create/bin/cli.mjs --config ./viteplus-starter/examples/monorepo.batch.json
 ```
 
-dry-run 输出规范化选项、官方根命令、每应用的 CLI argv/官方模板命令、cwd/target、UI/CSS 依赖，以及可选验收页文件，**不创建目录或安装依赖**。`--config` 只能与 `--dry-run` 同用；已有工作区逐应用维护请继续用 `--workspace`。
+dry-run 输出规范化选项、官方根命令、每应用的 CLI argv/官方模板命令、cwd/target、UI/CSS 依赖，以及可选验收页文件，**不创建目录或安装依赖**。新建批量模式的 `--config` 可单独执行或搭配 `--dry-run`，不能混用单应用创建选项。已有工作区逐应用添加使用 `--workspace`；对照 JSON 检查、规划或显式新建缺失应用分别使用 `--inspect-workspace`、`--plan-recovery`、`--execute-recovery` 加 `--config`，见 [Monorepo 说明](MONOREPO.md)。
 
 执行时先校验全部配置和目标，再生成官方根，随后统一检查真实根和全部成员路径，最后按以下顺序执行：
 

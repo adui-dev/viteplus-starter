@@ -426,3 +426,14 @@
 - 用户明确“不需要 linux，Windows 就行”，本阶段只验收 Windows。上一条记录中的 Linux 后续计划取消，Linux/macOS 不列为当前验收或交付阻塞项，保留未验证声明。
 - 本轮检查时 WSL 仅有 Docker Desktop 内部发行版；Docker 引擎启动未成功，未运行 Linux 容器或测试。本轮启动的 Docker 进程已退出，没有重置环境、改动 Secrets Engine 文件或安装发行版，不继续推进该方向。
 - 需求、能力表、Harness 与 V1 清单同步 Windows 范围。继续在仓库外含中文及空格路径中实测官方创建、缺失应用恢复、重复执行跳过、文件保护和完整构建；此处为进行中的验收方向，不称为已通过。
+
+## 2026-10-30：Windows 中文、空格路径与恢复实测完成
+
+- 在 D:/Workspace/adui-studio/Windows 路径验收 20261030 下创建独立工作区 adui-windows-paths，使用初始 配置.json 与恢复 配置.json。父目录、配置路径均含中文及空格，项目/应用 name 仍保持原安全规则。官方 shim PATH 与 VP_NODE_VERSION 同时选择 22.18.0，日志及环境报告确认 Node 22.18.0、pnpm 12.16.1。
+- 从独立父目录对初始配置 dry-run 三阶段且目标不存在，随后官方根、Vue TS/Ant Design Vue/UnoCSS 的 admin 与 UI Smoke 三阶段通过。没有绕过 Vite+ 官方 Application/Monorepo 入口；正式 App/main 与默认 website/utils 保留。
+- 恢复配置增加 React JS/Ant Design/Tailwind 的 portal。inspect 退出 1，正确区分 admin present、portal not-created；plan 退出 0，分别 validate-existing、create-missing，工作目录和 argv 路径完整。execute 跳过 admin，只完成 portal 官方创建及 UI 验收页两个子进程，结构检查通过。
+- 根 vp run --no-cache ready 8/8 无缓存成功，含官方 utils 测试/构建、website 类型/构建、Vue TS 类型及两应用完整构建。Vue /ui-check/ 与 React ./ 的双入口构建通过，最终 vp check 47 格式/20 代码文件通过；保留 TypeScript 7 API 实验性与 UnoCSS 多入口提示。本轮没有新增浏览器或引擎路径验收声明。
+- 完成后 inspect 四成员、两个 present，plan 两个 validate-existing。重复 execute completed=[]、skipped=2；重复 batch 与重复两页生成均拒绝。维护及拒绝期间 33 项根/应用文件哈希一致，恢复前保存的 14 项 admin 文件和 19 项官方默认成员原文件直至验证结束未变。共享锁/catalog 按添加应用规则更新，根无框架/UI/CSS 直接依赖。
+- 补充 Harness 的 PowerShell 路径变量、LiteralPath、当前目录决定批量输出等操作说明。批量文档同步五种 UI Smoke 和三引擎模型保护现状，修正新建 config 与已有工作区检查/规划/恢复模式的描述；未增加功能或修改生成器源码。
+- 测试工作区、两个 JSON 和专项 dist/ui-verify 保留，临时构建配置与两份仓库外哈希记录清理。原仓库依赖版本与锁文件不变，不创建 CI/CD 或发布。
+- 下一步按 Windows 范围核对 V1 最终交付清单与常用操作说明，收尾现有能力；不推进 Linux/macOS，不新增预设或业务查看器功能。

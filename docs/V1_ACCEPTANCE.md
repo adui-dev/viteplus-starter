@@ -85,3 +85,15 @@ Windows Node 22.18.0 下，210/210 测试、文档检查、8 个示例/20 个应
 inspect 找到六个成员、四个应用 present；plan 均为 validate-existing；execute completed=[]、skipped=4。上述入口执行前后 48 项根/应用源文件哈希一致，官方 website/utils 的 19 项原文件从添加应用前到验证结束保持一致；根无框架/UI/CSS 直接依赖，临时 UI 构建配置已移除，专项产物保留。临时 JSON 和哈希记录结束清理。
 
 本轮验证 Node 22.18.0 的代表生成器与构建路径，没有新增浏览器验收，也不宣称首次安装始终未经过其他 Node、全部引擎组合或其他操作系统已验证。按用户最新要求，后续仅推进 Windows 路径、创建、恢复及构建验收，不扩大预设或查看器功能。
+
+## Windows 中文、空格路径与恢复验收（2026-10-30）
+
+本轮在 D:/Workspace/adui-studio/Windows 路径验收 20261030/adui-windows-paths 实测，配置文件也带中文与空格：父目录中的初始 配置.json、恢复 配置.json。项目及应用 name 沿用安全的小写 kebab-case，不放宽名称校验。进程 PATH 前置官方 shim，并以 VP_NODE_VERSION 选择 Node 22.18.0；官方生成日志和环境报告确认为该版本，pnpm 12.16.1。
+
+初始配置仅含 admin（Vue TS/Ant Design Vue/UnoCSS/UI Smoke）。在独立父目录 dry-run 列出三阶段且不生成目标，再实际创建官方根、admin 与验收页，三阶段通过。恢复配置追加 portal（React JS/Ant Design/Tailwind/UI Smoke）：inspect 退出 1，分别报告 present、not-created；plan 退出 0，给出 validate-existing、create-missing，路径与两个新建步骤完整。execute 跳过 admin，成功创建 portal 及验收页，未重新集成原应用。
+
+根 vp run --no-cache ready 8/8 成功，包含官方默认成员、Vue TS 类型检查及两应用完整构建。两个 UI 双入口构建分别通过 /ui-check/、./，最终 vp check 47 格式/20 代码文件通过；TypeScript 7 API 实验性及 UnoCSS 多入口提示保留。没有新增浏览器验收或扩大为所有引擎路径已验证。
+
+完成后 inspect 识别四个成员、两个应用 present；plan 均为 validate-existing；重复 execute completed=[]、skipped=2。重复批量创建与重复生成两页均拒绝，维护与拒绝期间 33 项根/应用文件哈希一致；恢复前保存的 14 项 admin 文件和 19 项官方 website/utils 原文件直到最终检查仍一致。共享锁文件/catalog 因添加 portal 的正常更新不计为原应用文件修改，根无框架/UI/CSS 直接依赖。
+
+两个专项产物保留于各 dist/ui-verify，临时构建配置已移除；原始及恢复 JSON 与测试工作区保留，可按 [Harness](HARNESS.md#windows-中文与空格路径) 复查。仓库外临时哈希记录已清理。本轮未发现需修改生成器源码的问题，仅同步 Windows 范围、路径说明和批量文档中的过时字段描述。

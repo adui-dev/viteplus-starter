@@ -208,3 +208,21 @@ try {
 真实生成和构建需在同样的临时环境选择下另行执行：先用仓库外 JSON 指定一个不存在的官方工作区及 Vue/React × TS/JS 四个应用，运行原 CLI --config；随后在新工作区核对 vp env current --json，再运行 vp run --no-cache ready、vp check，以及 UI 应用的 verify-ui-build。Vite+ run 的选项放在任务名之前，任务名之后的参数会转发给脚本；不能写成 vp run ready --no-cache。保留官方根和应用的运行时声明，不通过修改模板来强行兼容。所有命令都需检查退出码，前一步失败应先处理现场，不将后续命令的成功代替前一步结果。
 
 示例和组合验证仍为 actualBuilds=0；真实生成、完整类型/构建、UI 双入口构建与浏览器验收分别记录，不把运行时兼容验证扩大成新增浏览器验收。
+
+## Windows 中文与空格路径
+
+父目录及配置文件路径可以包含中文和空格；项目和应用 name 仍须使用原有安全的小写 kebab-case。PowerShell 用单引号或路径变量保留完整参数，切换目录使用 Set-Location -LiteralPath；不要把命令与路径拼成一个字符串执行。批量输出始终是当前目录下的 name，不是 JSON 所在目录；需在已有工作区之外执行新建模式。
+
+仓库外验收工作区可按下面方式复查，三个模式各自独立运行：
+
+```powershell
+$starterCli = 'D:\Workspace\adui-studio\viteplus-starter\packages\create\bin\cli.mjs'
+$pathParent = 'D:\Workspace\adui-studio\Windows 路径验收 20261030'
+$workspacePath = Join-Path $pathParent 'adui-windows-paths'
+$expectedConfig = Join-Path $pathParent '恢复 配置.json'
+node $starterCli --inspect-workspace $workspacePath --config $expectedConfig
+node $starterCli --plan-recovery $workspacePath --config $expectedConfig
+node $starterCli --execute-recovery $workspacePath --config $expectedConfig
+```
+
+首次生成及恢复执行仍调用官方入口；不存在的应用才允许新建，已有完整应用跳过，部分完成应用阻塞。验收时先保存已有 App/main、预设配置和独立页哈希，再执行恢复和重复调用；根共享锁文件/catalog 的正常更新应与已有应用源文件保护分开检查。生成后在同一工作区串行运行完整 ready、UI 双入口构建和最终 check，不用结构检查代替构建。实际记录见 [V1 清单](V1_ACCEPTANCE.md)。

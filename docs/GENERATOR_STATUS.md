@@ -33,6 +33,8 @@
 
 官方新工作区 adui-node22-acceptance 已完成 Vue/React × TS/JS 四应用和两个 UI 页生成。托管 Node 22 环境离线冻结安装、禁用缓存 ready 11/11、两个 UI 双入口构建及最终 vp check 通过。首轮 UI 安装曾由系统 Node 24 的 Corepack 转发，后续托管 PATH 和显式 Node 22 Corepack 调用均复验冻结安装；这一区别保留在 V1 清单，不扩大为首次全链路安装或新增浏览器验收。已有应用恢复执行跳过四项，48 项保护文件与 19 项官方默认成员原文件哈希一致。
 
+Windows 中文及空格父目录、配置路径已补验：初始创建 Vue TS/Ant Design Vue/UnoCSS，再由缺失应用恢复入口新建 React JS/Ant Design/Tailwind，原应用跳过。无缓存 ready 8/8、两 UI 双入口及最终 check 通过；重复执行跳过两应用，重复批量/验收页拒绝，33 项维护期间文件、14 项原应用文件和 19 项默认成员原文件哈希保持。边界与完整证据见 [V1 清单](V1_ACCEPTANCE.md#windows-中文空格路径与恢复验收2026-10-30)。
+
 ## 组合计划验证
 
 运行 `node scripts/verify-generator-matrix.mjs`。矩阵覆盖 Vue 的 4 种 UI 选择、React 的 3 种 UI 选择，TS/JS、3 种 CSS、11 种增强配置，共 462 个有效组合。
