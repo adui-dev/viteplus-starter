@@ -196,7 +196,10 @@ export function runWorkspaceVp(cwd, args) {
       ? spawnSync(["vp", ...args].join(" "), { cwd, stdio: "inherit", shell: true })
       : spawnSync("vp", args, { cwd, stdio: "inherit" });
   if (result.error) throw result.error;
-  if (result.status !== 0) throw new Error("工作区本地命令失败：vp " + args.join(" "));
+  if (result.status !== 0)
+    throw Object.assign(new Error("工作区本地命令失败：vp " + args.join(" ")), {
+      exitCode: result.status ?? 1,
+    });
 }
 
 // Official monorepo app templates may retain imports that the root lint rule rejects.

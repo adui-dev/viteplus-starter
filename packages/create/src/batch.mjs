@@ -205,7 +205,10 @@ function runStep(step) {
   const result = spawnSync(process.execPath, step.args, { cwd: step.cwd, stdio: "inherit" });
   if (result.error) throw result.error;
   if (result.status !== 0)
-    throw new Error("子进程失败，退出码：" + (result.status ?? result.signal ?? "unknown"));
+    throw Object.assign(
+      new Error("子进程失败，退出码：" + (result.status ?? result.signal ?? "unknown")),
+      { exitCode: result.status ?? 1 },
+    );
 }
 
 async function checkCreatedRoot(root) {
@@ -250,6 +253,7 @@ export async function executeBatch(plan, runner = runStep, report = console.log)
       `批量生成失败：${phase}；${cause.message}\n已完成：${completed.join("、") || "无"}\n未执行：${pending.join("、") || "无"}\n已生成内容保留在 ${current.workspaceRoot}，当前失败阶段可能部分完成；不会自动删除、覆盖或回滚。`,
       { cause },
     );
+    if (Number.isInteger(cause?.exitCode) && cause.exitCode > 0) error.exitCode = cause.exitCode;
     Object.assign(error, {
       completed,
       failed: phase,

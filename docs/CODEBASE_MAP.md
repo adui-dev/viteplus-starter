@@ -67,6 +67,7 @@ UI/CSS 见 integrations；大屏核心见 packages/screen；三引擎见 package
 - `packages/create/src/batch.mjs`：JSON 严格校验、无写入批量计划、官方顺序执行与失败摘要。
 - `packages/create/test/batch.test.mjs`：真实 CLI dry-run、冲突与路径保护、顺序执行及失败保留现场测试。
 - `packages/create/test/batch-destination.test.mjs`：批量祖先清单的 BOM/1 MiB 边界、JSON 对象/普通文件/链接保护、真实 CLI 预览和执行前拒绝、内容不回显及原文件保持。
+- `packages/create/test/batch-exit-code.test.mjs`：批量错误的有效退出码传递及无效值过滤，Windows 隔离 vp.cmd 替身验证根/应用子进程非零退出、失败即停和部分文件保留；不调用真实官方工具。
 - `examples/monorepo.batch.json`、`docs/BATCH_CONFIG.md`：可执行配置样例与字段/运行说明。
 
 ## UI Smoke 验收工具
