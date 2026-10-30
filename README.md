@@ -2,6 +2,8 @@
 
 项目定位、需求完成度和计划/构建/浏览器验收的区别见 [生成器能力与验收范围](docs/GENERATOR_STATUS.md)。
 
+当前交付验收平台为 **Windows**，处于本地候选阶段，尚未发布。常用命令按执行目录整理在 [Windows V1 操作指南](docs/WINDOWS_GUIDE.md)，实际证据与限制见 [V1 清单](docs/V1_ACCEPTANCE.md)。
+
 Cesium 预设已接入 --engine cesium，提供本地椭球、GLB/.adui 授权加载、按需场景与资源配置；默认支持 env 自动加密构建。创建和批量用法见 [Cesium 指南](docs/CESIUM.md)。
 
 Babylon 预设使用 --engine babylon，提供本地场景、GLB/.adui 和默认 env 自动构建保护，支持四种框架/语言及工作区；用法见 [Babylon 指南](docs/BABYLON.md)。
@@ -34,7 +36,7 @@ node ./viteplus-starter/packages/create/bin/cli.mjs --workspace ./my-workspace -
 
 ## UI 组件独立验收页（新增）
 
-可以为已创建的 Vue/TDesign 或 React/Ant Design Application 添加本地 UI Smoke 页面，**不修改正式应用首页**：
+可以为已创建的 Vue Element Plus/Ant Design Vue/TDesign 或 React Ant Design/TDesign Application 添加本地 UI Smoke 页面，TS/JS 均支持，**不修改正式应用首页**：
 
 ```powershell
 # 在 D:\Workspace\adui-studio 执行
@@ -54,16 +56,17 @@ node .\viteplus-starter\packages\create\bin\cli.mjs --name starter-react-js --ty
 | React | `react-ts`              | `react`         |
 
 ```powershell
-node packages/create/bin/cli.mjs --name vue-js-demo --type application --framework vue --language js
-node packages/create/bin/cli.mjs --name react-js-demo --type application --framework react --language js --ui antd --css tailwindcss
-node packages/create/bin/cli.mjs --name vue-ts-demo --type application --framework vue --language ts --ui tdesign --css unocss
+# 在项目父目录调用；$starterCli 按 Windows 指南设置为 CLI 绝对路径
+node $starterCli --name vue-js-demo --type application --framework vue --language js
+node $starterCli --name react-js-demo --type application --framework react --language js --ui antd --css tailwindcss
+node $starterCli --name vue-ts-demo --type application --framework vue --language ts --ui tdesign --css unocss
 ```
 
 交互式创建会在框架选择后询问开发语言，默认 TypeScript。JS 生成器将按照官方工程实际配置处理 `vite.config.js` / `.ts` 等格式，并写入 `src/main.js` 或 `src/main.jsx`；UnoCSS 对应 `uno.config.js`。JavaScript 的 Vue 项目不会生成 TypeScript 专用的组件类型声明。Monorepo 根目录不接受 `--language`，各子应用独立选择。
 
 ## 2026-10-26：P3 检查修复
 
-Vue/TDesign/UnoCSS 与 React/Ant Design/Tailwind 的 `vp build` 已由用户验证通过，旧版 `vp check` 因 `./starter.plugins` 的 TS2307 失败。新版将所选插件**直接写入 `vite.config.ts`**，安装后执行 `vp fmt . --write`，不再新建 `starter.plugins.ts`。
+Vue/TDesign/UnoCSS 与 React/Ant Design/Tailwind 的 `vp build` 已由用户验证通过，旧版 `vp check` 因 `./starter.plugins` 的 TS2307 失败。新版将所选插件**直接写入 Vite 配置**，安装后只格式化本次修改文件，共享根策略在根目录单独格式化，不再新建 `starter.plugins.ts`。
 
 已经生成并安装好插件的旧项目，在其上级目录运行以下命令修复，不重装依赖：
 
@@ -76,7 +79,7 @@ node .\viteplus-starter\packages\create\bin\cli.mjs --name starter-react-p3 --ty
 
 基于 **Vite+ 官方模板**的多框架项目初始化与可选功能集成工具。
 
-> 当前状态：**开发阶段、尚未发布**。Vue/React × TypeScript/JavaScript 四种官方应用模板已完成真实创建和构建验证。P4 逐应用与 JSON 批量新建 Monorepo 均已通过 Vue TS/TDesign/UnoCSS + React JS/Ant Design/Tailwind 混合工作区的检查、完整构建和浏览器验收。其余 UI/CSS 组合、多屏、3D 和 npm 发布仍待完成。
+> 当前状态：**Windows V1 本地候选、尚未发布**。Vue/React × TypeScript/JavaScript 四种官方模板、五种框架/UI、工作区与恢复、大屏、Three/Cesium/Babylon 和 GLB/.adui 模型保护均有代表验收证据；未穷举全部组合，不把生成计划当成真实构建。当前版本仍为 0.0.0/private，不自动发布。
 
 ## 快速开始（开发者）
 
@@ -87,22 +90,25 @@ git clone https://github.com/adui-dev/viteplus-starter.git
 cd viteplus-starter
 pnpm install --frozen-lockfile
 node packages/create/bin/cli.mjs --help
-# 无参数交互创建（名称、类型、框架、确认）
-node packages/create/bin/cli.mjs
-node packages/create/bin/cli.mjs --name demo-vue --type application --framework vue --dry-run
-node packages/create/bin/cli.mjs --name demo-vue --type application --framework vue
-node packages/create/bin/cli.mjs --name demo-react --type application --framework react
+$starterRoot = (Get-Location).Path
+$starterCli = Join-Path $starterRoot 'packages\create\bin\cli.mjs'
+# 项目在生成器仓库外创建；以下目标必须不存在
+Set-Location ..
+# 无参数交互选择名称、框架、语言、UI/CSS、大屏、引擎与确认
+node $starterCli
+node $starterCli --name demo-vue --type application --framework vue --dry-run
+node $starterCli --name demo-vue --type application --framework vue
+node $starterCli --name demo-react --type application --framework react
 # UI 与 CSS 按需选择，生成后安装依赖并追加对应配置
-node packages/create/bin/cli.mjs --name demo-ui --type application --framework vue --ui tdesign --css unocss
-# 仅确认对应 UI/CSS 预设尚未写入时首次补装；部分完成项目先检查现场
-node packages/create/bin/cli.mjs --name demo-ui --type application --framework vue --ui tdesign --css unocss --apply-existing
+node $starterCli --name demo-ui --type application --framework vue --ui tdesign --css unocss
 ```
 
 当前 CLI 使用 Vite+ 内置 `vite:application` 或 `vite:monorepo`；Application 用 `--framework` 和 `--language` 映射到官方 `vue` / `vue-ts` / `react` / `react-ts` 模板。现已支持 UI 组件库选项（None / Element Plus / Ant Design / TDesign）和 CSS 框架（None / UnoCSS / Tailwind CSS）。React 不提供 Element Plus。选中依赖后由 pnpm 安装并生成 Vite 插件/样式入口；大屏首期已实现（见下文），Three.js 真实场景验收已实现；三种引擎与模型保护已接入，覆盖范围见对应指南。现在支持针对官方 `plugins: [...]`、`plugins: lazyPlugins(() => [...])` 和不包含 `plugins` 属性的 `defineConfig` 进行兼容配置注入。Vue 自动导入的 `src/components.d.ts` 保留类型声明，但会自动加入 Vite+ `fmt.ignorePatterns`，避免其重新生成造成格式漂移。其他组合仍需运行真实 check/build 验证；未知配置结构会明确报错而不强行修改。
 
-本地验证：
+在生成器仓库执行本地验证；生成项目的完整 build/ready 与页面验收另见 Windows 指南：
 
 ```powershell
+Set-Location -LiteralPath $starterRoot
 node --test
 node scripts/validate-docs.mjs
 node scripts/verify-examples.mjs
@@ -138,6 +144,7 @@ node packages/create/bin/cli.mjs --execute-recovery ../adui-batch-demo --config 
 - [代码索引](docs/CODEBASE_MAP.md)
 - [Skills 索引](docs/SKILLS.md)
 - [本地验证 Harness](docs/HARNESS.md)
+- [Windows V1 操作指南](docs/WINDOWS_GUIDE.md)
 
 本仓库明确**不创建或维护任何 CI/CD 工作流**。本地测试不等于 CI。
 

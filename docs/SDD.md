@@ -4,7 +4,7 @@
 
 根 Vite+ fmt 统一自有源码、测试与文档格式；仅排除原样保存的第三方 `.agents/skills/git-commit/**`、`.agents/skills/gitmoji/**`，保留其上游指令与安装哈希。没有关闭源码检查、lint 规则或 Git hooks。
 
-## 官方模板语言选择（新增）
+## 官方模板语言选择
 
 - Application 的 `--language ts|js` 默认 `ts`。Vue 选 `vue-ts` 或 `vue`；React 选 `react-ts` 或 `react`，全部使用 Vite+ 官方 `vite:application`，不再自行运行其他生成器。
 - `options.mjs` 负责框架 × 语言的模板映射及校验；`cli-args.mjs` 解析 `--language`；`prompts.mjs` 在框架后询问语言，默认 TypeScript。
@@ -12,16 +12,16 @@
 - `integrations.mjs` 按语言选择 `src/main.ts` / `src/main.js`（Vue）和 `src/main.tsx` / `src/main.jsx`（React），同时识别实际存在的 `vite.config.ts|mts|js|mjs`。若存在多个 Vite 配置则拒绝自动修改。
 - UnoCSS 配置采用 `uno.config.ts|js`；Vue JavaScript 组件自动导入设置 `dts: false`，Vue TypeScript 保留 `src/components.d.ts` 及对应格式忽略规则。
 - 旧版 `starter.plugins.ts` 的迁移只适用于历史 TypeScript 工程；JS 创建和 `--apply-existing` 不使用此历史格式。
-- 已完成代码级参数/生成验证；Vue + JavaScript + TDesign + UnoCSS、React + JavaScript + Ant Design + Tailwind 的官方创建、依赖安装和 `vp check/build` 均已在 Windows 验收通过。组件真实渲染及剩余组合尚待测试。
+- 四种框架/语言官方创建与完整构建已有 Windows 证据；五种框架/UI 均有代表组件渲染记录，未穷举全部组合。当前范围见 [能力表](GENERATOR_STATUS.md)，操作见 [Windows 指南](WINDOWS_GUIDE.md)。
 
 ## P3 生成器修复：插件内联与旧配置修复
 
 - `packages/create/src/format-config.mjs`：仅针对 Vue UI 自动导入，向 Vite+ `fmt.ignorePatterns` 添加 `src/components.d.ts`，避免自动生成的类型声明在重新生成后造成不稳定格式检查。保留原有 `fmt`、`ignorePatterns`，重复调用不新增重复条目；不支持的配置格式拒绝修改。该规则仅影响格式检查，不关闭 Lint 或 TypeScript。
 
 - `generateIntegration` 在 `vite.config.ts` 内联 Vite 插件的 import 和工厂调用，避免 `starter.plugins.ts` 跨文件导入；兼容普通数组、`lazyPlugins` 及无插件字段的 Vite+ 配置。
-- `applyIntegrations` 在写入后调用 `vp fmt . --write`，不得跳过失败。
+- `applyIntegrations` 在写入后只格式化本次修改的应用文件；共享根构建策略在其所属目录单独格式化，不向应用格式化命令传递父目录路径，不得跳过失败。
 - `--repair-existing` 仅用于符合已知 Starter 旧格式的现有 Vue/React Application：先验证项目类型、旧插件文件及配置形态，再替换旧导入并将 `starter.plugins.ts` 备份为 `starter.plugins.ts.bak`，随后格式化；**不安装依赖，也不重建项目**。
-- 此功能不是通用任意 TypeScript 配置的转换器，无法识别的结构必须拒绝修改；真实 Windows `vp check` 待用户复验。
+- 此功能不是通用任意 TypeScript 配置的转换器，无法识别的结构必须拒绝修改；旧项目 Windows 修复证据见 [项目状态](PROJECT_CONTEXT.md)，不自动升级其他旧快照。
 
 ## 当前可用模块
 
@@ -36,12 +36,12 @@
 
 `packages/create/bin/cli.mjs`:
 
-- 支持 `--name`、`--type`、`--framework`、`--dry-run`、`--help`。
+- 支持单应用、工作区、批量、预设和维护模式，具体白名单与互斥规则见 cli-args.mjs 及 --help。
 - 交互缺失选项可从终端读取，支持默认值与二次确认；取消时不调用 Vite+；非 TTY 必须显式传参。
 - 已存在目标目录立即拒绝；仅执行白名单参数，不使用用户输入拼接 shell 命令字符串。
-- 委托 `vp` 创建并传递退出状态；Application 向 `vite:application` 转发 `-- --template vue-ts|react-ts`。Windows 只使用白名单参数拼接单个 shell 命令避免 DEP0190，真实 Windows 创建仍需复验。
+- 委托 `vp` 创建并传递退出状态；Application 向 `vite:application` 转发 `-- --template vue|vue-ts|react|react-ts`。Windows 官方命令的参数仅来自白名单；批量/恢复的 Node 子进程用 argv 传路径。中文、空格路径下的官方创建和恢复已有实测记录。
 
-## UI/CSS 可选集成（已编写，待组合验收）
+## UI/CSS 可选集成
 
 `packages/create/src/integrations.mjs`：
 
@@ -52,35 +52,35 @@
 - Vue 使用 `unplugin-vue-components` 和对应 Resolver 按需引入组件；React 依赖自身组件导入机制；UnoCSS / Tailwind 均写入官方建议的插件与样式入口。
 - 支持独立 Application 及通过 `--workspace` 添加的 Monorepo Application；不在 Monorepo 根安装 UI/CSS。
 - `collectProjectOptions` 基础参数已全部提供时直接返回校验结果，未指定 UI/CSS 默认视为 None；修复 P3 新增交互字段导致的非交互单元测试回归。
-- 自动修改仅支持官方 Vue/React 的 `plugins: [...]` 格式以及标准 `src/main.ts[x]` 入口，不对未知结构强行变更。
+- 自动修改支持已知顶层 plugins 数组、lazyPlugins 或缺省 plugins 的官方配置，以及对应 TS/JS 标准入口；未知结构拒绝处理。代表组合已实测，覆盖范围不扩大为所有依赖版本。
 
-## 规划模块（未实现）
+## 已实现的增强与恢复模块
 
-- 进一步扩展选项 Schema：`engines`、`bigScreen`、`modelSecurity`（基础 `framework`、`ui`、`css` 已实现）。
-- 插件合并器：先形成配置中间模型，再统一写入 Vite 配置和入口，避免重复覆盖。
-- 3D 安全加载：AES-256-GCM 文件协议、授权密钥接口契约及 Three/Cesium/Babylon 适配。
-- Monorepo 多应用：每个应用独立选择框架、UI、CSS、大屏及 3D。
-- 失败恢复：区分生成前校验失败、模板执行失败与可选集成失败；避免错误清理他人已有文件。
+- options/screen-options/engine/model-protection 统一 screen、engine/engines 与 modelProtection 选项，CLI/交互/JSON 共用；具体字段以实现及批量说明为准。
+- vite-config 处理已知官方配置注入，写入器先检查路径及输出占用，保留备份与正式入口；不是任意配置迁移器。
+- packages/screen、three、cesium、babylon、model-security 提供大屏、按需场景、GLB/.adui 和无服务端模型构建；各自设计见后续模块章节。
+- workspace/batch 支持官方根与逐应用独立配置；recovery/workspace-inspect/workspace-recovery/workspace-recovery-execute 提供失败报告、只读检查/规划及仅新建缺失应用的显式执行。
+- 未实现范围包括自定义工作区布局、覆盖式恢复、其他模型格式及解码器；当前仅验收 Windows，不将这些内容写成已交付功能。
 
 ## 需求追踪
 
 - FR-001/002、NFR-001 → `packages/create/src/options.mjs`、`packages/create/src/cli-args.mjs`、`packages/create/src/prompts.mjs`、`packages/create/bin/cli.mjs`、`packages/create/test/*.test.mjs`。
 - NFR-002/003 → `scripts/validate-docs.mjs`、`docs/HARNESS.md`。
-- FR-003/004 → `packages/create/src/integrations.mjs`、`packages/create/test/integrations.test.mjs`（组合构建待验收）。
-- FR-005 至 FR-007 → 规划，暂无实现文件或测试。
+- FR-003/004 → `packages/create/src/integrations.mjs`、`packages/create/test/integrations.test.mjs`；代表构建/渲染证据见能力表。
+- FR-005 → packages/screen 与 create/src/screen；FR-006 → packages/three、cesium、babylon 及 create/src/engine、多引擎编排；FR-007/011 → packages/model-security 与各引擎模型控制器，源码和对应 test 目录均已存在。
 - FR-008 → `packages/create/src/workspace.mjs`、`packages/create/test/workspace.test.mjs`。
 - FR-010 → `packages/create/src/batch.mjs`、`packages/create/test/batch.test.mjs`、`examples/monorepo.batch.json`。
 
-## 待确认
+## 交付边界与后续授权
 
-真实 Vue/React 生成的依赖和构建复验、Monorepo 子应用框架选择方式、最低支持 Vite+ 版本、npm 发布包名称、模型授权服务协议与大屏策略的正式参数契约。
+当前锁定并验证 Vite+ 1.4.0，不承诺任意旧版本兼容；官方子应用模板、Node 最低版本、大屏参数及无服务端模型保护已有实现与记录。npm/Release 发布及命名另行授权，生产外部授权来源由业务决定。当前本地交付清单见 [V1](V1_ACCEPTANCE.md)。
 
 ## UI Smoke 工具设计
 
 - `packages/create/src/ui-smoke.mjs`：`planUiSmoke` 负责生成独立 HTML 与 Vue SFC、React JSX/TSX；`addUiSmoke` 校验项目 `package.json`、框架语言入口、Vite+ 插件配置，写入前检查同名文件。
-- `--ui-smoke` 只用于现有独立 Application，不能与 `--dry-run`、`--apply-existing`、`--repair-existing` 同时使用；仅支持 Vue + TDesign / React + Ant Design，TS/JS 均适用。
+- `--ui-smoke` 用于已有独立 Application 或官方 Monorepo 子应用，不能与 `--dry-run`、`--apply-existing`、`--repair-existing` 同时使用；支持 Vue 三种 UI、React 两种 UI，TS/JS 均适用，不接受根工作区。
 - 新增 `ui-smoke.html`、`src/ui-smoke/`，不改动业务入口或 Vite 配置；写入使用 `wx` 防覆盖；仅对新文件调用 `vp fmt`。
-- Vue `<t-button>` 验证组件自动导入；React 显式引用 `Button`；均含点击计数及可选 UnoCSS/Tailwind 视觉标记。
+- Vue 按预设验证 el-button/a-button/t-button 自动导入，React 显式引用对应组件库的 Button；均含点击计数及可选 UnoCSS/Tailwind 视觉标记。
 - React 独立生成 `SmokeApp.jsx|tsx`，仅默认导出组件；`main.jsx|tsx` 仅导入组件、样式并挂载。组件与非组件入口分离，符合官方 Fast Refresh lint 规则，不使用禁用规则或注释压制警告。
 - 新组件文件纳入同批写入预检；即使只有 `SmokeApp` 已存在，也在写入 HTML/入口或调用格式化前拒绝覆盖。旧验收页不自动改写或迁移。
 - 由 Vite+ 开发服务器访问 `/ui-smoke.html`；需要用户在浏览器验证真实效果，不将单元测试或构建成功视为浏览器验收成功。

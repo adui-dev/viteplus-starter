@@ -6,17 +6,17 @@
 - `packages/create/test/format-config.test.mjs`：默认 fmt、已有格式规则、幂等、异常结构测试。
 
 - `packages/create/src/vite-config.mjs`：内联 Vite 插件和已知旧版 `starter.plugins` 引用迁移。
-- `packages/create/src/integrations.mjs`：执行 `vp fmt . --write`，提供不重装依赖的旧项目修复函数。
+- `packages/create/src/integrations.mjs`：定向格式化本次修改文件，共享根策略在根目录处理；提供不重装依赖的旧项目修复函数。
 - `packages/create/bin/cli.mjs`：新增 `--repair-existing`，保留 `--apply-existing`。
 - 新生成项目不再创建 `starter.plugins.ts`；该文件仅可能存在于旧版本，修复后保留 `.bak` 备份。
 
-> 本文件仅列出本次初始化实际新增的关键路径。规划模块不视为已存在。
+> 本文件列出当前主要模块，后续章节补充各子系统路径。实现与实测范围分别见需求和能力表，不将规划模块视为已存在。
 
 | 路径                                                 | 作用                                                                  |
 | ---------------------------------------------------- | --------------------------------------------------------------------- |
 | `package.json`                                       | 工作区根信息及本地检查入口                                            |
 | `pnpm-workspace.yaml`                                | packages 工作区声明                                                   |
-| `vite.config.ts`                                     | 根部 Vite+ 最小配置，尚未做完整构建验证                               |
+| `vite.config.ts`                                     | 根部 Vite+ 格式、lint 与任务配置，服务生成器本地检查                  |
 | `packages/create/bin/cli.mjs`                        | 初始化 CLI 入口                                                       |
 | `packages/create/src/cli-args.mjs`                   | 参数白名单和重复参数校验                                              |
 | `packages/create/src/prompts.mjs`                    | 项目交互选择、确认和取消                                              |
@@ -32,7 +32,7 @@
 | `AGENTS.md`                                          | Agent 规则及导航入口                                                  |
 | `docs/`                                              | 需求、架构、设计、状态、Skills、Harness、ADR                          |
 
-UI/CSS 已在 `integrations.mjs` 实现；大屏核心见 `packages/screen`；Three.js 核心见 packages/three；其他引擎与生产授权服务尚未实现；.adui 加解密见文末。
+UI/CSS 见 integrations；大屏核心见 packages/screen；三引擎见 packages/three、cesium、babylon；.adui 与 env 模型构建见 packages/model-security。当前使用无服务端模型保护，未创建生产授权服务，也不列为 Windows 本地交付阻塞项。
 
 ## P4 Monorepo 多应用
 
@@ -174,6 +174,7 @@ engine-prompts.test.mjs：多选解析、摘要/取消、Three 保护提示；ve
 ## V1 收尾入口
 
 - docs/V1_ACCEPTANCE.md：模式选择、端到端验收顺序、现有证据与剩余限制。
+- docs/WINDOWS_GUIDE.md：Windows 常用流程、命令执行目录、维护模式和模型保护边界。
 - examples/README.md、ui-libraries.batch.json：示例索引及三个新增 UI 组合的可校验 JSON。
 - scripts/verify-examples.mjs、packages/create/test/examples.test.mjs：真实 CLI 批量预览与临时目录无输出校验。
 - scripts/validate-docs.mjs：必要文件、docs 全目录 Markdown 链接及需求编号检查。
