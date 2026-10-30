@@ -83,6 +83,19 @@ node .\viteplus-starter\packages\create\bin\cli.mjs --name starter-react-p3 --ty
 
 > 当前状态：**Windows V1 本地候选、尚未发布**。Vue/React × TypeScript/JavaScript 四种官方模板、五种框架/UI、工作区与恢复、大屏、Three/Cesium/Babylon 和 GLB/.adui 模型保护均有代表验收证据；未穷举全部组合，不把生成计划当成真实构建。当前版本仍为 0.0.0/private，不自动发布。
 
+## 通过 GitHub 下载使用
+
+在项目父目录执行，任选一种写法：
+
+```powershell
+vp create github:adui-dev/viteplus-starter
+# 或：vp create https://github.com/adui-dev/viteplus-starter
+Set-Location -LiteralPath viteplus-starter
+vp run create
+```
+
+GitHub 入口下载生成器工具仓库，不会直接执行其中的 CLI。下载后运行 vp run create，按提示选择框架、语言和预设；实际项目生成在工具仓库父目录，与工具目录并列。Vue/React 和 Monorepo 继续由官方模板创建，不需要发布 npm 包。参数和路径说明见 [远程使用](docs/REMOTE_CREATE.md)。
+
 ## 快速开始（开发者）
 
 环境：Node.js `^22.18.0 || ^24.11.0 || >=26.0.0`、pnpm，以及可运行的 `vp` 命令。版本范围与当前锁定的 Vite+ 1.4.0 一致；Node 22 的最低版本是 22.18.0，复验方法见 [Harness](docs/HARNESS.md#node-22-最低版本复验)。

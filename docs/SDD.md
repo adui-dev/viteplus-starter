@@ -4,6 +4,10 @@
 
 根 Vite+ fmt 统一自有源码、测试与文档格式；仅排除原样保存的第三方 `.agents/skills/git-commit/**`、`.agents/skills/gitmoji/**`，保留其上游指令与安装哈希。没有关闭源码检查、lint 规则或 Git hooks。
 
+## 远程下载后的启动入口
+
+根 vite.config.ts 提供 create 任务，command 为 node scripts/create.mjs、cache=false。启动器从 import.meta.url 定位仓库，以 process.execPath/argv 和 inherit stdio 启动原 CLI，cwd 为工具父目录，不经 shell 并保留退出状态。直接 CLI 的 cwd 不变；不使用 prepare/postinstall 自动生成项目。GitHub 外层下载与安装交给官方 Vite+，不将远程 bin 当成自动执行入口。
+
 ## 默认 normalize.css 静态样式
 
 base-styles.mjs 独立于可选 UI/CSS 依赖计划。planBaseStyles 为四种正式 main 入口列出本地静态 CSS、许可、来源与版本，不返回 npm 依赖；Monorepo 根返回 null。单应用、逐应用、批量和多引擎复用原 CLI，dry-run/批量计划展示 baseStyles。矩阵将默认静态路径加入 462 个组合的冲突检查，实际构建计数仍为 0。

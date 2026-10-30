@@ -14,6 +14,12 @@
 - 目标：Application 委托 `vp create vite:application -- --template vue|vue-ts|react|react-ts`；语言可选 `ts` / `js`，默认 TypeScript；Monorepo 委托 `vp create vite:monorepo`。
 - 验收：实测生成 Vue 和 React 应用，且保留 Vite+ 官方结构、工具链与 Git 配置。
 
+### FR-013 GitHub 远程使用入口
+
+- 状态：已实现本地启动入口，远程下载待实测；用户于 2026-10-30 指定通过 vp create github:user/repo 或 GitHub URL 使用。
+- 两种写法按官方流程下载生成器，下载后 vp run create 显式启动原 CLI；不在安装生命周期自动创建项目，不要求 npm/Release 发布。
+- 启动器按自身位置定位工具，在工具父目录执行，转发 argv/交互和失败退出状态；创建任务禁止缓存。基础工程仍委托官方入口，不复制自维护 Vue/React 工程。
+
 ### FR-002 交互式创建
 
 - 状态：已实现框架/语言/UI/CSS/大屏/引擎/模型保护交互，Windows TTY 选择与取消已实测；优先级：P0。

@@ -4,6 +4,8 @@
 
 ## 准备生成器
 
+也可使用 [GitHub 远程下载入口](REMOTE_CREATE.md)，下载后在工具目录运行 vp run create。下面的 git pull 适用于配置了远程的 Git 克隆，不能假定远程模板下载目录也有 origin。
+
 需要 Git、pnpm、可运行的 Vite+ `vp`，Node 范围为 `^22.18.0 || ^24.11.0 || >=26.0.0`。Node 22 最低为 22.18.0；指定该运行时并核对子进程的方法见 [Harness](HARNESS.md#node-22-最低版本复验)。
 
 以下假设仓库位于 D:/Workspace/adui-studio/viteplus-starter。在 PowerShell 中设置路径变量，后续在同一终端使用：
