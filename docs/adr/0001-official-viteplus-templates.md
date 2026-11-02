@@ -6,7 +6,7 @@
 
 ## 2026-10-30：GitHub 分发工具，官方模板创建应用
 
-按用户要求提供 github:user/repo 与 GitHub URL 入口。当前官方远程实现先下载仓库再安装，不运行远程 bin；因此采用下载后显式 vp run create，启动器在工具父目录复用原 CLI，创建任务不缓存，不在安装脚本中隐式生成应用。不发布 npm，也不把远程仓库改为自维护 Vue/React 模板。依据 [官方创建说明](https://viteplus.dev/guide/create) 和本地锁定 1.4.0 实现；两种远程下载须另行实测。
+按用户要求提供 github:user/repo 与 GitHub URL 入口。当前官方远程实现先下载仓库再安装，不运行远程 bin；因此采用下载后显式 vp run create，启动器在工具父目录复用原 CLI，创建任务不缓存，不在安装脚本中隐式生成应用。不发布 npm，也不把远程仓库改为自维护 Vue/React 模板。依据 [官方创建说明](https://viteplus.dev/guide/create) 和本地锁定 1.4.0 实现；截至 2026-11-02，两种来源已完成 Windows 实际下载与启动，代表 Vue TS 完整构建证据及官方安装目录识别边界见 [远程使用](../REMOTE_CREATE.md)。
 
 ## 背景
 

@@ -15,6 +15,8 @@ vp run create
 
 Vite+ 会提示下载目录，上例假设使用默认 viteplus-starter。已有同名目录时选择不存在的新目录，随后进入实际下载目录。远程命令先取得工具，第二步才选择项目配置。
 
+请进入自己选择的下载根目录，确认其中有 scripts/create.mjs。Windows 的 Vite+ 1.4.0 实测中，简写地址下载后把安装目录识别成了 packages/cesium，终端的 Next 提示也指向该子目录；此时仍应进入工具根目录运行 vp run create。根目录可能提示未安装本地 vite-plus，已验证帮助和实际创建可以通过全局 vp 正常执行；不要在 packages/cesium 内运行创建任务。需要开发或检查工具源码时，再在工具根目录执行 vp install。
+
 远程下载不等于 git clone，不能假定下载目录配置了 origin 或可直接 git pull。更新工具时下载到另一个新目录并核对版本，避免覆盖已有工具或项目；Windows 指南中的 git pull 仅用于已有远程的克隆仓库。
 
 例如工具在 D:/Workspace/adui-studio/viteplus-starter，demo-vue 会生成到 D:/Workspace/adui-studio/demo-vue。启动器从自身位置定位工具，不依赖下载目录名称；创建 cwd 固定为工具父目录，避免嵌入生成器自己的 pnpm 工作区。创建任务不缓存。
@@ -40,6 +42,24 @@ vp run create --config $batchConfig --dry-run
 
 ## 验证范围
 
-本地已验证参数/退出码转发、中文空格及元字符目录、任意调用 cwd、帮助/预览和 Windows TTY 取消无写入。两种 GitHub 下载命令需在入口推送后实测，当前不将本地启动验证称为远程下载成功。后续证据见 [项目状态](PROJECT_CONTEXT.md)。
+本地已验证参数/退出码转发、中文空格及元字符目录、任意调用 cwd、帮助/预览和 Windows TTY 取消无写入。
+
+截至 2026-11-02，已从推送后的 9233cdc 实际下载并完成以下 Windows 验证，环境为托管 Node 22.18.0、pnpm 12.16.1、Vite+ 1.4.0。两副本的 scripts/create.mjs 与原 CLI SHA256 均和源仓库一致；官方后处理会增量配置工具副本，不将整个目录称为原仓库字节副本。
+
+| 来源                                         | 工具目录（D:/Workspace/adui-studio 下） | 实际结果                                                                                                                 |
+| -------------------------------------------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| github:adui-dev/viteplus-starter             | adui-remote-shorthand-20261030          | 下载/安装退出 0；在根通过全局 vp 运行帮助，并成功创建旁边的 Vue TS 应用                                                  |
+| https://github.com/adui-dev/viteplus-starter | adui-remote-url-20261102                | 下载/根安装退出 0；安装后 React JS 预览映射官方 react 模板且目标不存在；TTY 选择 Monorepo 后取消退出 0，两处均未生成目标 |
+
+为避免覆盖已有工具，实测用以下非交互参数指定两个全新目录，均从工具父目录运行；普通使用仍可按上面的交互命令操作：
+
+```powershell
+vp create github:adui-dev/viteplus-starter --no-interactive --no-agent --no-editor --package-manager pnpm -- adui-remote-shorthand-20261030
+vp create https://github.com/adui-dev/viteplus-starter --no-interactive --no-agent --no-editor --package-manager pnpm -- adui-remote-url-20261102
+```
+
+在简写地址副本根执行 vp run create --name adui-remote-vue-ts-20261102 --type application --framework vue，官方 vue-ts 创建退出 0。应用位于 D:/Workspace/adui-studio/adui-remote-vue-ts-20261102，未嵌入工具工作区。正式入口首条导入为本地 normalize.css，其 SHA256 与仓库静态文件一致；应用 vp check 的 16 个格式文件、5 个代码文件通过，vp run build 的 vue-tsc -b 与首页构建 2/2 成功，产物保留。构建有插件耗时提示，不影响退出状态。
+
+生成器全量串行回归 254/254（无跳过）；此前默认并行回归中一个真实 CLI 用例触发 10 秒超时，串行复跑未复现，未修改测试超时或忽略失败。本轮没有新增浏览器验收、实际 React 创建或远程入口的 Monorepo 创建，不扩大为全部预设验证。后续证据见 [项目状态](PROJECT_CONTEXT.md)。
 
 官方说明：[创建项目](https://viteplus.dev/guide/create)。仓库仍为 private/0.0.0，不执行 npm/Release 发布或新增 CI/CD。
