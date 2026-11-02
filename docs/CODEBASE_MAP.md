@@ -208,6 +208,7 @@ engine-prompts.test.mjs：多选解析、摘要/取消、Three 保护提示；ve
 - ui-smoke.mjs：只读 preflightUiSmoke 与原写入函数共用检查，保护依赖与输出冲突。
 - packages/create/test/workspace-recovery-execute.test.mjs：顺序/重复调用、部分失败保留、后续目标占用、验收页冲突、虚假子进程成功与 CLI 模式隔离。
 - 同一测试补充创建/UI 阶段的退出码与上下文、无效码过滤；Windows 原生 CLI 用隔离 vp.cmd 替身验证退出码传递、已有文件内容/mtime 保持和部分失败重试前阻塞，不运行真实官方工具。
+- 恢复执行器维护后续显示标签队列，错误对象增加 pending，文本补充跳过应用和未执行子进程；同一测试覆盖五种阶段/检查失败的清单与现场保留，Windows CLI 核对实际失败文本，成功结果结构不变。
 
 ## V1 收尾入口
 

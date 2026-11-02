@@ -113,6 +113,81 @@ test("失败保留部分文件并停止，已有部分完成应用在执行前�
   assert.ok(!(await readdir(join(root, "apps"))).includes("second"));
 });
 
+test("恢复失败摘要区分当前失败阶段、已完成子进程和后续未执行步骤", async (t) => {
+  const create = "新建应用 first",
+    ui = "UI 验收页 first",
+    next = "新建应用 second";
+  for (const scenario of [
+    { at: create, failed: create, completed: [], pending: [ui, next] },
+    {
+      at: create,
+      structure: true,
+      failed: "检查新建应用 first",
+      completed: [create],
+      pending: [ui, next],
+    },
+    { at: ui, failed: ui, completed: [create], pending: [next] },
+    {
+      at: ui,
+      structure: true,
+      failed: "检查 UI 验收页 first",
+      completed: [create, ui],
+      pending: [next],
+    },
+    { at: next, failed: next, completed: [create, ui], pending: [] },
+  ]) {
+    const { root, config } = await fixture(t, true);
+    const before = await readFile(join(root, "apps/existing/package.json"), "utf8");
+    const calls = [];
+    await assert.rejects(
+      executeWorkspaceRecovery(
+        root,
+        config,
+        async (step) => {
+          calls.push(step.label);
+          if (step.label === scenario.at) {
+            await mkdir(step.target, { recursive: true });
+            await writeFile(join(step.target, "keep.txt"), "partial");
+            if (!scenario.structure)
+              throw Object.assign(new Error("controlled failure"), { exitCode: 19 });
+            return;
+          }
+          if (step.label === create) await createApp(step.target, "antd");
+          else {
+            const options = parseCliArgs(step.args.slice(1));
+            for (const [path, source] of Object.entries(planUiSmoke(options).files)) {
+              await mkdir(join(step.target, path, ".."), { recursive: true });
+              await writeFile(join(step.target, path), source);
+            }
+          }
+        },
+        quiet,
+      ),
+      (error) => {
+        assert.equal(error.failed, scenario.failed);
+        assert.deepEqual(error.completed, scenario.completed);
+        assert.deepEqual(error.pending, scenario.pending);
+        assert.deepEqual(error.skipped, ["existing"]);
+        assert.ok(error.message.includes("未执行子进程：" + (scenario.pending.join("、") || "无")));
+        assert.match(error.message, /已跳过应用：existing/);
+        return true;
+      },
+    );
+    assert.deepEqual(
+      calls,
+      [create, ui, next].slice(0, [create, ui, next].indexOf(scenario.at) + 1),
+    );
+    assert.equal(await readFile(join(root, "apps/existing/package.json"), "utf8"), before);
+    assert.equal(
+      await readFile(
+        join(root, "apps", scenario.at === next ? "second" : "first", "keep.txt"),
+        "utf8",
+      ),
+      "partial",
+    );
+  }
+});
+
 test("执行中占用后续目标，或 UI 输出出现冲突，均不覆盖且不继续", async (t) => {
   for (const conflict of ["next-target", "ui-output"]) {
     const { root, config } = await fixture(t, conflict === "ui-output");
@@ -262,6 +337,8 @@ process.exit(13);
     assert.equal(failed.status, 13, failed.stderr);
     assert.match(failed.stderr, /恢复执行失败：新建应用 first/);
     assert.match(failed.stderr, /已完成子进程：无/);
+    assert.match(failed.stderr, /未执行子进程：新建应用 second/);
+    assert.match(failed.stderr, /已跳过应用：existing/);
     const firstLog = await readFile(log, "utf8");
     const args = JSON.parse(firstLog.trim());
     assert.equal(args[args.indexOf("--directory") + 1], "apps/first");

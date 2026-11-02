@@ -286,6 +286,8 @@ workspace-recovery-execute 仅读取一次校验后的原配置，使用 planRec
 
 恢复 run 将子进程 status 放入 error.exitCode，executeWorkspaceRecovery 包装错误时只复制有效正整数，沿原 CLI 出口返回；无有效码的失败回退为 1。failed/completed/skipped、原始 cause 和现场保护说明保留。部分失败导致下次初始预检阻塞时返回 1，不将先前子进程退出码当作恢复状态保存，也不增加自动重试或覆盖路径。
 
+初始缺失应用按配置顺序组成显示标签队列：每应用的新建步骤后跟可选 UI 步骤。进入某个创建/UI 阶段时移除对应队首，结构检查不消耗后续标签；catch 将剩余队列复制到 error.pending，文本同时输出 skipped 和 pending，空列表显示“无”。因此结构检查失败仍保留后续 UI/应用标签，当前失败阶段、成功返回的子进程及初始跳过应用不重复列入 pending。该清单不含可执行命令，不参与重试或修改成功返回结构。
+
 ## V1 示例与文档检查
 
 verify-examples 在仓库外新建独立临时目录，逐个以 Node argv 调用真实 CLI --config --dry-run，检查官方 Monorepo 阶段、应用数量及临时目录无输出，最后清理临时目录；输出计划计数与 actualBuilds=0。没有安装、构建或发布路径。node --test 同步覆盖这项示例兼容检查。

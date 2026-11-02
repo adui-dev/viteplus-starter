@@ -34,11 +34,16 @@ export async function executeWorkspaceRecovery(
   const skipped = initial.apps
     .filter((app) => app.action !== "create-missing")
     .map((app) => app.name);
+  const pending = selected.flatMap((name) => [
+    "新建应用 " + name,
+    ...(config.apps.find((app) => app.name === name).uiSmoke ? ["UI 验收页 " + name] : []),
+  ]);
   const completed = [];
   let phase = "执行前预检";
   try {
     for (const name of selected) {
       phase = "新建应用 " + name;
+      pending.shift();
       const current = await planRecoveryForConfig(initial.root, config);
       if (!current.ok || current.apps.find((app) => app.name === name)?.action !== "create-missing")
         throw new Error("现场已变化或出现阻塞，拒绝继续创建");
@@ -66,6 +71,7 @@ export async function executeWorkspaceRecovery(
       await check(false);
       if (app.uiSmoke) {
         phase = "UI 验收页 " + name;
+        pending.shift();
         await preflightUiSmoke(join(initial.root, "apps", name), options);
         report("开始：" + phase);
         await runner({
@@ -81,13 +87,14 @@ export async function executeWorkspaceRecovery(
     }
   } catch (cause) {
     const error = new Error(
-      `恢复执行失败：${phase}；${cause?.message ?? String(cause)}\n工作区：${initial.root}\n已完成子进程：${completed.join("、") || "无"}\n${recoveryAdvice}`,
+      `恢复执行失败：${phase}；${cause?.message ?? String(cause)}\n工作区：${initial.root}\n已完成子进程：${completed.join("、") || "无"}\n已跳过应用：${skipped.join("、") || "无"}\n未执行子进程：${pending.join("、") || "无"}\n${recoveryAdvice}`,
       { cause },
     );
     if (Number.isInteger(cause?.exitCode) && cause.exitCode > 0) error.exitCode = cause.exitCode;
     Object.assign(error, {
       failed: phase,
       completed: [...completed],
+      pending: [...pending],
       skipped,
       workspaceRoot: initial.root,
     });
