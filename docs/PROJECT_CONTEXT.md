@@ -8,7 +8,7 @@
 
 - 仓库：`adui-dev/viteplus-starter`。Vite+ 官方 `vite:application` / `vite:monorepo` 是唯一基础工程来源，Vue/React Application 按语言选 `vue` / `vue-ts` / `react` / `react-ts`。
 - 已实现：基础 CLI 交互与参数模式、Application UI/CSS 集成、旧项目补装及 `--repair-existing`、UI Smoke、通过 `--workspace` 逐个添加及通过 JSON 批量新建 Monorepo 应用、本地单元测试与文档检查。
-- 当前阶段：Windows V1 实际使用与问题修复。显式新建缺失应用的恢复、三引擎及代表大屏专项已实现和验收，具体范围见文末及 GENERATOR_STATUS；自定义布局、其他操作系统与覆盖式恢复不在本阶段范围。
+- 当前阶段：Windows V1 CLI 分发入口与实际使用问题修复。用户 2026-11-02 明确希望一条命令进入配置向导，本地自包含 CLI 包已实现，正式包名和分发方式待确定。现有恢复、三引擎及代表大屏专项范围见文末及 GENERATOR_STATUS；自定义布局、其他操作系统与覆盖式恢复不在本阶段范围。
 - 严格要求：**不得添加任何 CI/CD、自动发布或部署工作流**；仅人工本地测试。
 
 ## 用户 Windows 实机验收（已确认）
@@ -35,7 +35,7 @@
 
 ## 下一步
 
-1. 按 Windows 指南在实际项目中使用现有能力，优先修复生成、补装及输入校验的具体问题；不重复扩张组合或新增业务演示。
+1. 按用户新要求优先完成 CLI 分发体验：本地 tgz 可通过 vp dlx 直接进入向导，下一步确定正式包名和分发方式；任何 npm/Release 发布仍需明确授权。继续维护 Windows 创建、补装及输入校验的具体问题，不重复扩张组合或新增业务演示。
 2. 默认本地 normalize.css、独立应用与 Monorepo 的 UI/CSS 联用已完成代表验收；官方模板和文件保护边界继续保留。
 3. 新需求明确后再调整范围；不能将代表组合通过视为完整矩阵通过，不推进其他系统或发布流程。
 
@@ -741,3 +741,12 @@
 - 回归在系统临时目录预加载受控 spawnSync，模拟官方步骤成功并留下 Vue TS 缺少对应语言入口、React JS 基础样式占用两种现场。验证真实 CLI 退出 1、阶段/目标/已完成提示、只调用一次受控官方子进程、无 UI 安装或整体成功输出，以及全部模拟文件内容/mtime 保持；临时目录自动清理，不作为真实官方创建或应用构建证据。
 - 生成器串行全量回归 262/262、无跳过，文档检查与根 vp check（188 格式/141 代码文件）通过。同步需求、设计、代码索引和 Windows 错误处理说明；父目录仍仅有清理后保留的 8 个目录，没有重建历史验收项目，也未安装依赖或运行浏览器验收。
 - 下一步继续按现有 Windows 创建、补装、恢复入口处理可复现问题；官方基础模板和当前预设范围保持，不自动扩展功能或验收矩阵。
+
+## 2026-11-02：自包含 CLI 分发入口与本地包验收
+
+- 用户实测 GitHub 模板下载后指出尚未出现 UI、大屏等选择，明确当前主线为独立 CLI 分发。复用已有向导和官方模板调用，新增根 npm run cli:pack；源码包名、0.0.0/private 及依赖版本保持，没有执行 npm/Release 发布。
+- scripts/cli-package.mjs 按固定来源复制 CLI、normalize.css/许可及五个预设源码树，保留跨模块相对路径；scripts/pack-cli.mjs 通过 npm 的 JS 入口、当前 Node 和 argv 生成本地 tgz，禁用生命周期脚本，每次使用新产物目录并清理自有暂存。生成包 85 个文件、零运行时依赖，不带测试、node_modules、环境密钥或 GLB；bin 和帮助统一使用 viteplus-starter 命令。
+- 四项回归覆盖资源、两个框架的多引擎和 JSON 批量只读预览、中文空格与元字符调用目录、目标已有/junction 拒绝及缺少 npm 上下文。Node 22.18.0/npm 10.9.3/Vite+ 1.4.0 下真实 tgz 离线安装仅添加一个 CLI 包；Windows cmd shim、npm exec 新缓存离线预览和 vp dlx 的帮助/预览均验证。Vue TS/Element Plus/Tailwind/大屏/三引擎/embedded 的安装后向导，以及 React JS/Ant Design/UnoCSS/大屏/Three+Babylon/external 的 vp dlx 向导均完成选择并取消，退出 0、无目标生成。
+- 从本地 tgz 经 vp dlx 真正创建临时 Vue TS/Element Plus 2.14.7/Tailwind 4.3.3/AdScreen 应用。官方选择 pnpm 11.22.0；一次 registry 超时自动重试后成功，未改变 registry 或依赖策略。check 29 格式/14 代码文件、完整 vue-tsc -b 与首页构建 2/2 通过；再经同入口生成 UI Smoke，/ui-check/ 双入口构建及最终 check 32 格式/17 代码文件通过，normalize 保持首条导入。没有执行浏览器或独立大屏生产入口验收，不扩大为全部预设真实创建通过。
+- 验收目录、安装、两份 npm 验证缓存、实际应用和构建产物在校验自有绝对路径后全部清理。仅保留仓库忽略的 dist/cli/pack-* tgz，未重建工作区父目录中的历史测试工程，也未修改用户的 test-starter。生成器串行回归 266/266、无跳过，文档检查及根 vp check（193 格式/144 代码文件）通过，无 lint 警告错误。
+- 下一步确定正式 CLI 包名和用户分发方式，保持本地包可直接使用；首次 npm/Release 发布须另有明确授权。CLI 分发与 GitHub 模板下载分开说明，不通过安装钩子自动启动向导，不增加 CI/CD 或业务演示。

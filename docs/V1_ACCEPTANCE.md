@@ -6,6 +6,10 @@
 
 本文中的本地项目路径和“现场/产物保留”描述记录各轮验收当时的状态，不要求测试工程永久保留。用户于 2026-11-02 要求清理之前创建的测试项目，后续目录清理情况见 [项目状态](PROJECT_CONTEXT.md)；清理不表示重新执行或扩大此前的验收范围。
 
+## 独立 CLI 本地包验收（2026-11-02）
+
+已验证自包含 tgz 的真实离线安装、Windows 命令 shim、npm exec 与 vp dlx 调用、两框架完整向导选择后取消。代表 Vue TS/Element Plus/Tailwind/大屏应用经 tgz 入口实际创建，check、完整类型/首页构建、tgz 入口生成 UI 页及双入口构建通过；临时安装、缓存和应用均清理。详细环境、首次网络重试和未覆盖范围见 [CLI 本地包实测](CLI_DISTRIBUTION.md#2026-11-02-本地包实测)。该包仍 private/0.0.0，未发布 npm/Release，GitHub 模板下载仍是两步流程。
+
 ## 正常编码应用补装与构建复验（2026-11-02）
 
 新建隔离 D:/Workspace/adui-studio/adui-clean-maintenance-vue-ts-20261102，由当前 CLI 委托官方 vite:application 的 vue-ts 模板生成；Node 22.18.0、pnpm 12.16.1、Vite+ 1.4.0。应用清单为无 BOM UTF-8，原 test-vue、BOM 对照副本及其他实际工程未改动。
