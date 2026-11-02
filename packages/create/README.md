@@ -5,13 +5,41 @@
 包名：`@adui/viteplus-starter` · 命令：`viteplus-starter` · [源码与文档](https://github.com/adui-dev/viteplus-starter) · [问题反馈](https://github.com/adui-dev/viteplus-starter/issues)
 
 > [!NOTE]
-> 首发版本为 `0.1.0`，当前仍为 private 本地候选包，尚未发布到 npm。请通过本地 tgz 启动。
+> 首发版本为 `0.1.0`，当前仍为 private 本地候选包，尚未发布到 npm。下文按包名安装的命令适用于正式发布后；当前请使用本地 tgz。
 
 ## 环境要求
 
 Windows、可运行的 Vite+ `vp` 命令，以及 Node.js `^22.18.0 || ^24.11.0 || >=26.0.0`。首次启动和项目创建需要可用的依赖缓存或网络。
 
 ## 快速开始
+
+### 安装 npm 包
+
+全局安装后，在希望存放新项目的父目录启动配置向导：
+
+```powershell
+npm install --global @adui/viteplus-starter
+viteplus-starter
+```
+
+如果安装为当前项目的开发依赖，使用本地命令：
+
+```powershell
+npm install --save-dev @adui/viteplus-starter
+npm exec -- viteplus-starter
+```
+
+也可免全局安装运行：
+
+```powershell
+npm exec --yes --package @adui/viteplus-starter -- viteplus-starter
+# 或使用 Vite+
+vp dlx @adui/viteplus-starter
+```
+
+包名为 `@adui/viteplus-starter`，命令名为 `viteplus-starter`。这是项目生成工具，无需在 Vue/React 业务代码中 import。
+
+### 使用本地 tgz
 
 从希望存放新项目的父目录运行，将路径替换为实际收到的 tgz：
 
@@ -27,13 +55,32 @@ npm exec --yes --package 'C:\Downloads\adui-viteplus-starter-0.1.0.tgz' -- vitep
 
 无参数进入向导：选择项目形态、Vue/React、TS/JS、UI、CSS、大屏、3D 引擎与模型保护。方向键移动，回车确认；引擎用空格多选，Ctrl+C 取消。项目生成在当前调用目录下，不使用 CLI 安装目录。
 
-创建完成后，在应用目录运行 `vp check`、`vp run build` 和 `vp dev`；Monorepo 在根目录运行 `vp run ready`。
+例如在向导中创建了 `my-app`，完成后执行：
+
+```powershell
+Set-Location -LiteralPath .\my-app
+vp check
+vp run build
+vp dev
+```
+
+生成应用的日常开发继续使用 `vp`；Monorepo 在根目录运行 `vp run ready`。
 
 ## 参数用法
 
 ```powershell
+# 全局安装后
+viteplus-starter --help
+viteplus-starter --name my-vue-app --type application --framework vue --ui element-plus --css tailwindcss --screen --dry-run
+# 去掉 --dry-run 即实际创建项目
+viteplus-starter --name my-vue-app --type application --framework vue --ui element-plus --css tailwindcss --screen
+```
+
+免全局安装或本地 tgz 方式，将同样的参数追加到命令末尾：
+
+```powershell
+npm exec --yes --package @adui/viteplus-starter -- viteplus-starter --help
 vp dlx -- 'C:\Downloads\adui-viteplus-starter-0.1.0.tgz' --help
-vp dlx -- 'C:\Downloads\adui-viteplus-starter-0.1.0.tgz' --name my-vue-app --type application --framework vue --ui element-plus --css tailwindcss --screen --dry-run
 ```
 
 `--dry-run` 只输出计划；去掉后创建项目。项目名使用小写字母、数字和中划线，以字母开头；目标目录须不存在。

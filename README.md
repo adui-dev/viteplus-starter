@@ -32,7 +32,48 @@
 - 已安装 Vite+，可运行 `vp`，并具有可用的 pnpm 环境。
 - 创建项目时需要网络或完整的模板、依赖缓存。
 
-### 下载并启动向导
+### 安装 npm 包并使用
+
+以下 npm 包名命令适用于正式发布后；当前未发布时，使用下文的 GitHub 或本地 tgz 入口。
+
+全局安装后，在希望存放新项目的父目录运行命令，即可进入配置向导：
+
+```powershell
+npm install --global @adui/viteplus-starter
+viteplus-starter
+```
+
+如果选择安装到当前项目的开发依赖，则通过 npm exec 调用本地命令：
+
+```powershell
+npm install --save-dev @adui/viteplus-starter
+npm exec -- viteplus-starter
+```
+
+也可以免全局安装，直接运行：
+
+```powershell
+npm exec --yes --package @adui/viteplus-starter -- viteplus-starter
+# 已使用 Vite+ 时也可运行
+vp dlx @adui/viteplus-starter
+```
+
+全局安装后可直接传参数创建应用，或先用 `--dry-run` 查看计划：
+
+```powershell
+viteplus-starter --help
+viteplus-starter --name my-vue-app --type application --framework vue --ui element-plus --css tailwindcss --dry-run
+# 确认计划后去掉 --dry-run 创建
+viteplus-starter --name my-vue-app --type application --framework vue --ui element-plus --css tailwindcss
+Set-Location -LiteralPath .\my-vue-app
+vp check
+vp run build
+vp dev
+```
+
+npm 包命令将项目生成在**当前调用目录**下。包名是 `@adui/viteplus-starter`，安装后的命令名是 `viteplus-starter`；它是项目生成工具，不需要在业务代码中 import。生成应用的日常开发继续使用 `vp`。
+
+### 从 GitHub 下载并启动向导
 
 在希望存放项目的父目录执行，目标 `viteplus-starter` 目录须不存在：
 

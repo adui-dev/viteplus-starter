@@ -825,3 +825,9 @@
 本轮只整理说明文档，不更改生成器、插件或发布状态。用户新安装的 Skill 原文与 skills-lock.json 保持原样，不纳入本轮提交；旧 tgz 不会随 README 修改更新。下一步在明确发布指令后核对 npm 登录、作用域权限，并重新打包包含最终说明的候选。
 
 本地验证：285/285 Node 测试通过，无跳过；文档校验、四份改动文档的格式检查、全仓 153 个代码文件 lint 及 git diff --check 通过。实际 vp run create 的 Vue/Element Plus/Tailwind 与 JSON 批量 dry-run 均通过，确认工具父目录及配置路径正确，未创建项目。包内文档 URL 均对应仓库现有文件。全仓 vp check 已执行，因本轮开始时已存在的 .agents/skills/create-readme/SKILL.md 格式问题未通过；保留第三方安装原文，不改配置掩盖该问题。本轮未重打 tgz、未执行新的项目构建或浏览器验收。
+
+## 2026-11-03 补齐 npm 安装后用法
+
+按用户反馈，根与包内 README 补充正式发布后的 npm 全局/项目内安装、viteplus-starter 命令、npm exec / vp dlx 免全局安装、帮助/预览/创建和进入生成应用后 check/build/dev 的完整流程。明确 npm 入口以当前调用目录为输出基准，包名与命令名不同，生成器无需在业务代码中 import。npm 尚未发布的说明保持；当前仍可使用 GitHub 或本地 tgz，不执行 registry 安装或发布。下一步重新打包含最终 README 的候选，再核对实际 npm 首发条件。
+
+本轮 285/285 测试、文档校验、四份改动文档的格式检查及全仓 153 文件 lint 通过。完整 vp check 仍仅因已安装 create-readme Skill 的既有格式问题未通过，安装原文及锁文件未修改、未暂存。npm 命令语法已核对官方 npm install / npm exec 文档，bin 名称与包清单一致；不将此说明补充称为 registry 安装成功。日志见忽略目录 dist/verification/npm-readme-tests.log。
