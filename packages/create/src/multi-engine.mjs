@@ -43,6 +43,8 @@ export async function runMultiEngine(args, runner = run) {
   }
   if (args.dryRun)
     return {
+      cwd: context?.root ?? process.cwd(),
+      target,
       official: buildVpCommand(options),
       baseStyles: planBaseStyles(options),
       engine: plan,

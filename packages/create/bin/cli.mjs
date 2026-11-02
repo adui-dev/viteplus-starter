@@ -384,6 +384,7 @@ async function main() {
     process.exitCode = result.status ?? 1;
   }
   if (result.status === 0) {
+    console.log("项目目录：" + target);
     console.log(
       options.type === "monorepo"
         ? "创建完成，请在工作区根运行 vp run ready；页面效果仍需浏览器验收"

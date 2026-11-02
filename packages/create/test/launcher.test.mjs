@@ -65,17 +65,43 @@ test("真实 CLI 预览显示直接入口和下载入口各自的绝对执行目
     Object.entries(process.env).filter(([key]) => key.toUpperCase() !== "PATH"),
   );
   env.PATH = "";
+  const workspace = join(f.parent, "工作区 & 'existing");
+  await mkdir(join(workspace, "apps"), { recursive: true });
+  await writeFile(
+    join(workspace, "package.json"),
+    JSON.stringify({ name: "existing", private: true, devDependencies: { "vite-plus": "1" } }),
+  );
+  await writeFile(join(workspace, "pnpm-workspace.yaml"), "packages:\n  - apps/*\n");
+  await writeFile(
+    join(workspace, "vite.config.ts"),
+    'import {defineConfig} from "vite-plus";export default defineConfig({})',
+  );
   const before = await readdir(f.parent);
+  const multiArgs = [
+    "--type",
+    "application",
+    "--framework",
+    "react",
+    "--language",
+    "js",
+    "--screen",
+    "--engines",
+    "three,babylon",
+    "--model-protection",
+    "none",
+  ];
   const cases = [
     ["preview-vue", ["--type", "application", "--framework", "vue", "--language", "js"]],
     ["preview-react", ["--type", "application", "--framework", "react"]],
     ["preview-workspace", ["--type", "monorepo"]],
+    ["preview-multi", multiArgs],
+    ["preview-member", [...multiArgs, "--workspace", workspace], workspace],
   ];
   for (const [entry, expectedCwd] of [
     [fileURLToPath(cliUrl), f.elsewhere],
     [f.script, f.parent],
   ]) {
-    for (const [name, args] of cases) {
+    for (const [name, args, workspaceRoot] of cases) {
       const result = spawnSync(process.execPath, [entry, "--name", name, ...args, "--dry-run"], {
         cwd: f.elsewhere,
         env,
@@ -84,15 +110,20 @@ test("真实 CLI 预览显示直接入口和下载入口各自的绝对执行目
       });
       assert.equal(result.status, 0, result.stderr);
       const plan = JSON.parse(result.stdout);
-      assert.equal(plan.cwd, expectedCwd);
-      assert.equal(plan.target, join(expectedCwd, name));
-      assert.equal(plan.command, "vp");
+      assert.equal(plan.cwd, workspaceRoot ?? expectedCwd);
       assert.equal(
-        plan.args[1],
+        plan.target,
+        workspaceRoot ? join(workspaceRoot, "apps", name) : join(expectedCwd, name),
+      );
+      const official = plan.official ?? plan;
+      assert.equal(official.command, "vp");
+      assert.equal(
+        official.args[1],
         name === "preview-workspace" ? "vite:monorepo" : "vite:application",
       );
     }
   }
   assert.deepEqual(await readdir(f.parent), before);
   assert.deepEqual(await readdir(f.elsewhere), []);
+  assert.deepEqual(await readdir(join(workspace, "apps")), []);
 });

@@ -12,6 +12,8 @@ Windows Vite+ 1.4.0 的远程后处理可能识别内部子包为安装目录；
 
 单项目 CLI 的 dry-run 在输出官方 command/args 时始终附带实际 commandCwd 与 target，JSON 字段仍为 cwd/target；此前仅 --workspace 输出这两个字段，独立应用及 Monorepo 根遗漏。字段来自已有路径计算，不重新解析路径或改变目标；直接入口按调用 cwd、下载启动器按工具父目录。launcher 回归通过隔离启动器引导真实 CLI，清空 PATH，验证两种入口 × Vue/React/Monorepo 的绝对路径及无目标生成。
 
+--engines 走独立 runMultiEngine，dry-run 同样在顶层提供 cwd/target；cwd 使用已解析的工作区根或当前进程目录，target 复用原计算，已有 official/baseStyles/engine/modelProtection 结构保持。launcher 回归也覆盖两种入口的独立多引擎应用及工作区成员。普通创建成功后，CLI 在最后的检查/构建提示前打印绝对 target，便于用户定位项目；仅输出路径，不自动切换终端或执行命令。
+
 ## 默认 normalize.css 静态样式
 
 base-styles.mjs 独立于可选 UI/CSS 依赖计划。planBaseStyles 为四种正式 main 入口列出本地静态 CSS、许可、来源与版本，不返回 npm 依赖；Monorepo 根返回 null。单应用、逐应用、批量和多引擎复用原 CLI，dry-run/批量计划展示 baseStyles。矩阵将默认静态路径加入 462 个组合的冲突检查，实际构建计数仍为 0。
