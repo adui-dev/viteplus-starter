@@ -4,6 +4,7 @@ import { addBaseStyles, planBaseStyles, preflightBaseStyles } from "../src/base-
 import { planWorkspaceRecovery } from "../src/workspace-recovery.mjs";
 import { inspectWorkspace } from "../src/workspace-inspect.mjs";
 import { createStageRunner } from "../src/recovery.mjs";
+import { preflightExistingOutput, finalizeExistingOutput } from "../src/existing-output.mjs";
 import { applicationPresetPlan, applicationFiles } from "../src/plugin-paths.mjs";
 import {
   captureApplication,
@@ -215,11 +216,19 @@ async function main() {
       (options.css ?? "none") !== "none"
     )
       throw new Error("--three-smoke 需单独调用，不混用创建/补装/其他验收选项");
+    let smokeOutput;
     const result = await stage("Three 集成", async () => {
       await preflightVpManifestEncoding(target);
+      smokeOutput = await preflightExistingOutput(target, {
+        ...options,
+        engine: "three",
+        modelProtection: "none",
+        smokePages: true,
+      });
       return addThreeSmoke(target, options);
     });
     await finishWorkspaceIntegration();
+    await stage("补装插件目录整理", () => finalizeExistingOutput(target, smokeOutput));
     console.log("Three.js 验收页已生成：" + result.previewPath);
     console.log(
       "进入应用目录运行 vp check 和 vp run build；独立页运行 vp dev，验证真实 WebGL、DPR、拾取与卸载清理",
@@ -261,6 +270,7 @@ async function main() {
     if (args.dryRun) throw new Error("--apply-existing 与 --dry-run 不能同时使用");
     if (options.type !== "application") throw new Error("只能向已存在的 Application 补装插件");
     if (!existsSync(target)) throw new Error("目标目录不存在，无法补装");
+    let outputPlan;
     await stage("补装预检", async () => {
       await preflightVpManifestEncoding(target);
       await preflightBaseStyles(target, options);
@@ -273,6 +283,8 @@ async function main() {
         await validateThreeTarget(target, options, !options.screen);
       }
       await preflightModelProtection(target, options);
+      if (!process.env.ADUI_DEFER_APPLICATION_OUTPUT)
+        outputPlan = await preflightExistingOutput(target, options);
     });
     if (workspace) await stage("工作区依赖准备", () => prepareWorkspacePeerExtensions(workspace));
     await stage("UI/CSS 集成", () => applyIntegrations(target, options));
@@ -284,7 +296,13 @@ async function main() {
       await stage("Babylon 集成", () => addBabylon(target, options));
     await stage("模型保护集成", () => addModelProtection(target, options));
     await finishWorkspaceIntegration();
+    if (outputPlan)
+      await stage("补装插件目录整理", () => finalizeExistingOutput(target, outputPlan));
     console.log("补装完成，请在应用目录执行 vp check 和 vp run build");
+    if (outputPlan)
+      console.log(
+        "本次新增插件已归档；业务首页保持，请在 App 中按需导入 src/plugins 下的组件或适配器。",
+      );
     return;
   }
   if (existsSync(target) && !args.dryRun) {

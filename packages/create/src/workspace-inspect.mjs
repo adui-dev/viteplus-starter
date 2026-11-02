@@ -9,7 +9,8 @@ import { planScreenPreset } from "./screen.mjs";
 import { planEngine } from "./engine.mjs";
 import { planModelProtection } from "./model-protection.mjs";
 import { readWorkspaceJson as json } from "./workspace-json.mjs";
-import { planApplicationOutput } from "./application-output.mjs";
+import { homeFiles } from "./application-home.mjs";
+import { applicationPath, applicationFiles } from "./plugin-paths.mjs";
 
 async function configs(directory) {
   const found = [];
@@ -130,17 +131,39 @@ export async function inspectWorkspace(directory, configFile, configuration) {
       pluginInfo?.isFile() &&
       pluginInfo.size < 65536 &&
       (await readFile(pluginIndex, "utf8")).includes("// ADui application plugins");
+    const presetFiles = [
+      ...(app.screen ? Object.keys((await planScreenPreset(options)).files) : []),
+      ...(engine?.files ?? []),
+      ...(protection?.files ?? []),
+    ];
+    let groupedPresets = grouped;
+    for (const path of presetFiles)
+      if (
+        applicationPath(path) !== path &&
+        (await inspectPath(join(target, applicationPath(path)), "工作区检查"))
+      )
+        groupedPresets = true;
+    const installedFiles = [];
+    for (const path of groupedPresets
+      ? applicationFiles(presetFiles, options.smokePages)
+      : presetFiles) {
+      // Historical and newly added presets can legitimately coexist in one app.
+      const legacy = presetFiles.find((candidate) => applicationPath(candidate) === path);
+      installedFiles.push(
+        groupedPresets &&
+          legacy &&
+          !(await inspectPath(join(target, path), "工作区检查")) &&
+          (await inspectPath(join(target, legacy), "工作区检查"))
+          ? legacy
+          : path,
+      );
+    }
     const files = new Set([
       "src/main." + ext,
       "index.html",
       ...(app.uiSmoke ? Object.keys(planUiSmoke(options).files) : []),
-      ...(grouped
-        ? (await planApplicationOutput(options)).files
-        : [
-            ...(app.screen ? Object.keys((await planScreenPreset(options)).files) : []),
-            ...(engine?.files ?? []),
-            ...(protection?.files ?? []),
-          ]),
+      ...installedFiles,
+      ...(grouped ? Object.keys(homeFiles(options)) : []),
     ]);
     for (const file of files)
       if (!(await inspectPath(join(target, file), "工作区检查"))?.isFile())

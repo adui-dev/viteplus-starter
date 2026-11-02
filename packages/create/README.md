@@ -1,6 +1,10 @@
 # ADui Vite+ Starter CLI
 
+包名：`@adui/viteplus-starter`；命令名：`viteplus-starter`。当前仍为 0.0.0/private 本地验收包，尚未发布。
+
 新建应用默认将所选 UI、大屏和引擎接入正式 main/App，运行时插件位于 src/plugins，Node 构建插件位于 build/plugins。默认不保留独立 smoke 页面与创建中间备份；新建时添加 --smoke-pages 可保留独立验收页，批量 JSON 对应应用的 smokePages: true。已有工程不会自动迁移或替换首页。
+
+--apply-existing 也将本次新增插件归档到相同目录，默认不保留预设独立页；需要时在该次补装命令加 --smoke-pages。已有插件、业务 App 和自定义插件注册入口不自动迁移。UI/CSS 与 normalize 仍按原规则增量添加入口样式；配置原件备份继续保留。Vue 业务页面可从 './plugins/screen/vue.mjs' 导入 AdScreen、从 './plugins/screen/config.ts'（JS 为 .js）导入 screenConfig；React 对应 react.mjs。所选 UI 按钮从 './plugins/ui/index.ts'（JS 为 .js）导入 UiButton，引擎适配器从对应 plugins/<engine>/lazy.mjs 导入。
 
 本地验收包提供 `viteplus-starter` 命令。无参数运行可选择项目名称、Application/Monorepo、Vue/React、TS/JS、UI、CSS、大屏、3D 引擎和模型保护；完整基础参数调用按参数模式执行，其他选项采用默认值。
 
@@ -19,9 +23,9 @@ viteplus-starter --name my-vue-app --type application --framework vue --ui eleme
 尚未发布到 npm。仓库开发者在生成器根目录运行 `npm --silent run cli:pack`，获得包含 `tarball` 绝对路径的 JSON；使用本地包启动：
 
 ```powershell
-vp dlx -- 'C:\path\to\viteplus-starter-create-0.0.0.tgz'
+vp dlx -- 'C:\path\to\adui-viteplus-starter-0.0.0.tgz'
 # 或
-npm exec --yes --package 'C:\path\to\viteplus-starter-create-0.0.0.tgz' -- viteplus-starter
+npm exec --yes --package 'C:\path\to\adui-viteplus-starter-0.0.0.tgz' -- viteplus-starter
 ```
 
 该包包含所需生成器和预设源码，不需要先下载整个工具仓库。GitHub 模板下载方式仍须进入下载根目录执行 `vp run create`；它与此 CLI 包入口是两条使用路径。

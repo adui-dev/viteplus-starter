@@ -13,6 +13,7 @@ import { preflightModelProtection, planModelProtection } from "./model-protectio
 import { createStageRunner } from "./recovery.mjs";
 import { preflightVpManifestEncoding } from "./vp-compatibility.mjs";
 import { applicationPresetPlan } from "./plugin-paths.mjs";
+import { preflightExistingOutput, finalizeExistingOutput } from "./existing-output.mjs";
 import {
   captureApplication,
   finalizeApplication,
@@ -36,6 +37,7 @@ export async function runMultiEngine(args, runner = run) {
     engine,
     modelProtection: engine === modelEngine(options) ? options.modelProtection : "none",
   }));
+  let existingOutput;
   if (args.applyExisting) {
     const stage = createStageRunner(target);
     await stage("补装预检", async () => {
@@ -52,6 +54,7 @@ export async function runMultiEngine(args, runner = run) {
         if (selection.engine === "babylon")
           await preflightBabylon(target, selection, !options.screen);
       }
+      existingOutput = await preflightExistingOutput(target, options);
     });
   }
   if (args.dryRun)
@@ -113,7 +116,11 @@ export async function runMultiEngine(args, runner = run) {
     const stage = createStageRunner(target);
     await stage("插件目录与首页接入", () => finalizeApplication(target, options, homeSnapshot));
   }
-  return { target, engine: args.applyExisting ? plan : applicationPresetPlan(plan, options) };
+  if (existingOutput && runner === run) {
+    const stage = createStageRunner(target);
+    await stage("补装插件目录整理", () => finalizeExistingOutput(target, existingOutput));
+  }
+  return { target, engine: applicationPresetPlan(plan, options) };
 }
 function run(argv) {
   const result = spawnSync(

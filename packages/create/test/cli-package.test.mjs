@@ -19,6 +19,7 @@ test("CLI 本地包保留资源与官方提示依赖，不带测试或生命周�
   const root = await fixture(t);
   const directory = join(root, "package");
   const manifest = await stageCliPackage(directory);
+  assert.equal(manifest.name, "@adui/viteplus-starter");
   assert.equal(manifest.private, true);
   assert.equal(manifest.bin["viteplus-starter"], "packages/create/bin/cli.mjs");
   assert.deepEqual(manifest.dependencies, { "@voidzero-dev/vite-plus-prompts": "1.4.0" });

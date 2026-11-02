@@ -241,3 +241,11 @@ engine-prompts.test.mjs：多选解析、摘要/取消、Three 保护提示；ve
 - cli.mjs / multi-engine.mjs：新建流程最后阶段接入，后者延后子阶段整理；batch 与 applicationInvocations 传递 smokePages。workspace-inspect 根据生成器标记识别新布局。
 - application-output.test.mjs：四种框架语言/三个引擎的路径与正式接入、可选独立页、多引擎、KEY 保持、占用/未知文件/junction/首页变更保护及格式失败保留。
 - docs/PROJECT_LAYOUT.md：默认目录、正式入口、独立页选项及已有工程边界。
+
+## 补装插件归档与包名（2026-11-02）
+
+- packages/create/src/existing-output.mjs：补装最终目标预检、按本次新增文件归档、上下文引用改写、保留业务/密钥/备份及受控清理。
+- application-output.mjs 的 stagingFiles：新建与补装共享暂存文件列表；cli/multi-engine 分别衔接单项、显式 Three 和多项补装的最后整理阶段。
+- workspace-inspect.mjs：区分首页管理标记与已归档预设，支持一个应用中新旧预设路径混合。
+- packages/create/test/existing-output.test.mjs：三引擎代表 TS/JS、旧/新大屏、显式独立页、多引擎、已有构建引用、业务文件/KEY/备份保持、占用/未知文件/junction/格式失败、真实 CLI 前置拒绝与工作区检查。
+- packages/create/package.json：分发包名 @adui/viteplus-starter；cli-package.test 检查最终打包清单名称。

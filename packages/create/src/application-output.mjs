@@ -44,7 +44,7 @@ export async function planApplicationOutput(options) {
   };
 }
 
-async function stagingFiles(options) {
+export async function stagingFiles(options) {
   const screen = options.screen ? Object.keys((await planScreenPreset(options)).files) : [];
   const engine = await planEngine(options),
     protection = planModelProtection(options);
