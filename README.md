@@ -14,6 +14,8 @@ Babylon 预设使用 --engine babylon，提供本地场景、GLB/.adui 和默认
 
 已有 CLI 支持 UI/CSS、大屏、引擎及模型保护选择。生成本地安装包后，可用一条命令进入向导，无需先下载整个工具仓库：
 
+选项使用 Vite+ 同款交互：方向键移动、回车确认；3D 引擎用空格勾选，可多选，不选则不启用。名称直接输入，Ctrl+C 可取消，不再输入菜单编号。
+
 ```powershell
 # 在生成器仓库根目录打包，获得本地 tgz 路径
 $bundle = npm --silent run cli:pack | ConvertFrom-Json

@@ -7,6 +7,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseCliArgs } from "../src/cli-args.mjs";
 import { collectProjectOptions } from "../src/prompts.mjs";
+import { scriptedPrompts } from "../fixtures/scripted-prompts.mjs";
 
 test("解析框架参数与 Dry Run", () => {
   assert.deepEqual(
@@ -33,8 +34,8 @@ test("拒绝未知、重复和缺少值的参数", () => {
 });
 
 test("交互选择 Vue Application 并确认", async () => {
-  const answers = ["my-app", "1", "1", "1", "1", "1", "1", "y"];
-  const result = await collectProjectOptions({}, async () => answers.shift());
+  const answers = ["my-app", "application", "vue", "ts", "none", "none", false, true];
+  const result = await collectProjectOptions({}, scriptedPrompts(answers));
   assert.deepEqual(result, {
     name: "my-app",
     type: "application",
@@ -46,19 +47,25 @@ test("交互选择 Vue Application 并确认", async () => {
 });
 
 test("交互选择 Monorepo，不询问根框架", async () => {
-  const answers = ["my-workspace", "2", "yes"];
-  const result = await collectProjectOptions({}, async () => answers.shift());
+  const answers = ["my-workspace", "monorepo", true];
+  const result = await collectProjectOptions({}, scriptedPrompts(answers));
   assert.deepEqual(result, { name: "my-workspace", type: "monorepo" });
 });
 
 test("输入非法名称后重新输入", async () => {
   const messages = [];
-  const answers = ["../bad", "valid-app", "application", "react", "1", "1", "1", "1", ""];
-  const result = await collectProjectOptions(
-    {},
-    async () => answers.shift(),
-    (s) => messages.push(s),
-  );
+  const answers = [
+    "../bad",
+    "valid-app",
+    "application",
+    "react",
+    "ts",
+    "none",
+    "none",
+    false,
+    true,
+  ];
+  const result = await collectProjectOptions({}, scriptedPrompts(answers, { messages }));
   assert.equal(result.name, "valid-app");
   assert.equal(result.framework, "react");
   assert.equal(messages.length, 1);
@@ -66,15 +73,8 @@ test("输入非法名称后重新输入", async () => {
 
 test("交互拒绝 Windows 保留名称后重新询问，普通名称仍可确认", async () => {
   const messages = [];
-  const answers = ["con", "com1", "con-app", "2", "y"];
-  const result = await collectProjectOptions(
-    {},
-    async () => {
-      assert.ok(answers.length, "不应多询问");
-      return answers.shift();
-    },
-    (message) => messages.push(message),
-  );
+  const answers = ["con", "com1", "con-app", "monorepo", true];
+  const result = await collectProjectOptions({}, scriptedPrompts(answers, { messages }));
   assert.deepEqual(result, { name: "con-app", type: "monorepo" });
   assert.equal(messages.length, 2);
   assert.ok(messages.every((message) => message.includes("Windows 保留名称")));
@@ -139,31 +139,29 @@ test("真实 CLI 在创建、预览和维护模式提前拒绝保留名且不写
 });
 
 test("取消交互不会生成项目参数", async () => {
-  const answers = ["my-app", "1", "2", "1", "1", "1", "1", "n"];
-  const result = await collectProjectOptions({}, async () => answers.shift());
+  const answers = ["my-app", "application", "react", "ts", "none", "none", false, false];
+  const result = await collectProjectOptions({}, scriptedPrompts(answers));
   assert.equal(result, null);
 });
 
 test("非交互完整配置不需要二次确认", async () => {
   const result = await collectProjectOptions(
     { name: "my-app", type: "application", framework: "react" },
-    async () => {
-      throw new Error("不应询问");
-    },
+    scriptedPrompts([]),
   );
   assert.deepEqual(result, { name: "my-app", type: "application", framework: "react" });
 });
 
 test("交互选择 Vue + TDesign + UnoCSS", async () => {
-  const answers = ["my-vue", "1", "1", "1", "4", "2", "1", "y"];
-  const result = await collectProjectOptions({}, async () => answers.shift());
+  const answers = ["my-vue", "application", "vue", "ts", "tdesign", "unocss", false, true];
+  const result = await collectProjectOptions({}, scriptedPrompts(answers));
   assert.equal(result.ui, "tdesign");
   assert.equal(result.css, "unocss");
 });
 
 test("React 的 UI 菜单不提供 Element Plus", async () => {
-  const answers = ["my-react", "1", "2", "1", "2", "3", "1", "y"];
-  const result = await collectProjectOptions({}, async () => answers.shift());
+  const answers = ["my-react", "application", "react", "ts", "antd", "tailwindcss", false, true];
+  const result = await collectProjectOptions({}, scriptedPrompts(answers));
   assert.equal(result.ui, "antd");
   assert.equal(result.css, "tailwindcss");
 });
@@ -215,16 +213,25 @@ test("解析显式 JavaScript 语言参数", () => {
 });
 
 test("交互式选择 Vue JavaScript", async () => {
-  const answers = ["vue-js-demo", "1", "1", "2", "1", "1", "1", "y"];
-  const result = await collectProjectOptions({}, async () => answers.shift());
+  const answers = ["vue-js-demo", "application", "vue", "js", "none", "none", false, true];
+  const result = await collectProjectOptions({}, scriptedPrompts(answers));
   assert.equal(result.framework, "vue");
   assert.equal(result.language, "js");
   assert.equal(result.ui, "none");
 });
 
 test("交互式选择 React JavaScript 并启用 Ant Design / Tailwind", async () => {
-  const answers = ["react-js-demo", "1", "2", "2", "2", "3", "1", "y"];
-  const result = await collectProjectOptions({}, async () => answers.shift());
+  const answers = [
+    "react-js-demo",
+    "application",
+    "react",
+    "js",
+    "antd",
+    "tailwindcss",
+    false,
+    true,
+  ];
+  const result = await collectProjectOptions({}, scriptedPrompts(answers));
   assert.deepEqual(
     [result.framework, result.language, result.ui, result.css],
     ["react", "js", "antd", "tailwindcss"],
@@ -232,8 +239,8 @@ test("交互式选择 React JavaScript 并启用 Ant Design / Tailwind", async (
 });
 
 test("交互空输入默认 TypeScript", async () => {
-  const answers = ["default-ts-demo", "1", "1", "", "1", "1", "1", "yes"];
-  const result = await collectProjectOptions({}, async () => answers.shift());
+  const answers = ["default-ts-demo", "application", "vue", undefined, "none", "none", false, true];
+  const result = await collectProjectOptions({}, scriptedPrompts(answers));
   assert.equal(result.language, "ts");
 });
 

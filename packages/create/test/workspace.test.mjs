@@ -9,6 +9,7 @@ import { buildVpCommand, validateProjectOptions } from "../src/options.mjs";
 import { parseCliArgs } from "../src/cli-args.mjs";
 import { generateIntegration } from "../src/integrations.mjs";
 import { collectProjectOptions } from "../src/prompts.mjs";
+import { scriptedPrompts } from "../fixtures/scripted-prompts.mjs";
 import {
   resolveWorkspaceApplication,
   updateWorkspaceDeclarationIgnore,
@@ -68,12 +69,12 @@ test("peer 修复在预检后显式写入，拒绝期间变化的配置", async 
 });
 
 test("交互式工作区应用保留路径，确认中展示实际成员目标", async () => {
-  const answers = ["console", "1", "2", "2", "2", "3", "1", "y"];
+  const answers = ["console", "application", "react", "js", "antd", "tailwindcss", false, true];
   const questions = [];
-  const selected = await collectProjectOptions({ workspace: "../mixed" }, async (prompt) => {
-    questions.push(prompt);
-    return answers.shift();
-  });
+  const selected = await collectProjectOptions(
+    { workspace: "../mixed" },
+    scriptedPrompts(answers, { questions }),
+  );
   assert.equal(selected.workspace, "../mixed");
   assert.deepEqual(
     [selected.framework, selected.language, selected.ui, selected.css],

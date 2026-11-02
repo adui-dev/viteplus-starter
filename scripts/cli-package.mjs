@@ -62,6 +62,7 @@ export async function stageCliPackage(directory) {
     bin: { "viteplus-starter": "packages/create/bin/cli.mjs" },
     files: ["packages/"],
     engines: sourceManifest.engines,
+    dependencies: sourceManifest.dependencies,
   };
   await writeFile(join(directory, "package.json"), JSON.stringify(manifest, null, 2) + "\n", {
     flag: "wx",

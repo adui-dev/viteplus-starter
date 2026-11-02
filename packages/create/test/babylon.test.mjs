@@ -7,6 +7,7 @@ import { planBabylon, preflightBabylon, addBabylon } from "../src/babylon.mjs";
 import { validateProjectOptions } from "../src/options.mjs";
 import { createBatchPlan } from "../src/batch.mjs";
 import { collectProjectOptions } from "../src/prompts.mjs";
+import { scriptedPrompts } from "../fixtures/scripted-prompts.mjs";
 const base = {
   name: "cube",
   type: "application",
@@ -97,14 +98,11 @@ test("Babylon 版本冲突和输出祖先链接在安装前拒绝，catalog 校�
   await assert.rejects(preflightBabylon(linked, base), /junction/);
 });
 test("Babylon 交互与批量计划按应用隔离，默认启用模型保护", async (t) => {
-  const answers = ["1", "4", "", "y"],
+  const answers = ["application", ["babylon"], undefined, true],
     questions = [];
   const selected = await collectProjectOptions(
     { name: "cube", framework: "vue", language: "ts", ui: "none", css: "none", screen: true },
-    async (question) => {
-      questions.push(question);
-      return answers.shift();
-    },
+    scriptedPrompts(answers, { questions }),
   );
   assert.equal(selected.engine, "babylon");
   assert.ok(questions.some((question) => question.startsWith("模型保护")));

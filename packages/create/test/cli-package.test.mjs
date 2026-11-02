@@ -15,13 +15,13 @@ async function fixture(t) {
   return root;
 }
 
-test("CLI 本地包保留全部运行时相对路径及资源，不带依赖、测试或生命周期脚本", async (t) => {
+test("CLI 本地包保留资源与官方提示依赖，不带测试或生命周期脚本", async (t) => {
   const root = await fixture(t);
   const directory = join(root, "package");
   const manifest = await stageCliPackage(directory);
   assert.equal(manifest.private, true);
   assert.equal(manifest.bin["viteplus-starter"], "packages/create/bin/cli.mjs");
-  assert.equal(manifest.dependencies, undefined);
+  assert.deepEqual(manifest.dependencies, { "@voidzero-dev/vite-plus-prompts": "1.4.0" });
   assert.equal(manifest.scripts, undefined);
   const paths = await readdir(directory, { recursive: true });
   assert.ok(paths.length > 50);

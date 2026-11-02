@@ -73,6 +73,8 @@ assets 保存指定 URL 的 8.0.1 固定快照、MIT 许可和来源/SHA256 记�
 
 `packages/create/src/prompts.mjs`：交互式名称、类型、框架选择，非法名称重试，创建确认/取消。
 
+交互适配器使用 @voidzero-dev/vite-plus-prompts 1.4.0，与 Vite+ 1.4.0 相同。CLI 只在非完整参数的 TTY 分支动态导入；名称由 text 的 validate 回调校验，其他枚举使用具名 select，3D 引擎使用 required:false、initialValues:[] 的 multiselect，不提供数字/逗号输入路径。引擎空列表归一为 none，单项仍返回 engine，多项按原顺序返回 engines；最终使用 confirm。任何提示的取消符号均立即返回 null，后端错误继续抛出，不吞异常；参数模式保持原行为。
+
 `packages/create/bin/cli.mjs`:
 
 - 支持单应用、工作区、批量、预设和维护模式，具体白名单与互斥规则见 cli-args.mjs 及 --help。
@@ -226,7 +228,7 @@ runtime 管理 Engine、Scene 与渲染循环；初始化异常和帧异常停�
 
 多引擎通过规范排序和单引擎子阶段复用实现；统一输出冲突/版本预检，基础工程、大屏仅首阶段创建，保护只传选定的模型适配阶段（优先 Three，其次 Babylon，最后 Cesium）。失败保留现场。设计与限制见 [MULTI_ENGINE](MULTI_ENGINE.md)。
 
-交互多选解析数字/名称列表，保持单选返回 engine，多选返回规范 engines；确认后 CLI 分派到同一多引擎编排器。联合验收构建使用显式引擎分组、includeDependenciesRecursively=false 和 strictExecutionOrder=true，避免共享辅助模块导致跨引擎加载；普通项目配置不自动修改。
+交互多选通过方向键和空格勾选，保持单选返回 engine，多选返回规范 engines；确认后 CLI 分派到同一多引擎编排器。参数模式的 --engines 仍为逗号列表。联合验收构建使用显式引擎分组、includeDependenciesRecursively=false 和 strictExecutionOrder=true，避免共享辅助模块导致跨引擎加载；普通项目配置不自动修改。
 
 ## Babylon 模型适配
 
@@ -272,11 +274,11 @@ ui-smoke 内部预设表统一维护框架/UI 对应包、展示名、Vue 标签
 
 ## 独立 CLI 本地包
 
-stageCliPackage 在新暂存目录中复制固定的 create/src、bin、normalize 静态资源与五个预设 src；只接受普通源码文件，拒绝隐藏文件、未知类型、链接和已有输出。保持 packages/<模块>/src 布局，使资源读取、模型安装器反向引用 create 及批量子进程入口无需重写。生成清单仅保留包名/版本/引擎约束、private、bin 与文件白名单，不携带开发依赖或生命周期脚本。
+stageCliPackage 在新暂存目录中复制固定的 create/src、bin、normalize 静态资源与五个预设 src；只接受普通源码文件，拒绝隐藏文件、未知类型、链接和已有输出。保持 packages/<模块>/src 布局，使资源读取、模型安装器反向引用 create 及批量子进程入口无需重写。生成清单保留包名/版本/引擎约束、private、bin、文件白名单及运行时 dependencies，不携带开发依赖或生命周期脚本。
 
 pack-cli 由 npm run cli:pack 启动，使用 npm_execpath 和当前 Node 通过 argv 调用 npm pack --offline --ignore-scripts，不经 shell。产物位于每次新建的 dist/cli/pack-*；独立临时暂存目录创建后校验归属，并在 finally 清理。没有自动发布步骤，源包与产物均保持 private/0.0.0。
 
-安装包的 bin 直接运行原 CLI，采用调用 cwd；它不使用 GitHub 启动器的工具父目录策略，也不会在安装时生成应用。help 使用实际命令名 viteplus-starter，生成器源码入口继续可用。包本身零运行时依赖，但生成应用仍要求可用的 vp，并由官方模板及应用包管理器安装所选依赖。
+安装包的 bin 直接运行原 CLI，采用调用 cwd；它不使用 GitHub 启动器的工具父目录策略，也不会在安装时生成应用。help 使用实际命令名 viteplus-starter，生成器源码入口继续可用。包声明官方提示组件的运行时依赖，由 dlx/安装器解析；生成应用仍要求可用的 vp，并由官方模板及应用包管理器安装所选依赖。
 
 ## 生成阶段失败与人工恢复
 

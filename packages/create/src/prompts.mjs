@@ -1,202 +1,165 @@
 import { validateProjectName, validateProjectOptions } from "./options.mjs";
 
-const PROJECT_TYPES = { 1: "application", 2: "monorepo" };
-const FRAMEWORKS = { 1: "vue", 2: "react" };
-export function parseEngineSelection(answer) {
-  const names = {
-    1: "none",
-    2: "three",
-    3: "cesium",
-    4: "babylon",
-    none: "none",
-    three: "three",
-    cesium: "cesium",
-    babylon: "babylon",
-  };
-  const selected = (answer || "1")
-    .split(",")
-    .map((value) => (Object.hasOwn(names, value.trim()) ? names[value.trim()] : undefined));
+const cancelled = Symbol("cancelled");
+const choices = (entries) => entries.map(([value, label]) => ({ value, label }));
+
+export function parseEngineSelection(values) {
+  const order = ["three", "cesium", "babylon"];
   if (
-    selected.some((value) => !value) ||
-    new Set(selected).size !== selected.length ||
-    (selected.length > 1 && selected.includes("none"))
+    !Array.isArray(values) ||
+    values.some((value) => !order.includes(value)) ||
+    new Set(values).size !== values.length
   )
-    throw new Error("引擎多选须用逗号分隔，不允许重复或混入 None");
-  return selected.length === 1
-    ? selected[0]
-    : ["three", "cesium", "babylon"].filter((value) => selected.includes(value));
+    throw new Error("引擎选择必须是不重复的 Three.js、Cesium 或 Babylon 列表");
+  const selected = order.filter((value) => values.includes(value));
+  return selected.length > 1 ? selected : (selected[0] ?? "none");
 }
 
-async function askUntilValid(ask, label, validate, report) {
-  for (;;) {
-    const value = (await ask(label)).trim();
-    try {
-      return validate(value);
-    } catch (error) {
-      report(error.message);
-    }
-  }
-}
-
-function choiceValidator(choices, defaultValue) {
-  return (answer) => {
-    const value = answer || defaultValue;
-    const choice = choices[value];
-    if (!Object.hasOwn(choices, value))
-      throw new Error(`无效选项: ${value}，请按提示输入数字或选项名称`);
-    return choice;
-  };
-}
-
-export async function collectProjectOptions(partial, ask, report = console.error) {
+export async function collectProjectOptions(partial, ui) {
   const options = { ...partial };
-  // 基础参数齐全时按非交互调用处理；UI/CSS 缺省为 None。
-  if (options.name && options.type && (options.type === "monorepo" || options.framework)) {
+  // Complete base arguments remain non-interactive; optional presets keep defaults.
+  if (options.name && options.type && (options.type === "monorepo" || options.framework))
     return validateProjectOptions(options);
-  }
-  let prompted = false;
 
-  if (!options.name) {
-    prompted = true;
-    options.name = await askUntilValid(ask, "项目名称: ", validateProjectName, report);
+  async function ask(kind, configuration) {
+    const answer = await ui[kind](configuration);
+    if (ui.isCancel(answer)) throw cancelled;
+    return answer;
   }
-
-  if (!options.type) {
-    prompted = true;
-    options.type = await askUntilValid(
-      ask,
-      "项目类型 [1] Application  [2] Monorepo (默认 1): ",
-      choiceValidator({ ...PROJECT_TYPES, application: "application", monorepo: "monorepo" }, "1"),
-      report,
-    );
-  }
-
-  if (options.type === "application" && !options.framework) {
-    prompted = true;
-    options.framework = await askUntilValid(
-      ask,
-      "前端框架 [1] Vue 3  [2] React (默认 1): ",
-      choiceValidator({ ...FRAMEWORKS, vue: "vue", react: "react" }, "1"),
-      report,
-    );
-  }
-
-  if (options.type === "application") {
-    if (!options.language) {
-      prompted = true;
-      options.language = await askUntilValid(
-        ask,
-        "开发语言 [1] TypeScript  [2] JavaScript (默认 1): ",
-        choiceValidator({ 1: "ts", 2: "js", ts: "ts", js: "js" }, "1"),
-        report,
-      );
-    }
-    if (!options.ui) {
-      prompted = true;
-      const values =
-        options.framework === "vue"
-          ? {
-              1: "none",
-              2: "element-plus",
-              3: "antd",
-              4: "tdesign",
-              none: "none",
-              "element-plus": "element-plus",
-              antd: "antd",
-              tdesign: "tdesign",
+  const select = (message, entries, initialValue) =>
+    ask("select", {
+      message,
+      options: choices(entries),
+      initialValue,
+    });
+  try {
+    if (!options.name) {
+      options.name = (
+        await ask("text", {
+          message: "项目名称",
+          placeholder: "my-app",
+          validate(value) {
+            try {
+              validateProjectName((value ?? "").trim());
+            } catch (error) {
+              return error.message;
             }
-          : { 1: "none", 2: "antd", 3: "tdesign", none: "none", antd: "antd", tdesign: "tdesign" };
-      const label =
-        options.framework === "vue"
-          ? "UI 组件库 [1] None  [2] Element Plus  [3] Ant Design Vue  [4] TDesign (默认 1): "
-          : "UI 组件库 [1] None  [2] Ant Design  [3] TDesign (默认 1): ";
-      options.ui = await askUntilValid(ask, label, choiceValidator(values, "1"), report);
-    }
-    if (!options.css) {
-      prompted = true;
-      options.css = await askUntilValid(
-        ask,
-        "CSS 框架 [1] None  [2] UnoCSS  [3] Tailwind CSS (默认 1): ",
-        choiceValidator(
-          {
-            1: "none",
-            2: "unocss",
-            3: "tailwindcss",
-            none: "none",
-            unocss: "unocss",
-            tailwindcss: "tailwindcss",
           },
-          "1",
-        ),
-        report,
-      );
+        })
+      ).trim();
     }
-  }
-  if (options.type === "application") {
-    if (options.screen === undefined) {
-      options.screen = await askUntilValid(
-        ask,
-        "大屏适配 [1] 不启用 [2] 启用 (默认 " +
-          (options.engines?.length || (options.engine && options.engine !== "none") ? "2" : "1") +
-          "): ",
-        choiceValidator(
-          { 1: false, 2: true, no: false, yes: true },
-          options.engines?.length || (options.engine && options.engine !== "none") ? "2" : "1",
-        ),
-        report,
+    if (!options.type)
+      options.type = await select(
+        "项目类型",
+        [
+          ["application", "Application"],
+          ["monorepo", "Monorepo"],
+        ],
+        "application",
       );
+    if (options.type === "application") {
+      if (!options.framework)
+        options.framework = await select(
+          "前端框架",
+          [
+            ["vue", "Vue 3"],
+            ["react", "React"],
+          ],
+          "vue",
+        );
+      if (!options.language)
+        options.language = await select(
+          "开发语言",
+          [
+            ["ts", "TypeScript"],
+            ["js", "JavaScript"],
+          ],
+          "ts",
+        );
+      if (!options.ui) {
+        const entries =
+          options.framework === "vue"
+            ? [
+                ["none", "None"],
+                ["element-plus", "Element Plus"],
+                ["antd", "Ant Design Vue"],
+                ["tdesign", "TDesign"],
+              ]
+            : [
+                ["none", "None"],
+                ["antd", "Ant Design"],
+                ["tdesign", "TDesign"],
+              ];
+        options.ui = await select("UI 组件库", entries, "none");
+      }
+      if (!options.css)
+        options.css = await select(
+          "CSS 框架",
+          [
+            ["none", "None"],
+            ["unocss", "UnoCSS"],
+            ["tailwindcss", "Tailwind CSS"],
+          ],
+          "none",
+        );
+      if (options.screen === undefined)
+        options.screen = await select(
+          "大屏适配",
+          [
+            [false, "不启用"],
+            [true, "启用"],
+          ],
+          Boolean(options.engines?.length || (options.engine && options.engine !== "none")),
+        );
+      if (options.screen && options.engine === undefined && options.engines === undefined) {
+        const selection = parseEngineSelection(
+          await ask("multiselect", {
+            message: "3D 引擎（空格选择，回车确认；不选则不启用）",
+            options: choices([
+              ["three", "Three.js"],
+              ["cesium", "Cesium"],
+              ["babylon", "Babylon"],
+            ]),
+            initialValues: [],
+            required: false,
+          }),
+        );
+        if (Array.isArray(selection)) options.engines = selection;
+        else options.engine = selection;
+      }
+      if (
+        (["three", "cesium", "babylon"].includes(options.engine) || options.engines?.length) &&
+        options.modelProtection === undefined &&
+        options["model-protection"] === undefined
+      )
+        options.modelProtection = await select(
+          "模型保护",
+          [
+            ["embedded", "自动加密加载"],
+            ["external", "外置密钥"],
+            ["none", "关闭"],
+          ],
+          "embedded",
+        );
     }
-    if (options.screen && options.engine === undefined && options.engines === undefined) {
-      const selection = await askUntilValid(
-        ask,
-        "3D 引擎 [1] None [2] Three.js [3] Cesium [4] Babylon（可逗号多选，默认 1）: ",
-        parseEngineSelection,
-        report,
-      );
-      if (Array.isArray(selection)) options.engines = selection;
-      else options.engine = selection;
-    }
-    if (
-      (["three", "babylon", "cesium"].includes(options.engine) ||
-        options.engines?.some((engine) => ["three", "babylon", "cesium"].includes(engine))) &&
-      options.modelProtection === undefined &&
-      options["model-protection"] === undefined
-    )
-      options.modelProtection = await askUntilValid(
-        ask,
-        "模型保护 [1] 自动加密加载 [2] 外置密钥 [3] 关闭 (默认 1): ",
-        choiceValidator(
-          {
-            1: "embedded",
-            2: "external",
-            3: "none",
-            embedded: "embedded",
-            external: "external",
-            none: "none",
-          },
-          "1",
-        ),
-        report,
-      );
+    const selected = validateProjectOptions(options);
+    if ((selected.engine || selected.engines) && !selected.screen && !partial.applyExisting)
+      throw new Error("新建引擎应用须同时启用大屏");
+    const description =
+      selected.type === "application"
+        ? `Application / ${selected.framework === "vue" ? "Vue 3" : "React"} / ${selected.language === "js" ? "JavaScript" : "TypeScript"} / UI: ${selected.ui ?? "none"} / CSS: ${selected.css ?? "none"} / 大屏: ${selected.screen ? "启用" : "关闭"} / 引擎: ${selected.engines?.join(",") ?? selected.engine ?? "none"} / 模型保护: ${selected.modelProtection ?? "none"}`
+        : "Monorepo (各子应用后续独立选择框架)";
+    const destination = selected.workspace
+      ? `${selected.workspace}/apps/${selected.name}`
+      : selected.name;
+    return (await ask("confirm", {
+      message: `将创建 ${destination} (${description})，确认吗？`,
+      initialValue: true,
+    }))
+      ? selected
+      : null;
+  } catch (error) {
+    if (error === cancelled) return null;
+    throw error;
   }
-  const selected = validateProjectOptions(options);
-  if ((selected.engine || selected.engines) && !selected.screen && !partial.applyExisting)
-    throw new Error("新建引擎应用须同时启用大屏");
-  if (!prompted) return selected;
-
-  const description =
-    selected.type === "application"
-      ? `Application / ${selected.framework === "vue" ? "Vue 3" : "React"} / ${selected.language === "js" ? "JavaScript" : "TypeScript"} / UI: ${selected.ui ?? "none"} / CSS: ${selected.css ?? "none"} / 大屏: ${selected.screen ? "启用" : "关闭"} / 引擎: ${selected.engines?.join(",") ?? selected.engine ?? "none"} / 模型保护: ${selected.modelProtection ?? "none"}`
-      : "Monorepo (各子应用后续独立选择框架)";
-  const destination = selected.workspace
-    ? `${selected.workspace}/apps/${selected.name}`
-    : selected.name;
-  const answer = (await ask(`\n将创建 ${destination} (${description})，确认吗？[Y/n]: `))
-    .trim()
-    .toLowerCase();
-  if (answer === "n" || answer === "no") return null;
-  if (answer !== "" && answer !== "y" && answer !== "yes") {
-    throw new Error("确认选项只能是 Y 或 N，已取消创建");
-  }
-  return selected;
 }

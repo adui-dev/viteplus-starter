@@ -9,6 +9,9 @@
   "scripts": {
     "test": "node --test"
   },
+  "dependencies": {
+    "@voidzero-dev/vite-plus-prompts": "1.4.0"
+  },
   "engines": {
     "node": "^22.18.0 || ^24.11.0 || >=26.0.0"
   }

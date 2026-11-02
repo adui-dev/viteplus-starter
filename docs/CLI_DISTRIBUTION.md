@@ -18,6 +18,10 @@ $bundle.tarball
 
 请使用 npm 运行打包脚本，由 npm 提供自身的 JS 入口；执行不经 shell 拼接、不运行包生命周期脚本、不安装依赖。生成包只有运行时源码、本地 normalize.css/MIT 许可和说明，没有仓库测试、node_modules、锁文件、环境密钥或测试模型，也没有安装生命周期脚本。
 
+当前包清单声明 @voidzero-dev/vite-plus-prompts 1.4.0 运行时依赖，由 dlx/安装器取得组件及传递依赖。首次启动需要可用的依赖缓存或网络；打包命令本身仍不安装依赖。
+
+更新源码后重新打包并使用新的 tarball 路径，旧 tgz 不会自动替换交互界面。直接从源码运行 vp run create 时，先在工具根执行 vp install --frozen-lockfile，安装新增的提示依赖。
+
 ## 一条命令进入向导
 
 切换到希望存放新项目的父目录，再使用包路径运行：
@@ -33,7 +37,7 @@ vp dlx -- $bundle.tarball
 vp dlx -- 'C:\Downloads\viteplus-starter-create-0.0.0.tgz'
 ```
 
-不需要先下载生成器仓库。无参数进入已有向导，选择项目类型、Vue/React、TS/JS、UI、CSS、大屏、引擎和模型保护，确认后创建；最后选择 n 则取消。目标位置依据调用目录，和 dlx 缓存或包安装目录无关。
+不需要先下载生成器仓库。无参数进入向导，选择项目类型、Vue/React、TS/JS、UI、CSS、大屏、引擎和模型保护。与 Vite+ 使用同款方向键选项和回车确认，3D 引擎用空格勾选，可多选，空列表表示不启用；名称直接输入。最终选择 No 或任意步骤 Ctrl+C 均取消，不创建项目。目标位置依据调用目录，和 dlx 缓存或包安装目录无关。
 
 帮助和预览参数直接跟在包路径后；`dlx --` 将后面的帮助等参数交给包：
 
@@ -57,6 +61,8 @@ npm exec --yes --package $bundle.tarball -- viteplus-starter
 后续正式 npm 包名、版本及首次发布需单独确定；本入口不会自动发布或创建流水线。
 
 ## 2026-11-02 本地包实测
+
+以下记录来自替换键盘向导前的首次本地包。当前提示依赖和操作方式以上文为准，后续键盘实测见项目状态。
 
 - Node 22.18.0、npm 10.9.3、Vite+ 1.4.0 下打包包含 85 个文件。独立临时前缀离线安装只添加 CLI 包；安装后的 Windows cmd shim 帮助正常，npm exec 使用新离线缓存完成 React JS/Ant Design/UnoCSS/三引擎预览，目标位于中文、空格及 & 调用目录，未创建目标。
 - 实际安装命令的 Vue TS/Element Plus/Tailwind/大屏/三引擎/embedded 完整选择，以及 vp dlx 的 React JS/Ant Design/UnoCSS/大屏/Three+Babylon/external 完整选择均到达确认提示；两次选择 n，退出 0、无目标生成。

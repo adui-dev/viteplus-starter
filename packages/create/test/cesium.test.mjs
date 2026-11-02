@@ -7,6 +7,7 @@ import { planCesium, preflightCesium, addCesium } from "../src/cesium.mjs";
 import { validateProjectOptions } from "../src/options.mjs";
 import { createBatchPlan } from "../src/batch.mjs";
 import { collectProjectOptions } from "../src/prompts.mjs";
+import { scriptedPrompts } from "../fixtures/scripted-prompts.mjs";
 const base = {
   name: "globe",
   type: "application",
@@ -15,18 +16,15 @@ const base = {
   engine: "cesium",
 };
 test("交互选择 Cesium 后询问模型保护，默认自动加密", async () => {
-  const answers = ["1", "3", "", "y"],
+  const answers = ["application", ["cesium"], undefined, true],
     questions = [];
   const selected = await collectProjectOptions(
     { name: "globe", framework: "vue", language: "ts", ui: "none", css: "none", screen: true },
-    async (question) => {
-      questions.push(question);
-      return answers.shift();
-    },
+    scriptedPrompts(answers, { questions }),
   );
   assert.equal(selected.engine, "cesium");
   assert.equal(selected.modelProtection, "embedded");
-  assert.ok(questions.some((question) => question.includes("[3] Cesium")));
+  assert.ok(questions.some((question) => question.startsWith("3D 引擎")));
   assert.ok(questions.some((question) => question.startsWith("模型保护")));
   assert.equal(answers.length, 0);
 });

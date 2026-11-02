@@ -8,8 +8,7 @@ import { preflightVpManifestEncoding } from "../src/vp-compatibility.mjs";
 import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { basename, resolve } from "node:path";
-import { stdin, stdout } from "node:process";
-import { createInterface } from "node:readline/promises";
+import { stdin } from "node:process";
 import { parseCliArgs } from "../src/cli-args.mjs";
 import { runMultiEngine } from "../src/multi-engine.mjs";
 import { buildVpCommand, validateProjectOptions } from "../src/options.mjs";
@@ -158,12 +157,8 @@ async function main() {
         "非交互或 --dry-run 模式必须提供 --name、--type，以及 Application 的 --framework",
       );
     }
-    const rl = createInterface({ input: stdin, output: stdout });
-    try {
-      options = await collectProjectOptions(args, (prompt) => rl.question(prompt));
-    } finally {
-      rl.close();
-    }
+    const prompts = await import("@voidzero-dev/vite-plus-prompts");
+    options = await collectProjectOptions(args, prompts);
     if (options === null) {
       console.log("已取消创建，未修改任何项目文件");
       return;

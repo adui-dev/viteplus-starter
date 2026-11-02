@@ -109,3 +109,5 @@ Cesium/Babylon 采用与现有 Three 相同的最高 2 倍 DPR、最长边 8192 
 ## 2026-11-02：CLI 分发与 GitHub 模板下载分离
 
 用户希望直接进入预设选择。复用已有 CLI，将运行时源码及所读取的 sibling 预设资源按原 packages 布局暂存，再由 npm pack 生成本地自包含 tgz。通过 vp dlx 执行包的 bin，不要求先下载整个工具仓库；创建工程仍委托官方入口，不复制 Vue/React 基础模板。此方案不新增运行时打包依赖，避免改写动态资源路径或在安装生命周期启动向导。源清单和产物保持 private/0.0.0，正式 npm 包名和发布另行确定；GitHub 下载入口仍为下载后显式启动两步流程。
+
+用户随后要求选择 UI 与 Vite+ 一致。采用 [Vite+ 官方提示组件](https://github.com/voidzero-dev/vite-plus/tree/main/packages/prompts) 1.4.0，替换 readline 数字菜单，复用方向键单选、空格多选、确认及取消渲染；不自制 ANSI/raw-mode 控制器，也不依赖 Vite+ 内部带哈希的 dist 文件。组件只在 TTY 向导动态加载，作为 CLI 运行时依赖写入本地包清单，原有参数/JSON 模式和官方创建入口保持。

@@ -20,4 +20,4 @@ node ./viteplus-starter/packages/create/bin/cli.mjs --name multi-app --type appl
 
 执行 node scripts/verify-multi-build.mjs <应用路径> 联合构建官方首页及已有引擎/模型验收页；临时配置结束删除，产物在 dist/multi-verify，不与同一工作区的 check/ready 并行。联合构建不等同全部引擎同页运行，浏览器组合渲染仍需独立验收。具体执行结果见 [状态](PROJECT_CONTEXT.md)。
 
-交互菜单支持 2,3,4 或 three,cesium,babylon；None 不能混入，重复选择拒绝，仅包含 Three 时询问模型保护。联合验收脚本的分块设置与静态入口检查用于避免跨引擎提前加载。自定义联合入口构建请采用相同的 output.codeSplitting 分组、includeDependenciesRecursively=false、strictExecutionOrder=true；这不是对任意业务构建配置的自动修复。
+交互菜单用方向键移动、空格勾选引擎、回车确认；不勾选表示不启用，选择任一引擎后询问模型保护。参数模式 --engines 仍使用 three,cesium,babylon 等逗号列表。联合验收脚本的分块设置与静态入口检查用于避免跨引擎提前加载。自定义联合入口构建请采用相同的 output.codeSplitting 分组、includeDependenciesRecursively=false、strictExecutionOrder=true；这不是对任意业务构建配置的自动修复。

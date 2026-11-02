@@ -8,6 +8,7 @@ import { fileURLToPath } from "node:url";
 import { validateProjectOptions } from "../src/options.mjs";
 import { parseCliArgs } from "../src/cli-args.mjs";
 import { collectProjectOptions } from "../src/prompts.mjs";
+import { scriptedPrompts } from "../fixtures/scripted-prompts.mjs";
 import { createBatchPlan, validateBatchConfig } from "../src/batch.mjs";
 import {
   planModelProtection,
@@ -118,23 +119,42 @@ test("Three 默认保护、显式关闭和外置；类型、根、依赖与重�
 });
 test("交互选择大屏和引擎，保护默认/关闭、确认摘要与取消", async () => {
   for (const [answer, expected] of [
-    ["", "embedded"],
-    ["2", "external"],
-    ["3", "none"],
+    [undefined, "embedded"],
+    ["external", "external"],
+    ["none", "none"],
   ]) {
-    const answers = ["viewer", "1", "2", "2", "1", "1", "2", "2", answer, "y"],
+    const answers = [
+        "viewer",
+        "application",
+        "react",
+        "js",
+        "none",
+        "none",
+        true,
+        ["three"],
+        answer,
+        true,
+      ],
       questions = [];
-    const result = await collectProjectOptions({}, async (prompt) => {
-      questions.push(prompt);
-      return answers.shift();
-    });
+    const result = await collectProjectOptions({}, scriptedPrompts(answers, { questions }));
     assert.equal(result.engine, "three");
     assert.equal(result.modelProtection, expected);
     assert.ok(result.screen);
     assert.match(questions.at(-1), new RegExp("模型保护: " + expected));
   }
-  const answers = ["viewer", "1", "1", "1", "1", "1", "2", "2", "", "n"];
-  assert.equal(await collectProjectOptions({}, async () => answers.shift()), null);
+  const answers = [
+    "viewer",
+    "application",
+    "vue",
+    "ts",
+    "none",
+    "none",
+    true,
+    ["three"],
+    undefined,
+    false,
+  ];
+  assert.equal(await collectProjectOptions({}, scriptedPrompts(answers)), null);
 });
 test("批量按应用保护及 UI 阶段隔离，真实 dry-run 不生成 KEY 或文件", async (t) => {
   const root = await mkdtemp(join(tmpdir(), "model-plan-"));
