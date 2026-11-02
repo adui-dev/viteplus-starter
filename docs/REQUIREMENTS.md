@@ -220,6 +220,6 @@ FR-014：用户指定可分发包名为 @adui/viteplus-starter，bin 继续为 v
 
 ## 2026-11-03 CLI 首发候选准备
 
-FR-014 / NFR-001：CLI 候选版本暂按 0.1.0 准备，保持 private:true，根工作区仍为 0.0.0/private；尚未获得 npm 发布授权。本轮补齐既有 MIT LICENSE、仓库/主页/反馈元信息和预期的 public/官方 registry 配置，不修改预设或新增发布执行器。
+FR-014 / NFR-001：CLI 首发版本经用户确认采用 0.1.0，保持 private:true，根工作区仍为 0.0.0/private；尚未获得 npm 发布授权。本轮补齐既有 MIT LICENSE、仓库/主页/反馈元信息和预期的 public/官方 registry 配置，不修改预设或新增发布执行器。
 
 本地打包应审查 npm 实际文件清单，校验包名/版本/文件名、必要资源和许可、重复/未知/隐藏/越界/测试/依赖/模型路径，并验证 tarball SHA-512。独立 pack-contents.json 提供逐文件信息及完整性，不能进入发布包。候选包必须经隔离安装、Windows shim、预览及向导取消验收。账户/作用域权限与最终发布为单独条件；E404 不等于拥有命名空间。

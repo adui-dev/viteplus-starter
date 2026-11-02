@@ -346,7 +346,7 @@ workspace-inspect 将“生成器管理的首页”与“预设目录已归档�
 
 ## 首发候选的包元信息与实际文件审查
 
-cli-package 从 CLI 源清单读取版本、显式 private 布尔值、描述、MIT、仓库/主页/反馈及 publishConfig；默认 private:true 保持，root LICENSE 原字节复制到暂存根。root 工作区不会作为 CLI 包发布。候选版本先用 0.1.0，最终首发版本尚需确认。
+cli-package 从 CLI 源清单读取版本、显式 private 布尔值、描述、MIT、仓库/主页/反馈及 publishConfig；默认 private:true 保持，root LICENSE 原字节复制到暂存根。root 工作区不会作为 CLI 包发布。用户已确认首发版本为 0.1.0，当前候选版本与之相同。
 
 cli-pack-report 只接收 npm pack 的元信息，核对包名/版本/标准 scoped 文件名和实际 files。允许固定顶层文件、normalize 静态资源、既有六个运行时源码树的已知类型；拒绝隐藏/越界路径、测试/依赖目录、模型、未知类型、重复项和缺少许可/入口的候选。pack-cli 在写侧车报告前计算实际 tarball SHA-512 并与 npm integrity 比较，成功后标记 integrityVerified；报告包含逐文件路径/字节数/模式及打包大小，位于产物目录，不进入 tarball。
 
