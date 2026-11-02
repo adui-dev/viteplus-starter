@@ -45,6 +45,8 @@ GitHub 远程入口已完成两种来源的 Windows 实际下载与启动；简�
 
 2026-11-02 应用清单编码实测：隔离的官方 React JS 工程副本在无 BOM 时离线冻结安装、check 和完整 build 通过；仅给清单加 BOM 后，check/fmt 通过，install/build 退出 1。CLI 已在维护写入前拒绝该编码，真实副本的 20 项文件内容和 mtime 保持；只读 JSON API 和预览仍支持读取。范围和错误见 [实测记录](V1_ACCEPTANCE.md#应用清单-bom-工具链实测2026-11-02)。
 
+正常编码路径已补验：新建官方 Vue TS 应用首次补装 Element Plus/Tailwind 及独立 UI 页，完整类型/首页和 UI 双入口构建通过，最终 check 20 格式/8 代码文件通过。原首页/基础样式 5 项文件保持；基础样式重复补齐无写入，UI/CSS 重复补装及重复验收页均拒绝，前后 30 项文件内容/mtime 一致。新编码预检正常放行，详见 [正常补装记录](V1_ACCEPTANCE.md#正常编码应用补装与构建复验2026-11-02)，未新增浏览器验收。
+
 2026-10-30 默认基础样式已补验：Node 22.18.0 下新建官方工作区及 Vue/React TS/JS 四应用，静态文件与正式入口自动生成，根无缓存 ready 11/11、check 65 格式/22 代码文件通过；四应用产物均包含位于原样式之前的 normalize 规则。test-vue 已补齐，6 项原配置/样式/依赖文件哈希一致，重复补装的三个目标文件内容和 mtime 均不变。Vue/React 开发浏览器确认本地 CSS 加载顺序与点击，无 warn/error；详见 [V1](V1_ACCEPTANCE.md#默认本地-normalizecss-验收2026-10-30)。
 
 该官方工作区另新增 Vue TS/Element Plus/Tailwind、React JS/Ant Design/UnoCSS，补齐基础样式与可选 UI/CSS 的联用：无缓存 ready 14/14、两组 UI 双入口构建、最终 check 96 格式/36 代码文件通过。开发首页确认 normalize 优先，生产组件点击和绿色 CSS 区域正确，无 warn/error；原 100 项文件及两新应用依赖隔离已核对。重复创建/验收页拒绝、基础样式重复补齐跳过写入，149 项文件内容与 mtime 保持；详见 [隔离验收](V1_ACCEPTANCE.md#monorepo-基础样式与-uicss-隔离补验2026-10-30)。

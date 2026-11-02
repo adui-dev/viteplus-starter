@@ -4,6 +4,18 @@
 
 当前交付验收平台为 Windows（用户于 2026-10-30 明确）；Linux/macOS 不在本阶段要求内，也未验证，不作为 Windows 交付的阻塞条件。
 
+## 正常编码应用补装与构建复验（2026-11-02）
+
+新建隔离 D:/Workspace/adui-studio/adui-clean-maintenance-vue-ts-20261102，由当前 CLI 委托官方 vite:application 的 vue-ts 模板生成；Node 22.18.0、pnpm 12.16.1、Vite+ 1.4.0。应用清单为无 BOM UTF-8，原 test-vue、BOM 对照副本及其他实际工程未改动。
+
+在父目录用 --apply-existing 首次补装 Element Plus/Tailwind CSS，再用 --ui-smoke 创建独立页，两次均退出 0，新编码预检正常放行。实际安装为 Element Plus 2.14.7、Tailwind/@tailwindcss/vite 4.3.3、unplugin-vue-components 32.1.0；这些是新验收工程的依赖，生成器仓库依赖和锁文件未变。
+
+应用 vp run build 的 vue-tsc -b 与首页构建 2/2 通过，verify-ui-build 的 /ui-check/ 首页+UI 双入口构建通过，最终 vp check 为 20 格式/8 代码文件通过，无 lint/类型警告或错误。保留双入口构建的插件耗时提示，产物在 dist 和 dist/ui-verify，临时 verify-ui.config.mjs 已清理。
+
+正式入口仍先导入本地 normalize.css，再导入 starter.tailwind.css 和原样式；从官方创建后、补装前保存的 App.vue、HelloWorld.vue、style.css、normalize.css 和 MIT 许可共 5 项文件，其内容 SHA256 与 mtime 在补装及构建后均保持。正式 main、Vite 配置和依赖按所选 UI/CSS 增量修改，未写入业务首页内容。
+
+构建后不选择 UI/CSS 的 --apply-existing 退出 0 且未重复写入；重复选择相同 UI/CSS 补装、重复 --ui-smoke 均退出 1，分别报告补装预检及 UI 验收页阶段。三次维护前后 30 项 Git 可见文件的 SHA256 与 mtime 一致。工作区和产物保留，本轮没有浏览器渲染或点击验收，也未增加新预设或编码转换行为。
+
 ## 应用清单 BOM 工具链实测（2026-11-02）
 
 隔离目录 D:/Workspace/adui-studio/adui-bom-app-probe-20261102 复制既有官方 React JS 测试工程的 Git 可见源码，仅用于编码对照，不作为新的生成模板；未复制 node_modules 或 .git。Node 22.18.0、pnpm 12.16.1、Vite+ 1.4.0 下，vp install --offline --frozen-lockfile 下载 0 项、复用 88 项，check 11 格式/3 代码文件及完整 vp run build 通过。prepare 提示找不到 .git，未将其计为 Git hooks 验收。
