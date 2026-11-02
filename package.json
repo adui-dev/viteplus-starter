@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "cli:pack": "node scripts/pack-cli.mjs",
     "check": "vp check",
     "test": "node --test",
     "docs:check": "node scripts/validate-docs.mjs",

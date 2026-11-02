@@ -47,6 +47,8 @@ node .\viteplus-starter\packages\create\bin\cli.mjs --name react-js-check --type
 
 ## 安装与验证
 
+CLI 本地打包、隔离安装和直接进入向导的步骤见 [CLI 分发](CLI_DISTRIBUTION.md)。打包使用 npm --silent run cli:pack，不升级工作区依赖；常规回归同时覆盖隔离包的资源和参数预览。
+
 ```powershell
 pnpm install
 node packages/create/bin/cli.mjs --help

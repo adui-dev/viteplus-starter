@@ -23,6 +23,9 @@ cli.mjs 的官方创建后基础样式预检复用 createStageRunner，报告“
 
 ## 核心入口
 
+- scripts/cli-package.mjs：固定源码与静态资源暂存、路径保护及独立包清单；scripts/pack-cli.mjs、根 cli:pack：npm 本地打包、唯一产物目录和暂存清理。
+- packages/create/test/cli-package.test.mjs：资源、隔离 CLI 多引擎/批量预览、特殊字符调用目录、输出冲突/junction 和打包上下文回归；docs/CLI_DISTRIBUTION.md、packages/create/README.md：本地 tgz 直接运行说明。
+
 - scripts/create.mjs、根 create 任务：下载后启动原 CLI，使用工具父目录、转发 argv/TTY 并禁用缓存。
 - packages/create/test/launcher.test.mjs：重命名/特殊字符目录、不同调用 cwd、参数与失败退出码；docs/REMOTE_CREATE.md：两种 GitHub 用法和验证边界。
 - cli.mjs 的单项目 dry-run 始终输出实际 cwd/target；launcher.test.mjs 以真实 CLI 覆盖直接入口和下载入口各自的绝对路径，含 Vue、React 与 Monorepo 根，不运行官方创建。

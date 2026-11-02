@@ -22,6 +22,7 @@ flowchart TD
 ## 模块边界
 
 - GitHub 入口由 Vite+ 下载工具仓库；scripts/create.mjs 经不缓存的 vp run create 启动原 CLI，cwd 为工具父目录。下载与项目创建分两步，官方基础模板来源不变。
+- 本地 CLI 分发由 scripts/cli-package.mjs 按固定范围暂存原 CLI 和预设源码，scripts/pack-cli.mjs 通过 npm pack 输出独立 tgz。保留 sibling 资源路径，不引入运行时打包器或框架模板；bin 直接启动原 CLI，cwd 为实际调用目录，和 GitHub 启动器的工具父目录策略分开。详见 [分发说明](CLI_DISTRIBUTION.md)。
 
 - `packages/create`：CLI、配置校验、官方命令调用和 UI/CSS 应用集成；负责已实现的官方模板编排、按应用集成及独立验收入口。
 - `packages/three` 提供引擎适配，`packages/model-security` 提供共享加解密源码与独立工具；生产授权服务尚未创建。

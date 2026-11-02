@@ -49,22 +49,22 @@ import {
 const usage = `ADui Vite+ Starter（Application / Monorepo）
 
 用法：
-  node packages/create/bin/cli.mjs
-  node packages/create/bin/cli.mjs --name my-vue-app --type application --framework vue
-  node packages/create/bin/cli.mjs --name my-react-app --type application --framework react
-  node packages/create/bin/cli.mjs --name my-vue-js-app --type application --framework vue --language js
-  node packages/create/bin/cli.mjs --name my-react-js-app --type application --framework react --language js
-  node packages/create/bin/cli.mjs --name my-workspace --type monorepo
-  node packages/create/bin/cli.mjs --config ./monorepo.json --dry-run
-  node packages/create/bin/cli.mjs --config ./monorepo.json
-  node packages/create/bin/cli.mjs --inspect-workspace ../adui-batch-demo
-  node packages/create/bin/cli.mjs --plan-recovery ../adui-batch-demo --config ./examples/monorepo.batch.json
-  node packages/create/bin/cli.mjs --execute-recovery ../adui-batch-demo --config ./examples/monorepo.batch.json
-  node packages/create/bin/cli.mjs --name my-vue-app --type application --framework vue --ui tdesign --css unocss
-  node packages/create/bin/cli.mjs --name my-vue-app --type application --framework vue --ui tdesign --css unocss --apply-existing
-  node packages/create/bin/cli.mjs --name my-vue-app --type application --framework vue --ui tdesign --css unocss --repair-existing
-  node packages/create/bin/cli.mjs --name my-vue-app --type application --framework vue --ui tdesign --css unocss --ui-smoke
-  node packages/create/bin/cli.mjs --name my-vue-app --type application --framework vue --dry-run
+  viteplus-starter
+  viteplus-starter --name my-vue-app --type application --framework vue
+  viteplus-starter --name my-react-app --type application --framework react
+  viteplus-starter --name my-vue-js-app --type application --framework vue --language js
+  viteplus-starter --name my-react-js-app --type application --framework react --language js
+  viteplus-starter --name my-workspace --type monorepo
+  viteplus-starter --config ./monorepo.json --dry-run
+  viteplus-starter --config ./monorepo.json
+  viteplus-starter --inspect-workspace ../adui-batch-demo
+  viteplus-starter --plan-recovery ../adui-batch-demo --config ./examples/monorepo.batch.json
+  viteplus-starter --execute-recovery ../adui-batch-demo --config ./examples/monorepo.batch.json
+  viteplus-starter --name my-vue-app --type application --framework vue --ui tdesign --css unocss
+  viteplus-starter --name my-vue-app --type application --framework vue --ui tdesign --css unocss --apply-existing
+  viteplus-starter --name my-vue-app --type application --framework vue --ui tdesign --css unocss --repair-existing
+  viteplus-starter --name my-vue-app --type application --framework vue --ui tdesign --css unocss --ui-smoke
+  viteplus-starter --name my-vue-app --type application --framework vue --dry-run
 
 说明：
   --execute-recovery <路径> --config <原批量 JSON>：显式新建缺失应用，已有应用跳过，遇阻停止。

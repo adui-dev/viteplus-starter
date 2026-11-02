@@ -270,6 +270,14 @@ engine-screen-smoke 生成两引擎共用的 Vue/React 验收 App：保留独立
 
 ui-smoke 内部预设表统一维护框架/UI 对应包、展示名、Vue 标签/resolver、主按钮属性和可选样式入口，生成和预检使用同一表。Vue 保留自动导入，React 组件和挂载模块继续分离。既有入口、配置及清单不修改；JS/TS、CSS 选择与输出冲突保护沿用原流程。批量配置逐应用调用该工具，不增加根级 UI 依赖。verify-ui-build 提供本地双入口构建，临时配置 wx 创建，构建成功或失败均清理，只接受指定验收 base；没有生产配置迁移或新架构选型。
 
+## 独立 CLI 本地包
+
+stageCliPackage 在新暂存目录中复制固定的 create/src、bin、normalize 静态资源与五个预设 src；只接受普通源码文件，拒绝隐藏文件、未知类型、链接和已有输出。保持 packages/<模块>/src 布局，使资源读取、模型安装器反向引用 create 及批量子进程入口无需重写。生成清单仅保留包名/版本/引擎约束、private、bin 与文件白名单，不携带开发依赖或生命周期脚本。
+
+pack-cli 由 npm run cli:pack 启动，使用 npm_execpath 和当前 Node 通过 argv 调用 npm pack --offline --ignore-scripts，不经 shell。产物位于每次新建的 dist/cli/pack-*；独立临时暂存目录创建后校验归属，并在 finally 清理。没有自动发布步骤，源包与产物均保持 private/0.0.0。
+
+安装包的 bin 直接运行原 CLI，采用调用 cwd；它不使用 GitHub 启动器的工具父目录策略，也不会在安装时生成应用。help 使用实际命令名 viteplus-starter，生成器源码入口继续可用。包本身零运行时依赖，但生成应用仍要求可用的 vp，并由官方模板及应用包管理器安装所选依赖。
+
 ## 生成阶段失败与人工恢复
 
 createStageRunner 包装已划定阶段的动作与预检，不接管通用路径/选项校验。成功后记录阶段，失败时保留 cause、有效非零 exitCode，快照复制已完成步骤并附目标和人工检查说明。CLI 继续通过原有官方模板入口和集成函数执行，异常传播到顶层停止后续动作。

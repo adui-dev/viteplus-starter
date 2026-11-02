@@ -10,6 +10,21 @@ Cesium 预设已接入 --engine cesium，提供本地椭球、GLB/.adui 授权�
 
 Babylon 预设使用 --engine babylon，提供本地场景、GLB/.adui 和默认 env 自动构建保护，支持四种框架/语言及工作区；用法见 [Babylon 指南](docs/BABYLON.md)。
 
+## 直接进入配置向导（本地 CLI 包）
+
+已有 CLI 支持 UI/CSS、大屏、引擎及模型保护选择。生成本地安装包后，可用一条命令进入向导，无需先下载整个工具仓库：
+
+```powershell
+# 在生成器仓库根目录打包，获得本地 tgz 路径
+$bundle = npm --silent run cli:pack | ConvertFrom-Json
+if ($LASTEXITCODE -ne 0) { throw 'CLI 打包失败' }
+# 到实际项目的父目录启动
+Set-Location ..
+vp dlx -- $bundle.tarball
+```
+
+当前仍为 private/0.0.0，尚未发布 npm。完整步骤和与 GitHub 下载模式的区别见 [CLI 分发说明](docs/CLI_DISTRIBUTION.md)。
+
 ## JSON 批量新建 Monorepo
 
 一份配置可以按顺序创建官方工作区、不同框架的应用和可选 UI 验收页：

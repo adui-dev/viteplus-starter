@@ -105,3 +105,7 @@ Cesium/Babylon 采用与现有 Three 相同的最高 2 倍 DPR、最长边 8192 
 ## 2026-10-30：默认基础样式采用本地静态快照
 
 按用户指定的 normalize.css URL 保存 8.0.1 固定快照与 MIT 许可，在 Vite+ 官方生成完成后增量加入应用入口。不引入 normalize.css npm 包或创建/运行时远程下载，不替代官方 Vue/React 模板。先执行可选 UI/CSS，再将基础样式整理到前面；同名未知文件及修改过的快照拒绝覆盖。版本、原始/格式化 SHA256 见 [来源记录](../../packages/create/assets/normalize.SOURCE.md)。
+
+## 2026-11-02：CLI 分发与 GitHub 模板下载分离
+
+用户希望直接进入预设选择。复用已有 CLI，将运行时源码及所读取的 sibling 预设资源按原 packages 布局暂存，再由 npm pack 生成本地自包含 tgz。通过 vp dlx 执行包的 bin，不要求先下载整个工具仓库；创建工程仍委托官方入口，不复制 Vue/React 基础模板。此方案不新增运行时打包依赖，避免改写动态资源路径或在安装生命周期启动向导。源清单和产物保持 private/0.0.0，正式 npm 包名和发布另行确定；GitHub 下载入口仍为下载后显式启动两步流程。
