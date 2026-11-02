@@ -643,3 +643,11 @@
 - 从工具根重复运行同名创建，任务明确 cache disabled，CLI 因目标存在退出 1；前后 20 项 Git 可见文件的 SHA256 及修改时间保持。下载启动器与源仓库 SHA256 一致，未修改 test-vue 或其他既有实际工程。
 - 生成器串行全量回归 254/254、无跳过；需求、远程证据和能力表同步。未扩展新功能或预设，也未执行浏览器或远程 Monorepo 创建验收。
 - 下一步按现有 GitHub 下载→vp run create 入口使用生成器，围绕实际创建、补装反馈修复问题；两个框架的代表创建与构建证据已补齐，不自动扩大验证矩阵。
+
+## 2026-11-02：远程入口的 JSON Monorepo 路径收尾
+
+- 从已有完整 URL 副本根通过系统临时目录的绝对 JSON 路径预览、执行，创建 adui-remote-monorepo-20261102 及 Vue TS 的 vue-admin、React JS 的 react-portal，三阶段均退出 0。根继续委托 vite:monorepo、应用委托 vite:application，UI/CSS none；实际目标位于工具父目录，预览不写目标，没有重新下载或扩展预设。
+- 保留官方 website/utils，根 devDependencies 仅 vite-plus；两应用 main 首条导入本地 normalize.css，CSS 与 MIT 许可 SHA256 均和仓库快照一致。根 vp run --no-cache ready 8/8 成功，含默认库 1 项测试、Vue 类型检查及全部完整构建；最终 vp check 41 格式/14 代码文件通过，官方 utils 的 TypeScript 7 API 实验性提示保留。
+- 同一下载入口的带配置工作区检查返回 ok:true、issues:[]、两应用 present；重复批量创建因根存在退出 1，前后 65 项 Git 可见文件的 SHA256 与修改时间保持。实际工作区和产物保留，临时配置验收后清理，旧实际工程不改动。
+- 生成器串行全量回归 254/254、无跳过；需求、远程命令与证据、能力表同步。本轮只补齐已实现的远程批量路径，不新增框架模板、预设、CI/CD 或发布，也未进行浏览器验收。
+- 下一步按 GitHub 下载→vp run create 使用现有创建、补装与批量能力，处理实际使用反馈。远程入口的代表单应用及混合工作区路径已完成，不自动追加新功能或重复扩张验收组合。

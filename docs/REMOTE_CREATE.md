@@ -36,6 +36,7 @@ vp run create --name demo-react --type application --framework react --language 
 $starterRoot = (Get-Location).Path
 $batchConfig = Join-Path $starterRoot 'examples\monorepo.batch.json'
 vp run create --config $batchConfig --dry-run
+vp run create --config $batchConfig
 ```
 
 原 node packages/create/bin/cli.mjs 入口保持原 cwd。新入口复用官方 Application/Monorepo 模板和已有文件保护；完整检查、构建及限制见 [Windows 指南](WINDOWS_GUIDE.md)。
@@ -71,6 +72,34 @@ vp run build
 
 React JS 应用与工具并列，UI/CSS none，main.jsx 首条导入本地 normalize.css；CSS 与 MIT 许可文件的 SHA256 均与仓库快照一致，未安装 normalize.css npm 包。应用 check 的 11 个格式文件、3 个代码文件通过，完整 build 脚本执行 vp build 成功并保留 dist。再次从工具根运行相同创建命令，任务未使用缓存，CLI 因目录存在退出 1；前后 20 项 Git 可见文件的内容 SHA256 与修改时间一致。工具启动器 SHA256 与源仓库仍一致。
 
-生成器全量串行回归 254/254（无跳过）；此前默认并行回归中一个真实 CLI 用例触发 10 秒超时，串行复跑未复现，未修改测试超时或忽略失败。本轮 React 补验同样串行全量通过。远程入口尚未实际新建 Monorepo，未新增浏览器验收，不扩大为全部框架/语言或预设验证。后续证据见 [项目状态](PROJECT_CONTEXT.md)。
+生成器全量串行回归 254/254（无跳过）；此前默认并行回归中一个真实 CLI 用例触发 10 秒超时，串行复跑未复现，未修改测试超时或忽略失败。后续 React 及 Monorepo 补验同样串行全量通过。未新增浏览器验收，不扩大为全部框架/语言或预设验证。后续证据见 [项目状态](PROJECT_CONTEXT.md)。
+
+## Monorepo 批量入口实测
+
+2026-11-02，在完整 URL 下载的工具根目录使用绝对 JSON 路径，先预览、再执行以下配置；工作区生成位置为工具父目录，不是配置文件目录。目标须不存在：
+
+```json
+{
+  "version": 1,
+  "name": "adui-remote-monorepo-20261102",
+  "apps": [
+    { "name": "vue-admin", "framework": "vue" },
+    { "name": "react-portal", "framework": "react", "language": "js" }
+  ]
+}
+```
+
+配置放在系统临时目录，vp run create --config <绝对路径> --dry-run 正确显示工具父目录 cwd、官方 vite:monorepo 根和 vue-ts/react 应用，预览无目标写入。随后 vp run create --config <绝对路径> 三阶段退出 0，生成 D:/Workspace/adui-studio/adui-remote-monorepo-20261102，未嵌入下载工具。根未指定框架或语言，两个应用 UI/CSS none，保留官方 website/utils，根 devDependencies 只有 vite-plus。
+
+在生成工作区执行：
+
+```powershell
+vp run --no-cache ready
+vp check
+```
+
+ready 无缓存 8/8 成功，包含默认库 1 项测试、官网和库构建、Vue 类型检查及两个应用的完整构建；最终 check 为 41 个格式文件、14 个代码文件通过。官方 utils 的 TypeScript 7 API 实验性提示保留。两个 main 的首条导入均为本地 normalize.css，CSS 与 MIT 许可 SHA256 均和仓库静态文件一致。
+
+通过下载入口执行 --inspect-workspace <工作区绝对路径> --config <配置绝对路径>，返回 ok:true、issues:[]、两应用 present。重复批量创建因根已存在退出 1，前后 65 项 Git 可见文件的 SHA256 及修改时间一致；实际工作区与产物保留，临时配置验收后清理。该轮覆盖现有 JSON 批量路径，不代表任意工作区布局、全部预设或浏览器效果均已验证。
 
 官方说明：[创建项目](https://viteplus.dev/guide/create)。仓库仍为 private/0.0.0，不执行 npm/Release 发布或新增 CI/CD。

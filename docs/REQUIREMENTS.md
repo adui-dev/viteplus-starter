@@ -16,7 +16,7 @@
 
 ### FR-013 GitHub 远程使用入口
 
-- 状态：已实现；Windows 两种 GitHub 来源下载、下载后启动、代表 Vue TS 与 React JS 创建/检查/完整构建及 React 同名创建拒绝已实测，详情见 [远程使用](REMOTE_CREATE.md)。用户于 2026-10-30 指定通过 vp create github:user/repo 或 GitHub URL 使用。
+- 状态：已实现；Windows 两种 GitHub 来源下载、下载后启动、代表 Vue TS/React JS 单应用与 JSON 混合 Monorepo 创建/检查/完整构建、重复创建拒绝已实测，详情见 [远程使用](REMOTE_CREATE.md)。用户于 2026-10-30 指定通过 vp create github:user/repo 或 GitHub URL 使用。
 - 两种写法按官方流程下载生成器，下载后 vp run create 显式启动原 CLI；不在安装生命周期自动创建项目，不要求 npm/Release 发布。
 - 启动器按自身位置定位工具，在工具父目录执行，转发 argv/交互和失败退出状态；创建任务禁止缓存。基础工程仍委托官方入口，不复制自维护 Vue/React 工程。
 
