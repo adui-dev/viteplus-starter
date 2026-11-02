@@ -4,6 +4,23 @@
 
 当前交付验收平台为 Windows（用户于 2026-10-30 明确）；Linux/macOS 不在本阶段要求内，也未验证，不作为 Windows 交付的阻塞条件。
 
+## 应用清单 BOM 工具链实测（2026-11-02）
+
+隔离目录 D:/Workspace/adui-studio/adui-bom-app-probe-20261102 复制既有官方 React JS 测试工程的 Git 可见源码，仅用于编码对照，不作为新的生成模板；未复制 node_modules 或 .git。Node 22.18.0、pnpm 12.16.1、Vite+ 1.4.0 下，vp install --offline --frozen-lockfile 下载 0 项、复用 88 项，check 11 格式/3 代码文件及完整 vp run build 通过。prepare 提示找不到 .git，未将其计为 Git hooks 验收。
+
+只在该副本 package.json 字节前添加 UTF-8 BOM 后，命令结果如下：
+
+| 命令                                    | 退出码 | 结果                                                  |
+| --------------------------------------- | ------ | ----------------------------------------------------- |
+| vp check                                | 0      | 格式、lint 和类型检查通过                             |
+| vp fmt src/styles/normalize.css --write | 0      | 指定静态 CSS 可格式化                                 |
+| vp run build                            | 1      | Failed to resolve vite command / Unexpected token BOM |
+| vp install --offline --frozen-lockfile  | 1      | Install error: expected value at line 1 column 1      |
+
+这些命令未改写带 BOM 清单的内容。由此增加 CLI 写入前兼容性预检：补装、旧修复及 UI/Three 验收页在原阶段中先拒绝应用 BOM 清单，报告路径并提示人工保存为 UTF-8 无 BOM；只读 API 和预览继续支持读取，不自动转换用户文件。
+
+修复后的真实 CLI 对该副本执行 --apply-existing，退出 1、阶段为补装预检、已完成为无，20 项复制源文件的 SHA256 和 mtime 均保持。五种维护入口另有隔离回归，含独立/工作区、多引擎及只读预览。副本与产物保留，BOM 未移除；没有修改原测试工程、安装 UI/引擎、浏览器验收或新增 CI/CD。
+
 ## BOM 工作区真实工具链验收（2026-10-30）
 
 隔离目录 D:/Workspace/adui-studio/adui-bom-validation-20261030 由官方 vite:monorepo 创建，使用 Node 22.18.0、pnpm 12.16.1、Vite+ 1.4.0。保留默认 website/utils，在根 JSON 和首行为 allowBuilds/core-js:false 的 YAML 中加入 BOM，验证生成器之外的真实工具链。

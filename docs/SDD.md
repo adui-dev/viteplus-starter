@@ -24,6 +24,8 @@ workspace-json.mjs 提取 readJsonObject(path, label, maxBytes)，负责普通�
 
 application-manifest 回归覆盖四种框架/语言的 BOM 清单：UI 和三引擎预检不写入，大屏以受控格式化回调写入预设时保留原清单、入口及 Vite 配置的字节和 mtime。另覆盖损坏 JSON、非对象和目录拒绝、不回显原文及所有文件保持。这是读取/写入 API 验证，不代表真实应用创建、安装或构建通过；官方新建工作区成员的根 JSON BOM 限制保持。
 
+vp-compatibility.mjs 的 preflightVpManifestEncoding 在路径检查后仅查看应用 package.json 的 UTF-8 BOM 字节签名，不修改或解析清单正文；缺失或非普通文件仍交给原模式校验。CLI 的普通/多引擎补装、旧修复、UI/Three 验收页在各自原阶段的写入操作前调用它。已验收 Vite+ 1.4.0 的 install/完整 build 会拒绝该编码，因此即使 fmt/check 可用也在写入前阻止维护操作并提示人工保存。只读入口和底层 API 不调用此执行兼容性预检，原根编码预检不变。
+
 ## 默认 normalize.css 静态样式
 
 base-styles.mjs 独立于可选 UI/CSS 依赖计划。planBaseStyles 为四种正式 main 入口列出本地静态 CSS、许可、来源与版本，不返回 npm 依赖；Monorepo 根返回 null。单应用、逐应用、批量和多引擎复用原 CLI，dry-run/批量计划展示 baseStyles。矩阵将默认静态路径加入 462 个组合的冲突检查，实际构建计数仍为 0。

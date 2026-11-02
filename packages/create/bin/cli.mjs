@@ -4,6 +4,7 @@ import { addBaseStyles, planBaseStyles, preflightBaseStyles } from "../src/base-
 import { planWorkspaceRecovery } from "../src/workspace-recovery.mjs";
 import { inspectWorkspace } from "../src/workspace-inspect.mjs";
 import { createStageRunner } from "../src/recovery.mjs";
+import { preflightVpManifestEncoding } from "../src/vp-compatibility.mjs";
 import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { basename, resolve } from "node:path";
@@ -211,7 +212,10 @@ async function main() {
       (options.css ?? "none") !== "none"
     )
       throw new Error("--three-smoke 需单独调用，不混用创建/补装/其他验收选项");
-    const result = await stage("Three 集成", () => addThreeSmoke(target, options));
+    const result = await stage("Three 集成", async () => {
+      await preflightVpManifestEncoding(target);
+      return addThreeSmoke(target, options);
+    });
     await finishWorkspaceIntegration();
     console.log("Three.js 验收页已生成：" + result.previewPath);
     console.log(
@@ -224,7 +228,10 @@ async function main() {
       throw new Error("--ui-smoke 不能与 --dry-run、--apply-existing、--repair-existing 同时使用");
     }
     if (!existsSync(target)) throw new Error("目标目录不存在，请先创建 Application");
-    const result = await stage("UI 验收页", () => addUiSmoke(target, options));
+    const result = await stage("UI 验收页", async () => {
+      await preflightVpManifestEncoding(target);
+      return addUiSmoke(target, options);
+    });
     console.log("UI Smoke 验证页已生成：" + result.previewPath);
     console.log(
       "进入应用目录运行 vp check 和 vp run build；独立页运行 vp dev，使用终端地址访问 " +
@@ -240,7 +247,10 @@ async function main() {
     if (args.dryRun) throw new Error("--repair-existing 与 --dry-run 不能同时使用");
     if (options.type !== "application") throw new Error("仅支持 Application 的旧版配置修复");
     if (!existsSync(target)) throw new Error("目标目录不存在，无法修复");
-    await stage("旧配置修复", () => repairExistingIntegrations(target, options));
+    await stage("旧配置修复", async () => {
+      await preflightVpManifestEncoding(target);
+      return repairExistingIntegrations(target, options);
+    });
     console.log("旧版插件引用修复完成，旧文件已备份，请在应用目录运行 vp check 和 vp run build");
     return;
   }
@@ -249,6 +259,7 @@ async function main() {
     if (options.type !== "application") throw new Error("只能向已存在的 Application 补装插件");
     if (!existsSync(target)) throw new Error("目标目录不存在，无法补装");
     await stage("补装预检", async () => {
+      await preflightVpManifestEncoding(target);
       await preflightBaseStyles(target, options);
       await preflightIntegrations(target, options);
       if (options.screen) await preflightScreenPreset(target, await planScreenPreset(options));

@@ -79,6 +79,77 @@ const uiSelections = [
   ["react", "tdesign"],
 ];
 
+test("CLI 写入模式在修改前拒绝 Vite+ 不兼容的应用 BOM 清单，预览仍只读可用", async (t) => {
+  const cli = fileURLToPath(new URL("../bin/cli.mjs", import.meta.url));
+  const env = Object.fromEntries(
+    Object.entries(process.env).filter(([key]) => key.toUpperCase() !== "PATH"),
+  );
+  env.PATH = "";
+  const cases = [
+    ["vue", "ts", false, ["--apply-existing", "--ui", "tdesign", "--css", "unocss"], "补装预检"],
+    [
+      "react",
+      "js",
+      true,
+      ["--apply-existing", "--screen", "--engines", "three,babylon", "--model-protection", "none"],
+      "补装预检",
+    ],
+    ["vue", "js", true, ["--ui-smoke", "--ui", "tdesign"], "UI 验收页"],
+    ["react", "ts", false, ["--three-smoke"], "Three 集成"],
+    ["vue", "ts", false, ["--repair-existing", "--ui", "tdesign"], "旧配置修复"],
+  ];
+  for (const [framework, language, workspace, flags, stage] of cases) {
+    const f = await fixture(t, framework, language, workspace);
+    if (flags.includes("--apply-existing"))
+      await writeFile(
+        join(f.app, "vite.config.js"),
+        'import {defineConfig} from "vite-plus";export default defineConfig({plugins:[]})',
+      );
+    const manifest = join(f.app, "package.json");
+    await writeFile(
+      manifest,
+      Buffer.concat([Buffer.from([239, 187, 191]), await readFile(manifest)]),
+    );
+    const before = await snapshot(f.root);
+    const args = [
+      cli,
+      "--name",
+      "app",
+      "--type",
+      "application",
+      "--framework",
+      framework,
+      "--language",
+      language,
+      ...(workspace ? ["--workspace", f.root] : []),
+    ];
+    const result = spawnSync(process.execPath, [...args, ...flags], {
+      cwd: f.root,
+      env,
+      encoding: "utf8",
+      timeout: 10000,
+    });
+    assert.equal(result.status, 1, result.stderr);
+    assert.equal(result.stdout, "");
+    assert.ok(result.stderr.includes("阶段：" + stage));
+    assert.match(result.stderr, /UTF-8 BOM/);
+    assert.match(result.stderr, /无 BOM/);
+    assert.ok(result.stderr.includes(manifest));
+    assert.deepEqual(await snapshot(f.root), before);
+    if (flags.includes("--apply-existing") && !workspace) {
+      const preview = spawnSync(process.execPath, [...args, "--dry-run"], {
+        cwd: f.root,
+        env,
+        encoding: "utf8",
+        timeout: 10000,
+      });
+      assert.equal(preview.status, 0, preview.stderr);
+      assert.equal(JSON.parse(preview.stdout).target, f.app);
+      assert.deepEqual(await snapshot(f.root), before);
+    }
+  }
+});
+
 test("多引擎补装预检失败报告阶段和目标，独立/工作区文件保持", async (t) => {
   const cli = fileURLToPath(new URL("../bin/cli.mjs", import.meta.url));
   const env = Object.fromEntries(
@@ -540,6 +611,7 @@ test("补装清单与入口检查共用基础样式预检，坏清单不回显�
     "manifest-content-marker",
     "null",
     "[]",
+    '{"dependencies":{"vue":"3","vite-plus":"1"}}',
     '\uFEFF{"dependencies":{"vue":"3","vite-plus":"1"}}',
   ]) {
     const f = await fixture(t);
@@ -573,7 +645,11 @@ test("补装清单与入口检查共用基础样式预检，坏清单不回显�
     assert.match(result.stderr, /阶段：补装预检/);
     assert.match(
       result.stderr,
-      manifest.startsWith("\uFEFF") ? /仅支持 plugins/ : /package.json 无效/,
+      manifest.startsWith("\uFEFF")
+        ? /UTF-8 BOM/
+        : manifest.startsWith("{")
+          ? /仅支持 plugins/
+          : /package.json 无效/,
     );
     assert.ok(!result.stderr.includes("manifest-content-marker"));
     assert.deepEqual(await snapshot(f.root), before);

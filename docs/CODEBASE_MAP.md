@@ -26,6 +26,7 @@
 - cli.mjs 的单项目 dry-run 始终输出实际 cwd/target；launcher.test.mjs 以真实 CLI 覆盖直接入口和下载入口各自的绝对路径，含 Vue、React 与 Monorepo 根，不运行官方创建。
 - multi-engine.mjs 的 dry-run 在原计划外补齐顶层 cwd/target；launcher.test.mjs 同时覆盖独立多引擎应用与工作区成员。cli.mjs 创建成功末尾输出绝对项目目录。
 - multi-engine.mjs 的默认 runner 和阶段包装保留有效失败退出码；multi-engine.test.mjs 在真实 CLI 的子进程边界注入受控结果，覆盖 17/23、信号/启动异常、遇错停止与模拟现场保留。
+- packages/create/src/vp-compatibility.mjs：应用清单 BOM 的写入前执行兼容性预检；CLI 五种维护入口复用，保留读取 API 与只读预览，file-protection.test.mjs 验证拒绝前无文件变化。
 - 多引擎补装前置检查复用 recovery.mjs 的“补装预检”阶段；multi-engine.test.mjs 核对错误元数据，file-protection.test.mjs 核对独立/工作区 CLI 的坏清单、后续引擎冲突提示和内容/mtime 保持。
 
 | 路径                                                 | 作用                                                                  |

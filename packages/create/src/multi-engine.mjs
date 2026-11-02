@@ -11,6 +11,7 @@ import { preflightBabylon } from "./babylon.mjs";
 import { planThreeSmoke, preflightThreeSmoke, validateThreeTarget } from "./three-smoke.mjs";
 import { preflightModelProtection, planModelProtection } from "./model-protection.mjs";
 import { createStageRunner } from "./recovery.mjs";
+import { preflightVpManifestEncoding } from "./vp-compatibility.mjs";
 export async function runMultiEngine(args, runner = run) {
   const options = validateProjectOptions(args);
   for (const key of ["uiSmoke", "threeSmoke", "repairExisting", "config"])
@@ -32,6 +33,7 @@ export async function runMultiEngine(args, runner = run) {
   if (args.applyExisting) {
     const stage = createStageRunner(target);
     await stage("补装预检", async () => {
+      await preflightVpManifestEncoding(target);
       await preflightBaseStyles(target, options);
       await preflightModelProtection(target, options);
       for (const selection of selections) {
