@@ -765,3 +765,15 @@
 - Vue main 注册插件、App 显式使用；React 保留 createRoot 并在 App 使用组件。按需引擎与模型授权适配保持，首页不扩展为业务查看器；多引擎首页只启动优先级选定的一个引擎。
 - 先检查首页快照、目标占用、未知暂存文件和链接，再整理路径。格式失败保留暂存文件/备份；KEY 及 env 轮换备份不清理。已有业务工程不自动迁移，旧补装入口继续保留原首页与历史新增目录，识别新布局并拒绝重复安装。
 - 单应用、多引擎、批量/恢复新建共享整理路径，预览与工作区结构检查同步最终文件计划。回归 274/274 通过，文档静态检查与根 vp check 通过；实际项目及打包验收另见后续记录。下一步完成本轮分发包的正式首页验收，再依据实际使用反馈处理已有工程的目录迁移边界。
+
+## 2026-11-02 默认插件目录与正式首页验收
+
+- 环境：Windows，Node 22.18.0、Vite+ 1.4.0，官方创建选择 pnpm 11.22.0；没有调整根依赖版本。
+- 通过真实官方入口创建 Vue TS/TDesign/UnoCSS/大屏/Three/embedded 与 React JS/Ant Design/Tailwind/大屏/Babylon/external。Vue check 为 52 格式/38 代码文件，React 为 52/39；两者完整 vp run build 均通过。浏览器发现 Babylon canvas 默认尺寸后，补齐首页 canvas 百分比样式并复验 React check/build 与 1280×720 视口。
+- Vue 首页按钮实际加载并显示用户指定的 DamagedHelmet。生产产物输出一个约 3.77 MB 的 .adui，没有 GLB/GLTF；未把原模型纳入仓库。Three 和 Babylon 构建均有大分块提示；Vue 浏览器有一条底层着色器精度 warning，无运行 error；React 浏览器无 warn/error。该轮未做 Cesium 首页生产渲染或全部 UI/语言组合的实际构建，不将结构回归称为完整矩阵实测。
+- 本轮本地 tgz 经 vp dlx 实际创建 Vue JS/Element Plus/大屏，check 为 24 格式/14 代码文件，完整构建通过；生产首页主按钮样式可见，点击计数 0→1，浏览器无 warn/error，normalize 是入口首条导入。其默认项目无 smoke 目录/HTML 和 before-adui 中间备份。
+- 最终 CLI 包包含 88 个运行时文件，路径为 dist/cli/pack-y9XDHa/viteplus-starter-create-0.0.0.tgz；最终归档包经 vp dlx 三引擎只读预览通过，最终计划 74 文件、entry 为 /、无默认验收页或旧插件路径，未创建目标。此前包路径不会自动更新。
+- 归档后的 vp run models:keygen 可执行；已有 KEY 返回拒绝覆盖，前后内容哈希保持。env 密钥未输出、未提交。
+- 最终源码回归 274/274、文档静态校验、根 vp check 199 格式/149 代码文件通过。截图保存在忽略目录 dist/verification；结构与边界见 [目录与接入](PROJECT_LAYOUT.md)。
+
+本轮三个临时应用和只读预览目录均已清理，原 Downloads 模型及用户现有工程未改动；只保留仓库忽略目录中的 tgz、截图和测试日志。功能提交 9ed257b 已推送。下一步沿生成器主线处理已有工程补装时的目录一致性与迁移保护，不增加查看器功能或新的引擎能力。

@@ -237,3 +237,13 @@ test-vue 分步本地提交 a664ce1（集成 UI/CSS）、0325b9c（独立验收�
 Chrome 两个开发首页 Count is 0→1；Vue 样式顺序为 normalize、Tailwind、原样式，React 为 normalize、Ant Design reset、UnoCSS、原样式。两个生产组件页均为真实库主按钮，计数 0→1；Tailwind/UnoCSS 浅绿色区域、深绿色文字、8px 圆角及 16px 内边距正确，四次页面观察的 warn/error 均为空。独立组件页保持自身入口，不宣称自动继承 normalize。截图 monorepo-vue-normalize-ui-20261030.jpg、monorepo-react-normalize-ui-20261030.jpg 保留在 D:/Workspace/adui-studio 仓库外。
 
 两组重复创建、重复 --ui-smoke 均退出 1；不带 UI/CSS 参数的 --apply-existing 均退出 0 并跳过基础样式写入。六次调用前后 149 项 Git 可见文件的内容和 mtime 一致，没有重新安装依赖。两个验收标签和本轮 4395–4398 服务已关闭，测试工作区原有未提交文件保留，未将其纳入生成器提交。此轮未发现需要修复的运行逻辑，仅同步代表实测范围和 Monorepo 说明，不扩大为全部组合已验证。
+
+## 2026-11-02 默认插件目录与正式首页验收
+
+- 环境：Windows，Node 22.18.0、Vite+ 1.4.0，官方创建选择 pnpm 11.22.0；没有调整根依赖版本。
+- 通过真实官方入口创建 Vue TS/TDesign/UnoCSS/大屏/Three/embedded 与 React JS/Ant Design/Tailwind/大屏/Babylon/external。Vue check 为 52 格式/38 代码文件，React 为 52/39；两者完整 vp run build 均通过。浏览器发现 Babylon canvas 默认尺寸后，补齐首页 canvas 百分比样式并复验 React check/build 与 1280×720 视口。
+- Vue 首页按钮实际加载并显示用户指定的 DamagedHelmet。生产产物输出一个约 3.77 MB 的 .adui，没有 GLB/GLTF；未把原模型纳入仓库。Three 和 Babylon 构建均有大分块提示；Vue 浏览器有一条底层着色器精度 warning，无运行 error；React 浏览器无 warn/error。该轮未做 Cesium 首页生产渲染或全部 UI/语言组合的实际构建，不将结构回归称为完整矩阵实测。
+- 本轮本地 tgz 经 vp dlx 实际创建 Vue JS/Element Plus/大屏，check 为 24 格式/14 代码文件，完整构建通过；生产首页主按钮样式可见，点击计数 0→1，浏览器无 warn/error，normalize 是入口首条导入。其默认项目无 smoke 目录/HTML 和 before-adui 中间备份。
+- 最终 CLI 包包含 88 个运行时文件，路径为 dist/cli/pack-y9XDHa/viteplus-starter-create-0.0.0.tgz；最终归档包经 vp dlx 三引擎只读预览通过，最终计划 74 文件、entry 为 /、无默认验收页或旧插件路径，未创建目标。此前包路径不会自动更新。
+- 归档后的 vp run models:keygen 可执行；已有 KEY 返回拒绝覆盖，前后内容哈希保持。env 密钥未输出、未提交。
+- 最终源码回归 274/274、文档静态校验、根 vp check 199 格式/149 代码文件通过。截图保存在忽略目录 dist/verification；结构与边界见 [目录与接入](PROJECT_LAYOUT.md)。
