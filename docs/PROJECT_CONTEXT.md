@@ -635,3 +635,11 @@
 - 新建 adui-remote-vue-ts-20261102 使用官方 vue-ts、UI/CSS none，本地 normalize.css 为正式入口首条导入且静态文件 SHA256 一致。应用 check 16 格式/5 代码文件通过，完整 build 的 vue-tsc -b 和首页构建 2/2 成功；保留插件耗时提示及产物。未新增浏览器验收、实际 React 或 Monorepo 远程创建，原 test-vue 和旧业务工程未改动。
 - 默认并行回归有一个真实 CLI 用例触发既有 10 秒超时；未改超时或忽略失败，串行全量复跑 254/254、无跳过。需求、设计、能力表、远程说明及 ADR 同步，依赖、锁文件及官方基础模板来源保持。
 - 下一步使用这两种 GitHub 入口按需创建实际 Windows 项目，处理使用中出现的具体生成或补装问题；本轮分发入口完成后不自动扩展预设、业务演示、其他系统或发布流程。
+
+## 2026-11-02：完整 URL 副本的 React 实际创建补验
+
+- 从已有 adui-remote-url-20261102 下载根运行 vp run create，显式选择 React/JS、UI/CSS none，由官方 vite:application 的 react 模板新建旁边的 adui-remote-react-js-20261102，退出 0；未重新下载、改写基础模板或安装额外预设。环境仍为托管 Node 22.18.0、pnpm 12.16.1、Vite+ 1.4.0。
+- 正式 main.jsx 首条导入本地 normalize.css，CSS 与 MIT 许可 SHA256 均和仓库静态文件一致，清单未增加 normalize.css 依赖。应用 check 11 格式/3 代码文件通过，完整 build 脚本执行 vp build 成功，产物保留。
+- 从工具根重复运行同名创建，任务明确 cache disabled，CLI 因目标存在退出 1；前后 20 项 Git 可见文件的 SHA256 及修改时间保持。下载启动器与源仓库 SHA256 一致，未修改 test-vue 或其他既有实际工程。
+- 生成器串行全量回归 254/254、无跳过；需求、远程证据和能力表同步。未扩展新功能或预设，也未执行浏览器或远程 Monorepo 创建验收。
+- 下一步按现有 GitHub 下载→vp run create 入口使用生成器，围绕实际创建、补装反馈修复问题；两个框架的代表创建与构建证据已补齐，不自动扩大验证矩阵。

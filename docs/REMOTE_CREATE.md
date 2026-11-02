@@ -46,10 +46,10 @@ vp run create --config $batchConfig --dry-run
 
 截至 2026-11-02，已从推送后的 9233cdc 实际下载并完成以下 Windows 验证，环境为托管 Node 22.18.0、pnpm 12.16.1、Vite+ 1.4.0。两副本的 scripts/create.mjs 与原 CLI SHA256 均和源仓库一致；官方后处理会增量配置工具副本，不将整个目录称为原仓库字节副本。
 
-| 来源                                         | 工具目录（D:/Workspace/adui-studio 下） | 实际结果                                                                                                                 |
-| -------------------------------------------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| github:adui-dev/viteplus-starter             | adui-remote-shorthand-20261030          | 下载/安装退出 0；在根通过全局 vp 运行帮助，并成功创建旁边的 Vue TS 应用                                                  |
-| https://github.com/adui-dev/viteplus-starter | adui-remote-url-20261102                | 下载/根安装退出 0；安装后 React JS 预览映射官方 react 模板且目标不存在；TTY 选择 Monorepo 后取消退出 0，两处均未生成目标 |
+| 来源                                         | 工具目录（D:/Workspace/adui-studio 下） | 实际结果                                                                                                         |
+| -------------------------------------------- | --------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| github:adui-dev/viteplus-starter             | adui-remote-shorthand-20261030          | 下载/安装退出 0；在根通过全局 vp 运行帮助，并成功创建旁边的 Vue TS 应用                                          |
+| https://github.com/adui-dev/viteplus-starter | adui-remote-url-20261102                | 下载/根安装退出 0；React JS 预览、实际创建、检查和构建通过；TTY 选择 Monorepo 后取消退出 0，两处均未生成取消目标 |
 
 为避免覆盖已有工具，实测用以下非交互参数指定两个全新目录，均从工具父目录运行；普通使用仍可按上面的交互命令操作：
 
@@ -60,6 +60,17 @@ vp create https://github.com/adui-dev/viteplus-starter --no-interactive --no-age
 
 在简写地址副本根执行 vp run create --name adui-remote-vue-ts-20261102 --type application --framework vue，官方 vue-ts 创建退出 0。应用位于 D:/Workspace/adui-studio/adui-remote-vue-ts-20261102，未嵌入工具工作区。正式入口首条导入为本地 normalize.css，其 SHA256 与仓库静态文件一致；应用 vp check 的 16 个格式文件、5 个代码文件通过，vp run build 的 vue-tsc -b 与首页构建 2/2 成功，产物保留。构建有插件耗时提示，不影响退出状态。
 
-生成器全量串行回归 254/254（无跳过）；此前默认并行回归中一个真实 CLI 用例触发 10 秒超时，串行复跑未复现，未修改测试超时或忽略失败。本轮没有新增浏览器验收、实际 React 创建或远程入口的 Monorepo 创建，不扩大为全部预设验证。后续证据见 [项目状态](PROJECT_CONTEXT.md)。
+随后在完整 URL 副本根执行以下命令，官方 react 模板创建退出 0：
+
+```powershell
+vp run create --name adui-remote-react-js-20261102 --type application --framework react --language js
+Set-Location -LiteralPath ../adui-remote-react-js-20261102
+vp check
+vp run build
+```
+
+React JS 应用与工具并列，UI/CSS none，main.jsx 首条导入本地 normalize.css；CSS 与 MIT 许可文件的 SHA256 均与仓库快照一致，未安装 normalize.css npm 包。应用 check 的 11 个格式文件、3 个代码文件通过，完整 build 脚本执行 vp build 成功并保留 dist。再次从工具根运行相同创建命令，任务未使用缓存，CLI 因目录存在退出 1；前后 20 项 Git 可见文件的内容 SHA256 与修改时间一致。工具启动器 SHA256 与源仓库仍一致。
+
+生成器全量串行回归 254/254（无跳过）；此前默认并行回归中一个真实 CLI 用例触发 10 秒超时，串行复跑未复现，未修改测试超时或忽略失败。本轮 React 补验同样串行全量通过。远程入口尚未实际新建 Monorepo，未新增浏览器验收，不扩大为全部框架/语言或预设验证。后续证据见 [项目状态](PROJECT_CONTEXT.md)。
 
 官方说明：[创建项目](https://viteplus.dev/guide/create)。仓库仍为 private/0.0.0，不执行 npm/Release 发布或新增 CI/CD。
