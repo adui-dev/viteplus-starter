@@ -14,7 +14,11 @@
 
 正式入口仍先导入本地 normalize.css，再导入 starter.tailwind.css 和原样式；从官方创建后、补装前保存的 App.vue、HelloWorld.vue、style.css、normalize.css 和 MIT 许可共 5 项文件，其内容 SHA256 与 mtime 在补装及构建后均保持。正式 main、Vite 配置和依赖按所选 UI/CSS 增量修改，未写入业务首页内容。
 
-构建后不选择 UI/CSS 的 --apply-existing 退出 0 且未重复写入；重复选择相同 UI/CSS 补装、重复 --ui-smoke 均退出 1，分别报告补装预检及 UI 验收页阶段。三次维护前后 30 项 Git 可见文件的 SHA256 与 mtime 一致。工作区和产物保留，本轮没有浏览器渲染或点击验收，也未增加新预设或编码转换行为。
+构建后不选择 UI/CSS 的 --apply-existing 退出 0 且未重复写入；重复选择相同 UI/CSS 补装、重复 --ui-smoke 均退出 1，分别报告补装预检及 UI 验收页阶段。三次维护前后 30 项 Git 可见文件的 SHA256 与 mtime 一致。工作区和产物保留，该创建/构建轮未进行浏览器验收，后续浏览器结果见下；未增加新预设或编码转换行为。
+
+2026-11-02 后续浏览器补验：通过 127.0.0.1:4399/ui-check/ 预览同一 dist/ui-verify 产物，在 Windows 内嵌浏览器默认 411×612 视口验证 UI 页。按钮是原生 BUTTON，类名 el-button/el-button--primary，背景 rgb(64, 158, 255)，点击次数 0→1。Tailwind 区域为 bg-emerald-100/text-emerald-800，实际背景 oklch(0.95 0.052 163.051)、文字 oklch(0.432 0.095 166.913)、圆角 8px、内边距 16px，截图确认浅绿色区域和深绿色文字可见。
+
+同一生产产物的正式首页显示官方 Get started 页面，Count is 0→1；两个页面观察到的 warn/error 日志均为空。验收后与先前 30 项 Git 可见文件基线比较，内容 SHA256 和 mtime 全部保持。UI 点击后截图 adui-clean-maintenance-vue-ts-20261102-ui-smoke-visible-20261102.jpg、首页截图 adui-clean-maintenance-vue-ts-20261102-home-20261102.jpg 保留在 D:/Workspace/adui-studio 仓库外。本轮临时标签和 4399 服务已关闭，未设置视口覆盖，未改动生成器源码、应用文件或依赖；仅补齐同一代表配置的浏览器证据，不扩大为全部环境/组合通过。
 
 ## 应用清单 BOM 工具链实测（2026-11-02）
 
