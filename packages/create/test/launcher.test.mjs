@@ -57,3 +57,42 @@ test("下载入口保留子进程失败退出码，不重试或输出成功", as
   assert.equal(result.stdout, "");
   assert.equal(result.stderr.trim(), "controlled failure");
 });
+
+test("真实 CLI 预览显示直接入口和下载入口各自的绝对执行目录与目标，且不写入", async (t) => {
+  const cliUrl = new URL("../bin/cli.mjs", import.meta.url);
+  const f = await fixture(t, `await import(${JSON.stringify(cliUrl.href)})`);
+  const env = Object.fromEntries(
+    Object.entries(process.env).filter(([key]) => key.toUpperCase() !== "PATH"),
+  );
+  env.PATH = "";
+  const before = await readdir(f.parent);
+  const cases = [
+    ["preview-vue", ["--type", "application", "--framework", "vue", "--language", "js"]],
+    ["preview-react", ["--type", "application", "--framework", "react"]],
+    ["preview-workspace", ["--type", "monorepo"]],
+  ];
+  for (const [entry, expectedCwd] of [
+    [fileURLToPath(cliUrl), f.elsewhere],
+    [f.script, f.parent],
+  ]) {
+    for (const [name, args] of cases) {
+      const result = spawnSync(process.execPath, [entry, "--name", name, ...args, "--dry-run"], {
+        cwd: f.elsewhere,
+        env,
+        encoding: "utf8",
+        timeout: 10000,
+      });
+      assert.equal(result.status, 0, result.stderr);
+      const plan = JSON.parse(result.stdout);
+      assert.equal(plan.cwd, expectedCwd);
+      assert.equal(plan.target, join(expectedCwd, name));
+      assert.equal(plan.command, "vp");
+      assert.equal(
+        plan.args[1],
+        name === "preview-workspace" ? "vite:monorepo" : "vite:application",
+      );
+    }
+  }
+  assert.deepEqual(await readdir(f.parent), before);
+  assert.deepEqual(await readdir(f.elsewhere), []);
+});

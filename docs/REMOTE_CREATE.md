@@ -30,6 +30,8 @@ vp run create --name demo-vue --type application --framework vue --ui tdesign --
 vp run create --name demo-react --type application --framework react --language js --ui antd --css tailwindcss
 ```
 
+单项目 --dry-run 会显示实际执行目录 cwd 和绝对目标 target。下载入口中的 cwd 为工具父目录，直接 node CLI 则使用调用目录；可在创建前核对这两个字段，预览不会生成目标。已有 --workspace 预览仍显示工作区根及应用绝对目标。
+
 任务名后直接写 CLI 参数。--workspace、--config 等相对路径按工具父目录解释，建议使用绝对路径：
 
 ```powershell

@@ -283,7 +283,8 @@ async function main() {
         {
           command,
           args: vpArgs,
-          ...(workspace ? { cwd: commandCwd, target } : {}),
+          cwd: commandCwd,
+          target,
           integrations,
           ...(planBaseStyles(options) ? { baseStyles: planBaseStyles(options) } : {}),
           ...(planModelProtection(options)

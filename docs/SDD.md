@@ -10,6 +10,8 @@
 
 Windows Vite+ 1.4.0 的远程后处理可能识别内部子包为安装目录；使用入口始终是下载根目录的 create 任务。该入口和 CLI 使用 Node 内置模块，已验证根未安装本地依赖时可通过全局 vp 启动并创建官方应用，不为此加入自动安装或改写官方探测逻辑。工具源码开发检查仍需在根安装依赖。实测范围与目录提示见 [远程使用](REMOTE_CREATE.md)。
 
+单项目 CLI 的 dry-run 在输出官方 command/args 时始终附带实际 commandCwd 与 target，JSON 字段仍为 cwd/target；此前仅 --workspace 输出这两个字段，独立应用及 Monorepo 根遗漏。字段来自已有路径计算，不重新解析路径或改变目标；直接入口按调用 cwd、下载启动器按工具父目录。launcher 回归通过隔离启动器引导真实 CLI，清空 PATH，验证两种入口 × Vue/React/Monorepo 的绝对路径及无目标生成。
+
 ## 默认 normalize.css 静态样式
 
 base-styles.mjs 独立于可选 UI/CSS 依赖计划。planBaseStyles 为四种正式 main 入口列出本地静态 CSS、许可、来源与版本，不返回 npm 依赖；Monorepo 根返回 null。单应用、逐应用、批量和多引擎复用原 CLI，dry-run/批量计划展示 baseStyles。矩阵将默认静态路径加入 462 个组合的冲突检查，实际构建计数仍为 0。
