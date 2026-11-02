@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { validateProjectOptions } from "./options.mjs";
 import { runWorkspaceVp } from "./workspace.mjs";
 import { demoCss, reactDemo, vueDemo } from "./screen-demo.mjs";
+import { readJsonObject } from "./workspace-json.mjs";
 
 const sources = fileURLToPath(new URL("../../screen/src/", import.meta.url));
 export async function planScreenPreset(input) {
@@ -68,8 +69,7 @@ export async function preflightScreenPreset(directory, plan) {
 export async function addScreenPreset(directory, input, formatter = runWorkspaceVp) {
   const options = validateProjectOptions(input);
   const plan = await planScreenPreset(options);
-  await inspect(join(directory, "package.json"));
-  const manifest = JSON.parse(await readFile(join(directory, "package.json"), "utf8"));
+  const manifest = await readJsonObject(join(directory, "package.json"), "大屏应用清单");
   const dependencies = { ...manifest.dependencies, ...manifest.devDependencies };
   if (!dependencies["vite-plus"] || !dependencies[options.framework])
     throw new Error("大屏预设仅支持已安装的对应 Vite+ 应用");

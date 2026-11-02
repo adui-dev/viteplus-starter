@@ -5,6 +5,7 @@ import { createRequire } from "node:module";
 import { inspectPath } from "./safe-paths.mjs";
 import { validateProjectOptions } from "./options.mjs";
 import { runWorkspaceVp } from "./workspace.mjs";
+import { readJsonObject } from "./workspace-json.mjs";
 export const babylonVersion = "9.32.1";
 export async function planBabylon(input) {
   const options = validateProjectOptions(input);
@@ -99,8 +100,7 @@ export async function preflightBabylon(directory, input, requireScreen = true) {
     if (await inspectPath(join(directory, path)))
       throw new Error("Babylon 文件已存在，拒绝覆盖：" + path);
   const manifestPath = join(directory, "package.json");
-  await inspectPath(manifestPath);
-  const manifest = JSON.parse(await readFile(manifestPath, "utf8")),
+  const manifest = await readJsonObject(manifestPath, "Babylon 应用清单"),
     deps = { ...manifest.devDependencies, ...manifest.dependencies };
   if (!deps["vite-plus"] || !deps[options.framework])
     throw new Error("Babylon 需要所选框架的 Vite+ 应用");

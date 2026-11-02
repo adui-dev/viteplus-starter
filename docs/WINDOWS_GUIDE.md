@@ -104,6 +104,8 @@ node $starterCli --workspace $workspacePath --name reports --type application --
 
 添加成员前，根 package.json 应保存为 UTF-8 无 BOM：当前官方 Vite+ 1.4.0 创建入口不能读取其 BOM。生成器会在写 peer 和调用官方工具前拒绝并报告路径，恢复计划对应 manual-review；先人工确认并转换该文件，不删除或覆盖工作区。pnpm-workspace.yaml 的 BOM 可由现有预检和增量合并处理。
 
+已有应用的大屏、UI 验收页及三引擎预设可以读取带 UTF-8 BOM 的应用 package.json，读取不会转换或重写原文件。该兼容仅涉及生成器清单读取，后续官方工具的检查和构建仍需按实际结果验收，不能据此绕过上面的根编码预检。
+
 ## 检查和恢复已有工作区
 
 预期 JSON 应包含希望对照的全部应用；如需 reports 也参与对照，将原 JSON 复制到自己保存的配置文件，在副本追加应用，并把 $batchConfig 指向该副本，不直接修改仓库示例。inspect 缺失或阻塞时退出 1，代表需要处理现场。先检查、再审阅计划：

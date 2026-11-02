@@ -1,4 +1,5 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { readJsonObject } from "./workspace-json.mjs";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 import { validateProjectOptions } from "./options.mjs";
@@ -168,8 +169,7 @@ async function fileExists(path) {
 
 export async function preflightUiSmoke(directory, options) {
   const plan = planUiSmoke(options);
-  await inspectPath(join(directory, "package.json"), "UI Smoke");
-  const manifest = JSON.parse(await readFile(join(directory, "package.json"), "utf8"));
+  const manifest = await readJsonObject(join(directory, "package.json"), "UI Smoke 应用清单");
   const dependencies = { ...manifest.dependencies, ...manifest.devDependencies };
   const preset = presets[plan.framework][plan.ui];
   const componentPackage = preset.package;

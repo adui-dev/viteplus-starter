@@ -5,6 +5,7 @@ import { createRequire } from "node:module";
 import { validateProjectOptions } from "./options.mjs";
 import { runWorkspaceVp } from "./workspace.mjs";
 import { demoCss, vueDemo, reactDemo } from "./screen-demo.mjs";
+import { readJsonObject } from "./workspace-json.mjs";
 
 export async function planThreeSmoke(input) {
   const options = validateProjectOptions(input);
@@ -171,8 +172,7 @@ export async function preflightThreeSmoke(directory, plan) {
 export async function validateThreeTarget(directory, input, requireScreen = true) {
   const options = validateProjectOptions(input);
   const manifestPath = join(directory, "package.json");
-  if (!(await inspect(manifestPath))?.isFile()) throw new Error("缺少应用 package.json");
-  const manifest = JSON.parse(await readFile(manifestPath, "utf8")),
+  const manifest = await readJsonObject(manifestPath, "Three 应用清单"),
     deps = { ...manifest.devDependencies, ...manifest.dependencies };
   if (!deps["vite-plus"] || !deps[options.framework])
     throw new Error("Three Smoke 需要所选框架的 Vite+ 应用");

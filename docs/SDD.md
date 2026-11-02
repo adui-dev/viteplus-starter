@@ -18,6 +18,12 @@ runMultiEngine 的默认 Node 子进程边界将有效非零 status 记录为 er
 
 多引擎 applyExisting 的原有基础样式、模型保护和各引擎前置检查统一置于 createStageRunner(target) 的“补装预检”阶段，失败提供 failed/target/completed/cause 及已有人工处理说明。检查顺序和选择保持，预检成功后才进入各引擎子阶段 runner；不新增安装、配置写入或清理行为。file-protection 回归以真实 CLI 检查坏清单与后续引擎输出冲突时的目标、阶段、内容不回显，以及根/应用文件内容和 mtime 保持。
 
+## 应用预设的 JSON 清单读取
+
+workspace-json.mjs 提取 readJsonObject(path, label, maxBytes)，负责普通文件/路径检查、文件头 BOM、JSON 对象及仅带路径的安全报错。旧 readWorkspaceJson 入口作为包装保留原标签和 1 MiB 上限；应用读取不新增大小限制。大屏、UI Smoke、Three/Cesium/Babylon 的应用 package.json 改用该共享读取器，保留后续框架、入口、依赖版本及输出预检。已安装依赖的版本元数据读取不在此改动范围。
+
+application-manifest 回归覆盖四种框架/语言的 BOM 清单：UI 和三引擎预检不写入，大屏以受控格式化回调写入预设时保留原清单、入口及 Vite 配置的字节和 mtime。另覆盖损坏 JSON、非对象和目录拒绝、不回显原文及所有文件保持。这是读取/写入 API 验证，不代表真实应用创建、安装或构建通过；官方新建工作区成员的根 JSON BOM 限制保持。
+
 ## 默认 normalize.css 静态样式
 
 base-styles.mjs 独立于可选 UI/CSS 依赖计划。planBaseStyles 为四种正式 main 入口列出本地静态 CSS、许可、来源与版本，不返回 npm 依赖；Monorepo 根返回 null。单应用、逐应用、批量和多引擎复用原 CLI，dry-run/批量计划展示 baseStyles。矩阵将默认静态路径加入 462 个组合的冲突检查，实际构建计数仍为 0。

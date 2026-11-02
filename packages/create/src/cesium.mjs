@@ -6,6 +6,7 @@ import { inspectPath } from "./safe-paths.mjs";
 import { validateProjectOptions } from "./options.mjs";
 import { injectStarterPlugins } from "./vite-config.mjs";
 import { runWorkspaceVp } from "./workspace.mjs";
+import { readJsonObject } from "./workspace-json.mjs";
 export const cesiumDependencies = ["cesium@1.146.0"];
 export const cesiumDevDependencies = ["vite-plugin-static-copy@4.1.1"];
 export async function planCesium(input) {
@@ -106,8 +107,7 @@ export async function preflightCesium(directory, input, requireScreen = true) {
     if (await inspectPath(join(directory, path)))
       throw new Error("Cesium 文件已存在，拒绝覆盖：" + path);
   const manifestPath = join(directory, "package.json");
-  await inspectPath(manifestPath);
-  const manifest = JSON.parse(await readFile(manifestPath, "utf8")),
+  const manifest = await readJsonObject(manifestPath, "Cesium 应用清单"),
     deps = { ...manifest.devDependencies, ...manifest.dependencies };
   if (!deps["vite-plus"] || !deps[options.framework])
     throw new Error("Cesium 需要所选框架的 Vite+ 应用");

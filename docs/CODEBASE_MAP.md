@@ -69,7 +69,8 @@ UI/CSS 见 integrations；大屏核心见 packages/screen；三引擎见 package
 ## P4 Monorepo 多应用
 
 - `packages/create/src/workspace.mjs`：工作区预检、安全成员路径、同名包检查和根声明忽略规则增量合并。
-- `packages/create/src/workspace-json.mjs`：工作区根/成员与预期配置的共享只读 JSON 校验，BOM/1 MiB/普通文件/对象检查及安全报错；由 workspace 和 workspace-inspect 共用。
+- `packages/create/src/workspace-json.mjs`：readJsonObject 共享只读 JSON 对象/BOM/普通文件校验及安全报错；readWorkspaceJson 包装保留工作区根/成员与预期配置的 1 MiB 规则。大屏、UI Smoke 与三引擎读取应用清单时复用前者。
+- `packages/create/test/application-manifest.test.mjs`：四种框架/语言的 BOM 应用清单读取、预检只读及大屏受控写入；损坏/非对象/目录拒绝、原文不回显与文件保护。
 - `packages/create/test/workspace.test.mjs`：官方命令参数、配置隔离、目录与 junction 保护、真实 CLI dry-run/覆盖拒绝。
 - `packages/create/test/workspace-json.test.mjs`：根与成员 BOM、大小边界、检查/规划/受控恢复及重复跳过、作用域重名、坏清单的 CLI 预检与文件保护。
 - workspace.mjs 对待新建成员另查官方模板的根 JSON 编码限制；workspace-json 测试验证根 BOM 提前阻塞、共享配置不写、恢复规划 manual-review 及全部已有应用仍可跳过。
