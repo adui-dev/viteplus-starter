@@ -256,3 +256,12 @@ Chrome 两个开发首页 Count is 0→1；Vue 样式顺序为 normalize、Tailw
 - 两项实际构建均有 Three 大分块提示；官方 utils 构建有 TypeScript 7 API 实验性提示，未更改官方版本或检查规则。本轮未执行新增浏览器验收、Cesium 实际补装或全部 UI 组合的真实构建；这些范围不由结构/单元回归替代。
 - 全量回归 282/282、文档校验、根 vp check 201 格式/151 代码文件通过。8 项新增回归覆盖旧/新大屏、三引擎代表 TS/JS、显式独立页、多引擎、已有构建引用不误改、KEY/业务/原件备份保持、占用/未知文件/junction/格式失败及真实 CLI 保护。
 - 本轮验收日志与摘要保存在忽略目录 dist/verification；新本地包路径与旧包不同，旧 tgz 不会自动更新。用户现有 test-starter 未被迁移，原 Downloads 模型未修改。
+
+## 2026-11-03 0.1.0 候选包隔离验收
+
+- 本轮只修改 CLI 打包/元信息/许可/文件清单及文档，未更改预设。CLI 版本暂按推荐 0.1.0，保持 private:true；根为 0.0.0/private。未执行 npm publish、远程 stage、Release 或登录。
+- Node 22.18.0、npm 10.9.3、Vite+ 1.4.0 下本地 npm pack 产物为 dist/cli/pack-CTTmQw/adui-viteplus-starter-0.1.0.tgz，共90文件；同目录 pack-contents.json 记录完整清单和 integrityVerified:true。实际 tarball SHA-512 与 npm integrity 一致，根 MIT LICENSE 与 normalize 原许可均存在，未把侧车报告装入包。
+- 仓库外两次独立 npm install --ignore-scripts 各安装9个包，无生命周期执行。最终候选与已安装验证的归档逐字节一致；安装后包名、0.1.0/private、publishConfig、无 scripts 和根 LICENSE 原字节均核对通过。
+- 从含中文、空格、& 和单引号的调用目录运行已安装 Windows cmd shim：帮助成功；Vue TS/Element Plus/Tailwind/大屏/Three 与 React JS/Ant Design/UnoCSS/大屏/三引擎 dry-run 成功，cwd/target 指向调用目录，未创建目标。TTY 首提示 Ctrl+C 退出0，官方提示依赖正常加载，无目标生成。仅证明候选安装、资源读取、规划和取消，不将该轮预览称为新的应用构建或浏览器验收。
+- 全量回归285/285、无跳过，文档校验、根 vp check 204格式/153代码文件通过；vp install --frozen-lockfile 成功，根锁文件与依赖声明未升级。实际清单与隔离验收摘要保留在忽略目录 dist/verification；两次安装及调用目录已按自有临时路径保护清理。
+- 截至2026-11-03，npm whoami 为 ENEEDAUTH；官方 registry 的公开包查询与无认证 HTTPS 请求均为404。没有直接读取或记录凭据，@adui 作用域权限和最终首发版本仍需确认。private:true 保留，本地验收通过不等于已具备发布权限或已发布。
