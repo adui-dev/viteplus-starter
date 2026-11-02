@@ -83,10 +83,12 @@ export async function runMultiEngine(args, runner = run) {
     try {
       await runner(argv);
     } catch (cause) {
-      throw new Error(
+      const error = new Error(
         "多引擎阶段失败：" + selection.engine + "；已完成文件保留，不自动回滚。" + cause.message,
         { cause },
       );
+      if (Number.isInteger(cause?.exitCode) && cause.exitCode > 0) error.exitCode = cause.exitCode;
+      throw error;
     }
   }
   return { target, engine: plan };
@@ -98,5 +100,9 @@ function run(argv) {
     { stdio: "inherit" },
   );
   if (result.error) throw result.error;
-  if (result.status !== 0) throw new Error("退出码 " + result.status);
+  if (result.status !== 0) {
+    const error = new Error("退出码 " + (result.signal ?? result.status ?? "unknown"));
+    if (Number.isInteger(result.status) && result.status > 0) error.exitCode = result.status;
+    throw error;
+  }
 }

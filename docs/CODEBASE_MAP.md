@@ -25,6 +25,7 @@
 - packages/create/test/launcher.test.mjs：重命名/特殊字符目录、不同调用 cwd、参数与失败退出码；docs/REMOTE_CREATE.md：两种 GitHub 用法和验证边界。
 - cli.mjs 的单项目 dry-run 始终输出实际 cwd/target；launcher.test.mjs 以真实 CLI 覆盖直接入口和下载入口各自的绝对路径，含 Vue、React 与 Monorepo 根，不运行官方创建。
 - multi-engine.mjs 的 dry-run 在原计划外补齐顶层 cwd/target；launcher.test.mjs 同时覆盖独立多引擎应用与工作区成员。cli.mjs 创建成功末尾输出绝对项目目录。
+- multi-engine.mjs 的默认 runner 和阶段包装保留有效失败退出码；multi-engine.test.mjs 在真实 CLI 的子进程边界注入受控结果，覆盖 17/23、信号/启动异常、遇错停止与模拟现场保留。
 
 | 路径                                                 | 作用                                                                  |
 | ---------------------------------------------------- | --------------------------------------------------------------------- |

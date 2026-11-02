@@ -14,6 +14,8 @@ Windows Vite+ 1.4.0 的远程后处理可能识别内部子包为安装目录；
 
 --engines 走独立 runMultiEngine，dry-run 同样在顶层提供 cwd/target；cwd 使用已解析的工作区根或当前进程目录，target 复用原计算，已有 official/baseStyles/engine/modelProtection 结构保持。launcher 回归也覆盖两种入口的独立多引擎应用及工作区成员。普通创建成功后，CLI 在最后的检查/构建提示前打印绝对 target，便于用户定位项目；仅输出路径，不自动切换终端或执行命令。
 
+runMultiEngine 的默认 Node 子进程边界将有效非零 status 记录为 error.exitCode，阶段异常包装继续保留该字段和 cause，最终交给 CLI catch 设置进程退出码。仅接受正整数；无有效码的启动/信号失败仍由 CLI 返回 1，消息保留失败阶段及可用的 signal/status。循环继续采用 throw 停止，不补跑、清理或输出成功。multi-engine 回归在独立 Node 进程预加载受控 spawnSync 结果，验证真实 CLI 退出 17/23、信号/启动错误返回 1、阶段顺序和先前模拟文件保留；不调用官方生成器。
+
 ## 默认 normalize.css 静态样式
 
 base-styles.mjs 独立于可选 UI/CSS 依赖计划。planBaseStyles 为四种正式 main 入口列出本地静态 CSS、许可、来源与版本，不返回 npm 依赖；Monorepo 根返回 null。单应用、逐应用、批量和多引擎复用原 CLI，dry-run/批量计划展示 baseStyles。矩阵将默认静态路径加入 462 个组合的冲突检查，实际构建计数仍为 0。

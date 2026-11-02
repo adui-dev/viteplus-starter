@@ -1,8 +1,10 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { mkdtemp, rm, mkdir, writeFile, stat } from "node:fs/promises";
+import { mkdtemp, rm, mkdir, writeFile, readFile, readdir, stat } from "node:fs/promises";
+import { spawnSync } from "node:child_process";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve, dirname, basename } from "node:path";
 import { validateProjectOptions } from "../src/options.mjs";
 import { runMultiEngine } from "../src/multi-engine.mjs";
 import { createBatchPlan } from "../src/batch.mjs";
@@ -137,6 +139,90 @@ test("多引擎计划不写文件，只有第一阶段创建基础工程和大�
     /cesium/,
   );
   assert.equal(count, 2);
+});
+
+test("多引擎真实 CLI 保留子阶段退出码，启动或信号失败返回 1，并停止后续阶段", async (t) => {
+  const root = await mkdtemp(join(tmpdir(), "multi-exit-"));
+  assert.equal(dirname(resolve(root)), resolve(tmpdir()));
+  assert.ok(basename(root).startsWith("multi-exit-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  const cli = fileURLToPath(new URL("../bin/cli.mjs", import.meta.url));
+  const env = Object.fromEntries(
+    Object.entries(process.env).filter(([key]) => key.toUpperCase() !== "PATH"),
+  );
+  env.PATH = "";
+  for (const [index, scenario] of [
+    { at: 1, status: 17, expected: 17 },
+    { at: 2, status: 23, expected: 23 },
+    { at: 1, status: null, signal: "SIGTERM", expected: 1 },
+    { at: 1, launchError: true, expected: 1 },
+  ].entries()) {
+    const cwd = join(root, String(index));
+    await mkdir(cwd);
+    const preload = join(cwd, "preload.mjs");
+    const trace = join(cwd, "calls.json");
+    await writeFile(
+      preload,
+      `
+import childProcess from "node:child_process";
+import {syncBuiltinESMExports} from "node:module";
+import {mkdirSync, writeFileSync} from "node:fs";
+const scenario = ${JSON.stringify(scenario)};
+const calls = [];
+childProcess.spawnSync = (command, args) => {
+  if (command !== process.execPath || args[0] !== ${JSON.stringify(cli)} || !args.includes("--engine"))
+    throw new Error("unexpected child command");
+  calls.push(args[args.indexOf("--engine") + 1]);
+  writeFileSync(${JSON.stringify(trace)}, JSON.stringify(calls));
+  if (calls.length < scenario.at) {
+    mkdirSync(${JSON.stringify(join(cwd, "failure-app"))});
+    writeFileSync(${JSON.stringify(join(cwd, "failure-app/completed-stage.txt"))}, "preserve completed stage");
+    return {status: 0};
+  }
+  if (scenario.launchError) return {error: new Error("controlled launch failure")};
+  return {status: scenario.status, signal: scenario.signal ?? null};
+};
+syncBuiltinESMExports();
+`,
+    );
+    const result = spawnSync(
+      process.execPath,
+      [
+        "--import",
+        pathToFileURL(preload).href,
+        cli,
+        "--name",
+        "failure-app",
+        "--type",
+        "application",
+        "--framework",
+        "vue",
+        "--screen",
+        "--engines",
+        "three,cesium,babylon",
+        "--model-protection",
+        "none",
+      ],
+      { cwd, env, encoding: "utf8", timeout: 10000 },
+    );
+    assert.equal(result.status, scenario.expected, result.stderr);
+    assert.equal(result.stdout, "");
+    assert.match(result.stderr, /多引擎阶段失败/);
+    assert.match(result.stderr, scenario.at === 2 ? /cesium/ : /three/);
+    assert.deepEqual(
+      JSON.parse(await readFile(trace, "utf8")),
+      ["three", "cesium"].slice(0, scenario.at),
+    );
+    if (scenario.at === 2) {
+      assert.equal(
+        await readFile(join(cwd, "failure-app/completed-stage.txt"), "utf8"),
+        "preserve completed stage",
+      );
+      assert.deepEqual((await readdir(cwd)).sort(), ["calls.json", "failure-app", "preload.mjs"]);
+    } else {
+      assert.deepEqual((await readdir(cwd)).sort(), ["calls.json", "preload.mjs"]);
+    }
+  }
 });
 test("批量多引擎计划隔离应用，保留旧 engine 参数", async (t) => {
   const root = await mkdtemp(join(tmpdir(), "multi-plan-"));

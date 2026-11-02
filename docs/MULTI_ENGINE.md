@@ -12,6 +12,8 @@ node ./viteplus-starter/packages/create/bin/cli.mjs --name multi-app --type appl
 
 批量 JSON 示例应用：{"name":"viewer","framework":"react","screen":true,"engines":["three","babylon"],"modelProtection":"none"}。根仍委托官方 vite:monorepo，成员委托 vite:application。dry-run 列出合并依赖、文件、各验收地址及模型保护生成标记，不生成 KEY。每阶段失败停止，保留已生成内容，不回滚、覆盖续跑或跳过冲突。
 
+子阶段返回有效非零正整数退出码时，多引擎 CLI 会保留该码；例如阶段退出 23，PowerShell 的 $LASTEXITCODE 也是 23。启动失败或信号终止等没有有效退出码的情况返回 1。先核对报错阶段与保留现场，修复原因后再按已有工程的补装规则处理；不自动重试或认为后续阶段已完成。
+
 --engines 的 dry-run 还在顶层显示实际执行目录 cwd 与绝对目标 target，保留原 official 对象。在下载工具中启动时，独立应用以工具父目录为 cwd；配合 --workspace 时改为已解析的工作区根，target 为其 apps/<name>，可据此核对位置。创建完成的普通 CLI 提示也会显示绝对项目目录。
 
 执行 node scripts/verify-multi-build.mjs <应用路径> 联合构建官方首页及已有引擎/模型验收页；临时配置结束删除，产物在 dist/multi-verify，不与同一工作区的 check/ready 并行。联合构建不等同全部引擎同页运行，浏览器组合渲染仍需独立验收。具体执行结果见 [状态](PROJECT_CONTEXT.md)。
