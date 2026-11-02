@@ -1,5 +1,7 @@
 # 按应用多引擎生成
 
+> 2026-11-02 默认输出已调整：新建应用将插件归档并接入正式 main/App，独立页须加 --smoke-pages；本文原路径描述适用于历史布局或底层维护入口。新目录、KEY 脚本及已有项目边界以 [项目结构](PROJECT_LAYOUT.md) 为准。
+
 完整批量样例见 [multi-engine.batch.json](../examples/multi-engine.batch.json)。
 
 CLI 新增 --engines three,cesium,babylon；JSON 应用新增 engines 字符串数组，与旧 engine 互斥。只允许三个已支持引擎的非空、不重复子集，不允许 none。旧 --engine/JSON engine 和交互单选保持兼容，交互多选已接入。

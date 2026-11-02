@@ -89,7 +89,8 @@ test("隔离 CLI 包从调用目录预览 Vue/React 全部引擎与 JSON 批量�
     assert.equal(plan.target, join(cwd, "new-app"));
     assert.equal(plan.official.args[1], "vite:application");
     assert.equal(plan.official.args.at(-1), framework + (language === "ts" ? "-ts" : ""));
-    assert.equal(plan.engine.previews.length, 3);
+    assert.equal(plan.engine.entry, "/");
+    assert.equal(plan.engine.previews, undefined);
     assert.equal(plan.modelProtection.mode, "embedded");
   }
   const config = join(root, "批量 配置.json");

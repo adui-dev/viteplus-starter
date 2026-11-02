@@ -41,7 +41,7 @@ test("批量计划包含 Three 的文件依赖，UI 阶段不重复传引擎与�
   };
   const plan = await createBatchPlan(input, root);
   assert.ok(plan.steps[1].args.includes("--engine"));
-  assert.ok(plan.steps[1].engine.files.includes("src/adui-three/lazy.mjs"));
+  assert.ok(plan.steps[1].engine.files.includes("src/plugins/three/lazy.mjs"));
   assert.equal(plan.steps[2].args.includes("--engine"), false);
   assert.equal(plan.steps[2].args.includes("--screen"), false);
   assert.equal(plan.steps[3].engine, undefined);

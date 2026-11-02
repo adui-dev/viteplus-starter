@@ -9,6 +9,7 @@ import { planScreenPreset } from "./screen.mjs";
 import { planEngine } from "./engine.mjs";
 import { planModelProtection } from "./model-protection.mjs";
 import { readWorkspaceJson as json } from "./workspace-json.mjs";
+import { planApplicationOutput } from "./application-output.mjs";
 
 async function configs(directory) {
   const found = [];
@@ -123,13 +124,23 @@ export async function inspectWorkspace(directory, configFile, configuration) {
         : app.language === "ts"
           ? "tsx"
           : "jsx";
+    const pluginIndex = join(target, "src/plugins/index." + (app.language === "ts" ? "ts" : "js"));
+    const pluginInfo = await inspectPath(pluginIndex, "工作区检查");
+    const grouped =
+      pluginInfo?.isFile() &&
+      pluginInfo.size < 65536 &&
+      (await readFile(pluginIndex, "utf8")).includes("// ADui application plugins");
     const files = new Set([
       "src/main." + ext,
       "index.html",
       ...(app.uiSmoke ? Object.keys(planUiSmoke(options).files) : []),
-      ...(app.screen ? Object.keys((await planScreenPreset(options)).files) : []),
-      ...(engine?.files ?? []),
-      ...(protection?.files ?? []),
+      ...(grouped
+        ? (await planApplicationOutput(options)).files
+        : [
+            ...(app.screen ? Object.keys((await planScreenPreset(options)).files) : []),
+            ...(engine?.files ?? []),
+            ...(protection?.files ?? []),
+          ]),
     ]);
     for (const file of files)
       if (!(await inspectPath(join(target, file), "工作区检查"))?.isFile())

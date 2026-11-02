@@ -69,3 +69,7 @@ npm exec --yes --package $bundle.tarball -- viteplus-starter
 - 从同一本地 tgz 经 vp dlx 新建临时官方 Vue TS 应用，安装 Element Plus 2.14.7、Tailwind 4.3.3 并生成 AdScreen；该应用由官方选择 pnpm 11.22.0。安装期间一次 lodash registry 超时后由包管理器重试完成，未更改 registry 或依赖策略；官方前置的非 Vite+ 目录提示保留，不视为生成器失败。
 - 应用首次 check 为 29 格式/14 代码文件通过，完整 build 的 vue-tsc -b 与首页构建 2/2 成功。再由 tgz 的同一入口生成 UI Smoke，使用 /ui-check/ 首页+UI 双入口构建通过；最终 check 为 32 格式/17 代码文件、无 lint/类型警告错误。normalize.css 保持正式入口首条导入。未执行浏览器渲染或独立大屏生产入口构建，不扩大为所有预设已实测。
 - 临时安装目录、两份 npm 验证缓存、实际应用及产物全部清理，CLI tgz 作为交付产物保留在仓库忽略目录；包管理器自己的全局 dlx 缓存保持默认行为。用户下载的 test-starter 和其他工程未改动。生成器回归与提交状态见 [项目状态](PROJECT_CONTEXT.md)。
+
+## 新建输出调整（2026-11-02）
+
+当前源码生成的 CLI 包将所选插件接入正式首页，默认归档 src/plugins、build/plugins，并清理本次新建的验收暂存页和中间备份。加 --smoke-pages 可额外保留独立页。此前构建的 tgz 不会随 git pull 自动更新，需重新运行 cli:pack 并使用新路径；目录与已有项目边界见 [项目结构](PROJECT_LAYOUT.md)。

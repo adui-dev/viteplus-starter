@@ -1,5 +1,7 @@
 # Babylon 应用生成预设
 
+> 2026-11-02 默认输出已调整：新建应用将插件归档并接入正式 main/App，独立页须加 --smoke-pages；本文原路径描述适用于历史布局或底层维护入口。新目录、KEY 脚本及已有项目边界以 [项目结构](PROJECT_LAYOUT.md) 为准。
+
 --engine babylon 在官方 Vite+ Vue/React、TS/JS 模板上增加 @babylonjs/core 与 @babylonjs/loaders 9.32.1、框架生命周期组件及 /babylon-smoke.html 独立验收页。正式 App、main、首页保留。支持本地 GLB、授权回调解密 .adui、env 自动加密打包及 [多引擎组合](MULTI_ENGINE.md)。默认启用 embedded 模型保护，Vite 配置备份后增量加入模型插件；--model-protection none 时不修改 Vite 配置。
 
 ## 创建与补装

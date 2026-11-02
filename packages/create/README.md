@@ -1,5 +1,7 @@
 # ADui Vite+ Starter CLI
 
+新建应用默认将所选 UI、大屏和引擎接入正式 main/App，运行时插件位于 src/plugins，Node 构建插件位于 build/plugins。默认不保留独立 smoke 页面与创建中间备份；新建时添加 --smoke-pages 可保留独立验收页，批量 JSON 对应应用的 smokePages: true。已有工程不会自动迁移或替换首页。
+
 本地验收包提供 `viteplus-starter` 命令。无参数运行可选择项目名称、Application/Monorepo、Vue/React、TS/JS、UI、CSS、大屏、3D 引擎和模型保护；完整基础参数调用按参数模式执行，其他选项采用默认值。
 
 与 Vite+ 使用相同的官方提示组件：方向键选择、回车确认，3D 引擎用空格勾选后回车，不选则不启用；项目名称直接输入。确认页选择 No 或任意步骤按 Ctrl+C 可取消。首次启动由包管理器安装包清单声明的提示组件依赖。

@@ -2,6 +2,10 @@ import { lstat, readFile, writeFile, mkdir } from "node:fs/promises";
 import { resolve, dirname, join } from "node:path";
 import { injectStarterPlugins } from "../../create/src/vite-config.mjs";
 import { modelSmoke } from "./smoke.mjs";
+import {
+  installedPresetPath,
+  rewriteInstalledPluginPaths,
+} from "../../create/src/plugin-paths.mjs";
 export async function setupModelPlugin(project, keyMode = "embedded", engine = "three") {
   if (!["three", "babylon", "cesium"].includes(engine)) throw new Error("不支持的模型引擎");
   if (!["external", "embedded"].includes(keyMode))
@@ -43,9 +47,12 @@ export async function setupModelPlugin(project, keyMode = "embedded", engine = "
     ? "ts"
     : "js";
   if (
-    !(await readFile(join(root, "src/adui-" + engine + "/lazy.mjs"), "utf8")).includes(
-      "loadBundledModel",
-    )
+    !(
+      await readFile(
+        join(root, await installedPresetPath(root, "src/adui-" + engine + "/lazy.mjs")),
+        "utf8",
+      )
+    ).includes("loadBundledModel")
   )
     throw new Error("需要当前版本 --engine " + engine + " 生成的应用，旧快照不自动覆盖升级");
   const configs = [];
@@ -121,7 +128,7 @@ export async function setupModelPlugin(project, keyMode = "embedded", engine = "
     const target = join(root, path);
     await mkdir(dirname(target), { recursive: true });
     await inspect(target);
-    await writeFile(target, source, { flag: "wx" });
+    await writeFile(target, await rewriteInstalledPluginPaths(root, source), { flag: "wx" });
   }
   await inspect(configPath);
   if ((await readFile(configPath, "utf8")) !== original)

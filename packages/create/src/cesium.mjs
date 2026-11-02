@@ -1,3 +1,8 @@
+import {
+  installedPresetPath,
+  rejectGroupedPreset,
+  rewriteInstalledPluginPaths,
+} from "./plugin-paths.mjs";
 import { engineScreenSmoke, engineScreenStyles } from "./engine-screen-smoke.mjs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join, relative } from "node:path";
@@ -95,6 +100,7 @@ export default function GlobeView(){const host=useRef${ts ? "<HTMLDivElement|nul
   return { files, previewPath: "/cesium-smoke.html" };
 }
 export async function preflightCesium(directory, input, requireScreen = true) {
+  await rejectGroupedPreset(directory, Object.keys((await planCesium(input)).files));
   const options = validateProjectOptions(input),
     plan = await planCesium(options);
   for (const path of ["src/adui-cesium", "src/cesium-smoke", "adui-cesium-build"]) {
@@ -153,7 +159,13 @@ export async function preflightCesium(directory, input, requireScreen = true) {
       options.framework + ".mjs",
       "config." + ((options.language ?? "ts") === "ts" ? "ts" : "js"),
     ])
-      if (!(await inspectPath(join(directory, "src/adui-screen", name)))?.isFile())
+      if (
+        !(
+          await inspectPath(
+            join(directory, await installedPresetPath(directory, "src/adui-screen/" + name)),
+          )
+        )?.isFile()
+      )
         throw new Error("请先安装所选框架/语言的大屏预设");
   const configs = [];
   for (const name of ["vite.config.ts", "vite.config.mts", "vite.config.js", "vite.config.mjs"])
@@ -184,7 +196,7 @@ export async function addCesium(directory, input, runner = runWorkspaceVp) {
     const target = join(directory, path);
     await mkdir(dirname(target), { recursive: true });
     await inspectPath(target);
-    await writeFile(target, source, { flag: "wx" });
+    await writeFile(target, await rewriteInstalledPluginPaths(directory, source), { flag: "wx" });
   }
   await inspectPath(current.backup);
   await writeFile(current.backup, current.source, { flag: "wx" });

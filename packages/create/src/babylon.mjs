@@ -1,3 +1,8 @@
+import {
+  installedPresetPath,
+  rejectGroupedPreset,
+  rewriteInstalledPluginPaths,
+} from "./plugin-paths.mjs";
 import { engineScreenSmoke, engineScreenStyles } from "./engine-screen-smoke.mjs";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { join, dirname } from "node:path";
@@ -90,6 +95,7 @@ export default function BabylonView(){const host=useRef${ts ? "<HTMLDivElement|n
   return { files, previewPath: "/babylon-smoke.html" };
 }
 export async function preflightBabylon(directory, input, requireScreen = true) {
+  await rejectGroupedPreset(directory, Object.keys((await planBabylon(input)).files));
   const options = validateProjectOptions(input),
     plan = await planBabylon(options);
   for (const path of ["src/adui-babylon", "src/babylon-smoke"]) {
@@ -137,7 +143,7 @@ export async function preflightBabylon(directory, input, requireScreen = true) {
       : []),
   ];
   for (const path of paths)
-    if (!(await inspectPath(join(directory, path)))?.isFile())
+    if (!(await inspectPath(join(directory, await installedPresetPath(directory, path))))?.isFile())
       throw new Error("缺少所选框架/语言的入口或大屏预设：" + path);
   return { plan, dependencies: deps };
 }
@@ -152,7 +158,7 @@ export async function addBabylon(directory, input, runner = runWorkspaceVp) {
     const target = join(directory, path);
     await mkdir(dirname(target), { recursive: true });
     await inspectPath(target);
-    await writeFile(target, source, { flag: "wx" });
+    await writeFile(target, await rewriteInstalledPluginPaths(directory, source), { flag: "wx" });
   }
   await runner(directory, [
     "fmt",

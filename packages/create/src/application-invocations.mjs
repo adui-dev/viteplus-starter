@@ -21,6 +21,7 @@ export function applicationInvocations(app, workspaceRoot) {
     app.css,
   ];
   const uiArgs = [...args];
+  if (app.smokePages) args.push("--smoke-pages");
   if (app.engine) args.push("--engine", app.engine);
   if (app.engines) args.push("--engines", app.engines.join(","));
   if (app.modelProtection !== undefined) args.push("--model-protection", app.modelProtection);

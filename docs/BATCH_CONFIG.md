@@ -124,3 +124,7 @@ Chrome 中 Vue TS 与 React JS 两页面均通过按钮点击 0→1、CSS 颜色
 使用 --plan-recovery <已有根> --config <原批量 JSON>，不复用 --config 的新建根流程。缺失应用、已存在应用和部分完成应用分别规划为 create-missing、validate-existing、manual-review；详见 [Monorepo 操作计划](MONOREPO.md)。该命令不会执行计划，保留原有批量新建根拒绝覆盖行为。
 
 --execute-recovery <已有根> --config <原 JSON> 是单独的显式写入入口，仅创建预检认定缺失的应用；manual-review 会阻止整次执行。它不是重跑原 batch，也不处理部分完成的已有应用。具体顺序、根共享文件变化及失败保留语义见 [Monorepo 执行说明](MONOREPO.md)。
+
+## 2026-11-02 新建默认输出
+
+应用默认从正式首页使用所选预设，插件集中到 src/plugins / build/plugins；默认不保留独立预设验收页及创建中间备份。应用字段 smokePages: true 可保留大屏/引擎/模型独立页，uiSmoke 仍是另行添加 UI 验收页；恢复新建沿用同一选项。详情见 [项目结构](PROJECT_LAYOUT.md)。

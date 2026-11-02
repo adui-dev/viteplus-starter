@@ -130,9 +130,12 @@ test("多引擎规范排序、兼容单选并拒绝歧义与非法列表", () =>
 test("多引擎计划不写文件，只有第一阶段创建基础工程和大屏，失败停止", async () => {
   const preview = await runMultiEngine({ ...base, dryRun: true });
   assert.equal(preview.official.args[1], "vite:application");
-  assert.equal(preview.engine.previews.length, 3);
+  assert.equal(preview.engine.entry, "/");
+  assert.equal(preview.engine.previews, undefined);
   const calls = [];
-  await runMultiEngine(base, async (argv) => calls.push(argv));
+  const completed = await runMultiEngine(base, async (argv) => calls.push(argv));
+  assert.ok(completed.engine.files.includes("src/plugins/three/lazy.mjs"));
+  assert.equal(completed.engine.previews, undefined);
   assert.ok(calls[0].includes("--screen"));
   assert.ok(!calls[0].includes("--apply-existing"));
   assert.ok(calls[1].includes("--apply-existing"));
@@ -184,6 +187,8 @@ childProcess.spawnSync = (command, args) => {
   if (calls.length < scenario.at) {
     mkdirSync(${JSON.stringify(join(cwd, "failure-app"))});
     writeFileSync(${JSON.stringify(join(cwd, "failure-app/completed-stage.txt"))}, "preserve completed stage");
+    mkdirSync(${JSON.stringify(join(cwd, "failure-app/src"))});
+    writeFileSync(${JSON.stringify(join(cwd, "failure-app/src/App.vue"))}, "preserve official App fixture");
     return {status: 0};
   }
   if (scenario.launchError) return {error: new Error("controlled launch failure")};

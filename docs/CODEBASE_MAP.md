@@ -232,3 +232,12 @@ engine-prompts.test.mjs：多选解析、摘要/取消、Three 保护提示；ve
 - packages/create/src/integrations.mjs：应用文件与根构建策略在各自目录单独定向格式化，避免向 Vite+ fmt 传递 ..。
 - packages/create/test/build-policy.test.mjs：Monorepo 根策略格式化工作目录及无父目录路径回归，保留原 App。
 - docs/V1_ACCEPTANCE.md：主工作区失败后显式继续、全新回归、构建/浏览器与保护证据。
+
+## 新建项目输出与首页（2026-11-02）
+
+- packages/create/src/plugin-paths.mjs：最终路径映射、计划过滤、历史/新布局识别及重复安装保护。
+- packages/create/src/application-home.mjs：按框架/语言/UI/大屏/引擎生成插件入口、首页及按需场景组件。
+- packages/create/src/application-output.mjs：官方 App 快照、最终文件计划、完整预检、归档、定向格式化及已知暂存文件清理。
+- cli.mjs / multi-engine.mjs：新建流程最后阶段接入，后者延后子阶段整理；batch 与 applicationInvocations 传递 smokePages。workspace-inspect 根据生成器标记识别新布局。
+- application-output.test.mjs：四种框架语言/三个引擎的路径与正式接入、可选独立页、多引擎、KEY 保持、占用/未知文件/junction/首页变更保护及格式失败保留。
+- docs/PROJECT_LAYOUT.md：默认目录、正式入口、独立页选项及已有工程边界。

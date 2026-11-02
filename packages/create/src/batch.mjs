@@ -12,6 +12,8 @@ import { planEngine } from "./engine.mjs";
 import { planModelProtection } from "./model-protection.mjs";
 import { resolveWorkspaceApplication, runWorkspaceVp } from "./workspace.mjs";
 import { inspectPath } from "./safe-paths.mjs";
+import { planApplicationOutput } from "./application-output.mjs";
+import { applicationPresetPlan, applicationFiles } from "./plugin-paths.mjs";
 
 const maxConfigBytes = 1024 * 1024;
 
@@ -44,6 +46,7 @@ export function validateBatchConfig(input) {
         "ui",
         "css",
         "uiSmoke",
+        "smokePages",
         "screen",
         "engine",
         "engines",
@@ -151,11 +154,14 @@ export async function createBatchPlan(input, cwd = process.cwd()) {
       official: { ...buildVpCommand(options), cwd: workspaceRoot },
       integrations: planIntegrations(options),
       baseStyles: planBaseStyles(options),
-      ...(planModelProtection(options) ? { modelProtection: planModelProtection(options) } : {}),
+      output: await planApplicationOutput(options),
+      ...(planModelProtection(options)
+        ? { modelProtection: applicationPresetPlan(planModelProtection(options), options) }
+        : {}),
       ...(app.engine || app.engines
         ? {
             engine: {
-              ...(await planEngine(options)),
+              ...applicationPresetPlan(await planEngine(options), options),
             },
           }
         : {}),
@@ -163,8 +169,12 @@ export async function createBatchPlan(input, cwd = process.cwd()) {
         ? {
             screen: {
               options: app.screen,
-              files: Object.keys((await planScreenPreset(options)).files),
-              previewPath: "/screen-smoke.html",
+              files: applicationFiles(
+                Object.keys((await planScreenPreset(options)).files),
+                options.smokePages,
+              ),
+              entry: "/",
+              ...(options.smokePages ? { previewPath: "/screen-smoke.html" } : {}),
             },
           }
         : {}),

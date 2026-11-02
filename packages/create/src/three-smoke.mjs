@@ -1,3 +1,8 @@
+import {
+  installedPresetPath,
+  rejectGroupedPreset,
+  rewriteInstalledPluginPaths,
+} from "./plugin-paths.mjs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { inspectPath } from "./safe-paths.mjs";
 import { dirname, join } from "node:path";
@@ -161,6 +166,7 @@ async function inspect(path) {
   return inspectPath(path, "Three 目标");
 }
 export async function preflightThreeSmoke(directory, plan) {
+  await rejectGroupedPreset(directory, Object.keys(plan.files));
   for (const path of ["", "src", "src/adui-screen", "src/adui-three", "src/three-smoke"]) {
     const stat = await inspect(join(directory, path));
     if (stat && !stat.isDirectory()) throw new Error("Three 目标目录被占用：" + path);
@@ -191,7 +197,7 @@ export async function validateThreeTarget(directory, input, requireScreen = true
         ]
       : []),
   ])
-    if (!(await inspect(join(directory, path)))?.isFile())
+    if (!(await inspect(join(directory, await installedPresetPath(directory, path))))?.isFile())
       throw new Error("请先按所选框架/语言运行 --screen；缺少 " + path);
   for (const [name, version] of [
     ["three", "0.186.1"],
@@ -223,7 +229,7 @@ export async function addThreeSmoke(directory, input, runner = runWorkspaceVp) {
     const target = join(directory, path);
     await mkdir(dirname(target), { recursive: true });
     await inspect(target);
-    await writeFile(target, source, { flag: "wx" });
+    await writeFile(target, await rewriteInstalledPluginPaths(directory, source), { flag: "wx" });
   }
   runner(directory, [
     "fmt",

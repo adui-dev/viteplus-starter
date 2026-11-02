@@ -6,6 +6,7 @@ import { modelSmoke } from "../../model-security/src/smoke.mjs";
 import { setupModelPlugin } from "../../model-security/src/setup.mjs";
 import { generateProjectKey } from "../../model-security/src/project-key.mjs";
 import { runWorkspaceVp } from "./workspace.mjs";
+import { rejectGroupedPreset } from "./plugin-paths.mjs";
 export function planModelProtection(input) {
   const options = validateProjectOptions(input);
   if (!options.modelProtection || options.modelProtection === "none") return null;
@@ -59,6 +60,7 @@ export async function preflightModelProtection(directory, input) {
   directory = resolve(directory);
   const plan = planModelProtection(input);
   if (!plan) return;
+  await rejectGroupedPreset(directory, plan.files);
   for (const path of ["", "adui-model-build", "src/model-smoke", "src/models"]) {
     const stat = await inspect(join(directory, path));
     if (stat && !stat.isDirectory()) throw new Error("模型保护目录被占用：" + path);

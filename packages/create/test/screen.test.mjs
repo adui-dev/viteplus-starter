@@ -142,6 +142,7 @@ test("批量 screen 与 uiSmoke 同时选择时，UI 验收阶段不混用 scree
   assert.equal(checked.apps[0].screen.designWidth, 1280);
   const plan = await createBatchPlan(input, root);
   assert.ok(plan.steps[1].args.includes("--screen"));
-  assert.ok(plan.steps[1].screen.files.includes("screen-smoke.html"));
+  assert.ok(plan.steps[1].screen.files.includes("src/plugins/screen/vue.mjs"));
+  assert.ok(!plan.steps[1].screen.files.includes("screen-smoke.html"));
   assert.equal(plan.steps[2].args.includes("--screen"), false);
 });

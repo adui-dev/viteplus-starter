@@ -12,6 +12,12 @@ import { planThreeSmoke, preflightThreeSmoke, validateThreeTarget } from "./thre
 import { preflightModelProtection, planModelProtection } from "./model-protection.mjs";
 import { createStageRunner } from "./recovery.mjs";
 import { preflightVpManifestEncoding } from "./vp-compatibility.mjs";
+import { applicationPresetPlan } from "./plugin-paths.mjs";
+import {
+  captureApplication,
+  finalizeApplication,
+  planApplicationOutput,
+} from "./application-output.mjs";
 export async function runMultiEngine(args, runner = run) {
   const options = validateProjectOptions(args);
   for (const key of ["uiSmoke", "threeSmoke", "repairExisting", "config"])
@@ -54,9 +60,11 @@ export async function runMultiEngine(args, runner = run) {
       target,
       official: buildVpCommand(options),
       baseStyles: planBaseStyles(options),
-      engine: plan,
-      modelProtection: planModelProtection(options),
+      engine: applicationPresetPlan(plan, options),
+      modelProtection: applicationPresetPlan(planModelProtection(options), options),
+      output: await planApplicationOutput(options),
     };
+  let homeSnapshot;
   for (const [index, selection] of selections.entries()) {
     const argv = [
       "--name",
@@ -73,6 +81,7 @@ export async function runMultiEngine(args, runner = run) {
       selection.modelProtection ?? "none",
     ];
     if (options.workspace) argv.push("--workspace", options.workspace);
+    if (options.smokePages) argv.push("--smoke-pages");
     if (index === 0) {
       argv.push("--ui", options.ui ?? "none", "--css", options.css ?? "none");
       if (options.screen)
@@ -89,6 +98,8 @@ export async function runMultiEngine(args, runner = run) {
     if (index > 0 || args.applyExisting) argv.push("--apply-existing");
     try {
       await runner(argv);
+      if (runner === run && !args.applyExisting && index === 0)
+        homeSnapshot = await captureApplication(target, options);
     } catch (cause) {
       const error = new Error(
         "多引擎阶段失败：" + selection.engine + "；已完成文件保留，不自动回滚。" + cause.message,
@@ -98,13 +109,17 @@ export async function runMultiEngine(args, runner = run) {
       throw error;
     }
   }
-  return { target, engine: plan };
+  if (homeSnapshot) {
+    const stage = createStageRunner(target);
+    await stage("插件目录与首页接入", () => finalizeApplication(target, options, homeSnapshot));
+  }
+  return { target, engine: args.applyExisting ? plan : applicationPresetPlan(plan, options) };
 }
 function run(argv) {
   const result = spawnSync(
     process.execPath,
     [fileURLToPath(new URL("../bin/cli.mjs", import.meta.url)), ...argv],
-    { stdio: "inherit" },
+    { stdio: "inherit", env: { ...process.env, ADUI_DEFER_APPLICATION_OUTPUT: "1" } },
   );
   if (result.error) throw result.error;
   if (result.status !== 0) {

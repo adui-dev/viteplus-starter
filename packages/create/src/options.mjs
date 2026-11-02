@@ -29,6 +29,10 @@ export function validateProjectOptions(options) {
   }
 
   const { name, type, framework } = options;
+  if (options.smokePages !== undefined && typeof options.smokePages !== "boolean")
+    throw new Error("smokePages 必须是布尔值");
+  if (type === "monorepo" && options.smokePages)
+    throw new Error("Monorepo 根不生成验收页，请在应用中选择");
   if (options.engines !== undefined) {
     if (options.engine !== undefined) throw new Error("engine 与 engines 不能混用");
     const list = options.engines;
@@ -118,6 +122,7 @@ export function validateProjectOptions(options) {
   return {
     name,
     type,
+    ...(options.smokePages ? { smokePages: true } : {}),
     ...(workspace === undefined ? {} : { workspace }),
     ...(framework === undefined ? {} : { framework }),
     ...(options.language === undefined ? {} : { language }),

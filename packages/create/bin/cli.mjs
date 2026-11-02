@@ -4,6 +4,12 @@ import { addBaseStyles, planBaseStyles, preflightBaseStyles } from "../src/base-
 import { planWorkspaceRecovery } from "../src/workspace-recovery.mjs";
 import { inspectWorkspace } from "../src/workspace-inspect.mjs";
 import { createStageRunner } from "../src/recovery.mjs";
+import { applicationPresetPlan, applicationFiles } from "../src/plugin-paths.mjs";
+import {
+  captureApplication,
+  finalizeApplication,
+  planApplicationOutput,
+} from "../src/application-output.mjs";
 import { preflightVpManifestEncoding } from "../src/vp-compatibility.mjs";
 import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
@@ -46,6 +52,8 @@ import {
 } from "../src/workspace.mjs";
 
 const usage = `ADui Vite+ Starter（Application / Monorepo）
+
+新建应用默认从首页使用所选插件；--smoke-pages 可额外保留独立验收页。
 
 用法：
   viteplus-starter
@@ -292,14 +300,17 @@ async function main() {
           cwd: commandCwd,
           target,
           integrations,
+          ...(options.type === "application"
+            ? { output: await planApplicationOutput(options) }
+            : {}),
           ...(planBaseStyles(options) ? { baseStyles: planBaseStyles(options) } : {}),
           ...(planModelProtection(options)
-            ? { modelProtection: planModelProtection(options) }
+            ? { modelProtection: applicationPresetPlan(planModelProtection(options), options) }
             : {}),
           ...(options.engine
             ? {
                 engine: {
-                  ...(await planEngine(options)),
+                  ...applicationPresetPlan(await planEngine(options), options),
                 },
               }
             : {}),
@@ -307,8 +318,12 @@ async function main() {
             ? {
                 screen: {
                   options: options.screen,
-                  files: Object.keys((await planScreenPreset(options)).files),
-                  previewPath: "/screen-smoke.html",
+                  files: applicationFiles(
+                    Object.keys((await planScreenPreset(options)).files),
+                    options.smokePages,
+                  ),
+                  entry: "/",
+                  ...(options.smokePages ? { previewPath: "/screen-smoke.html" } : {}),
                 },
               }
             : {}),
@@ -354,6 +369,13 @@ async function main() {
     );
   if (result.status === 0 && options.type === "application")
     await stage("基础样式预检", () => preflightBaseStyles(target, options));
+  const homeSnapshot =
+    result.status === 0 &&
+    options.type === "application" &&
+    !process.env.ADUI_DEFER_APPLICATION_OUTPUT &&
+    (options.screen || options.engine || (options.ui && options.ui !== "none"))
+      ? await stage("首页接入预检", () => captureApplication(target, options))
+      : null;
   if (
     result.status === 0 &&
     (integrations.dependencies.length || integrations.devDependencies.length)
@@ -367,7 +389,7 @@ async function main() {
   if (result.status === 0) await finishWorkspaceIntegration();
   if (result.status === 0 && options.screen) {
     await stage("大屏集成", () => addScreenPreset(target, options));
-    console.log("AdScreen 大屏预设已生成：/screen-smoke.html");
+    console.log("AdScreen 大屏预设已生成，创建完成后接入首页");
   }
   if (result.status === 0 && options.engine) {
     if (options.engine === "three") await stage("Three 集成", () => addThreeSmoke(target, options));
@@ -375,14 +397,16 @@ async function main() {
     if (options.engine === "babylon")
       await stage("Babylon 集成", () => addBabylon(target, options));
     await finishWorkspaceIntegration();
-    console.log("引擎按需场景已生成：" + (await planEngine(options)).previewPath);
+    console.log("引擎按需场景已生成，创建完成后从首页使用");
   }
   if (result.status === 0 && planModelProtection(options)) {
     await stage("模型保护集成", () => addModelProtection(target, options));
-    console.log(
-      "模型保护已配置：/model-smoke.html；KEY 已写入被忽略的 .env.local，IV 按模型自动随机生成。",
-    );
+    console.log("模型保护已配置；KEY 已写入被忽略的 .env.local，IV 按模型自动随机生成。");
     console.log("运行 vp run models:keygen 或 vp run models:keyrotate 管理 KEY；轮换后重新构建。");
+  }
+  if (homeSnapshot) {
+    await stage("插件目录与首页接入", () => finalizeApplication(target, options, homeSnapshot));
+    console.log("运行时插件：src/plugins；构建插件：build/plugins；所选功能已接入首页。");
   }
   if (result.signal) {
     process.exitCode = 1;

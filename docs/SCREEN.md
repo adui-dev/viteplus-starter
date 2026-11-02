@@ -1,5 +1,7 @@
 # 大屏适配插件（P5 首期）
 
+> 2026-11-02 默认输出已调整：新建应用将插件归档并接入正式 main/App，独立页须加 --smoke-pages；本文原路径描述适用于历史布局或底层维护入口。新目录、KEY 脚本及已有项目边界以 [项目结构](PROJECT_LAYOUT.md) 为准。
+
 参考 `D:\Workspace\bn\smart-geology-web\src\components\AdScreen.vue` 的原生引擎层、设计稿 HUD 和两种浮层设计重新实现。原业务工程仅作为参考，没有修改。共享实现位于 `packages/screen`，提供 Vue 插件/组件、React 组件、框架无关布局与 DOM 控制器，以及 TS 声明。包当前 private，仅在仓库与生成项目内使用，尚未发布 npm。
 
 ## 生成与补装

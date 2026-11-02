@@ -1,5 +1,6 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { inspectPath } from "./safe-paths.mjs";
+import { rejectGroupedPreset } from "./plugin-paths.mjs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { validateProjectOptions } from "./options.mjs";
@@ -58,6 +59,7 @@ async function inspect(path) {
   return inspectPath(path, "大屏目标");
 }
 export async function preflightScreenPreset(directory, plan) {
+  await rejectGroupedPreset(directory, Object.keys(plan.files));
   for (const relative of ["src", "src/adui-screen", "src/screen-smoke"]) {
     const entry = await inspect(join(directory, relative));
     if (entry && !entry.isDirectory()) throw new Error("大屏目录被非目录文件占用：" + relative);

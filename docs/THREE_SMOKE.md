@@ -1,5 +1,7 @@
 # Three.js 真实场景验收（首期）
 
+> 2026-11-02 默认输出已调整：新建应用将插件归档并接入正式 main/App，独立页须加 --smoke-pages；本文原路径描述适用于历史布局或底层维护入口。新目录、KEY 脚本及已有项目边界以 [项目结构](PROJECT_LAYOUT.md) 为准。
+
 向已有官方 Vue/React TS/JS 应用新增 Three.js 最小旋转立方体，使用 AdScreen 的原生引擎层，保留正式首页、main 和 Vite 配置。先按 [SCREEN](SCREEN.md) 生成大屏预设，再单独运行：
 
 ```powershell

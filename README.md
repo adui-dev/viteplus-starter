@@ -4,7 +4,9 @@
 
 当前交付验收平台为 **Windows**，处于本地候选阶段，尚未发布。常用命令按执行目录整理在 [Windows V1 操作指南](docs/WINDOWS_GUIDE.md)，实际证据与限制见 [V1 清单](docs/V1_ACCEPTANCE.md)。
 
-Vue/React 的 TS/JS 应用默认包含本地 normalize.css 8.0.1，入口优先导入 `./styles/normalize.css`，保留官方 App 与原样式；不安装 normalize.css npm 包。CSS 选择 none 时也会加入。已有应用可用 --apply-existing 单独补齐，静态快照及许可来源见 [说明](packages/create/assets/normalize.SOURCE.md)。
+Vue/React 的 TS/JS 应用默认包含本地 normalize.css 8.0.1，入口优先导入 `./styles/normalize.css`；不安装 normalize.css npm 包。CSS 选择 none 时也会加入。已有应用可用 --apply-existing 单独补齐，静态快照及许可来源见 [说明](packages/create/assets/normalize.SOURCE.md)。
+
+新建应用将运行时插件集中到 `src/plugins`、构建插件集中到 `build/plugins`，所选 UI/大屏/引擎从正式 main/App 接入。默认不保留独立验收页及创建中间备份；需要验收页时加 `--smoke-pages`。已有业务项目不自动迁移。目录与接入方式见 [项目结构](docs/PROJECT_LAYOUT.md)。
 
 Cesium 预设已接入 --engine cesium，提供本地椭球、GLB/.adui 授权加载、按需场景与资源配置；默认支持 env 自动加密构建。创建和批量用法见 [Cesium 指南](docs/CESIUM.md)。
 
