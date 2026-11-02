@@ -10,6 +10,7 @@ import { preflightCesium } from "./cesium.mjs";
 import { preflightBabylon } from "./babylon.mjs";
 import { planThreeSmoke, preflightThreeSmoke, validateThreeTarget } from "./three-smoke.mjs";
 import { preflightModelProtection, planModelProtection } from "./model-protection.mjs";
+import { createStageRunner } from "./recovery.mjs";
 export async function runMultiEngine(args, runner = run) {
   const options = validateProjectOptions(args);
   for (const key of ["uiSmoke", "threeSmoke", "repairExisting", "config"])
@@ -29,17 +30,21 @@ export async function runMultiEngine(args, runner = run) {
     modelProtection: engine === modelEngine(options) ? options.modelProtection : "none",
   }));
   if (args.applyExisting) {
-    await preflightBaseStyles(target, options);
-    await preflightModelProtection(target, options);
-    for (const selection of selections) {
-      if (selection.engine === "three") {
-        await preflightThreeSmoke(target, await planThreeSmoke(selection));
-        await validateThreeTarget(target, selection, !options.screen);
+    const stage = createStageRunner(target);
+    await stage("补装预检", async () => {
+      await preflightBaseStyles(target, options);
+      await preflightModelProtection(target, options);
+      for (const selection of selections) {
+        if (selection.engine === "three") {
+          await preflightThreeSmoke(target, await planThreeSmoke(selection));
+          await validateThreeTarget(target, selection, !options.screen);
+        }
+        if (selection.engine === "cesium")
+          await preflightCesium(target, selection, !options.screen);
+        if (selection.engine === "babylon")
+          await preflightBabylon(target, selection, !options.screen);
       }
-      if (selection.engine === "cesium") await preflightCesium(target, selection, !options.screen);
-      if (selection.engine === "babylon")
-        await preflightBabylon(target, selection, !options.screen);
-    }
+    });
   }
   if (args.dryRun)
     return {

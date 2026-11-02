@@ -107,7 +107,14 @@ test("后续引擎输出冲突在首阶段写入前拒绝", async (t) => {
         runs++;
       },
     ),
-    /已存在/,
+    (error) => {
+      assert.match(error.message, /已存在/);
+      assert.equal(error.failed, "补装预检");
+      assert.equal(error.target, root);
+      assert.deepEqual(error.completed, []);
+      assert.ok(error.cause instanceof Error);
+      return true;
+    },
   );
   assert.equal(runs, 0);
   await assert.rejects(stat(join(root, "three-smoke.html")), { code: "ENOENT" });

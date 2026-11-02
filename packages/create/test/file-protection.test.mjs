@@ -79,6 +79,59 @@ const uiSelections = [
   ["react", "tdesign"],
 ];
 
+test("多引擎补装预检失败报告阶段和目标，独立/工作区文件保持", async (t) => {
+  const cli = fileURLToPath(new URL("../bin/cli.mjs", import.meta.url));
+  const env = Object.fromEntries(
+    Object.entries(process.env).filter(([key]) => key.toUpperCase() !== "PATH"),
+  );
+  env.PATH = "";
+  for (const [framework, language, workspace, conflict] of [
+    ["vue", "ts", false, "manifest"],
+    ["react", "js", true, "manifest"],
+    ["vue", "js", true, "engine"],
+    ["react", "ts", false, "engine"],
+  ]) {
+    const f = await fixture(t, framework, language, workspace);
+    if (conflict === "manifest")
+      await writeFile(join(f.app, "package.json"), '{"private-note":"do-not-echo"');
+    else await writeFile(join(f.app, "babylon-smoke.html"), "preserve user output");
+    const before = await snapshot(f.root);
+    const result = spawnSync(
+      process.execPath,
+      [
+        cli,
+        "--name",
+        "app",
+        "--type",
+        "application",
+        "--framework",
+        framework,
+        "--language",
+        language,
+        "--screen",
+        "--engines",
+        "three,babylon",
+        "--model-protection",
+        "none",
+        "--apply-existing",
+        ...(workspace ? ["--workspace", f.root] : []),
+      ],
+      { cwd: f.root, env, encoding: "utf8", timeout: 10000 },
+    );
+    assert.equal(result.status, 1, result.stderr);
+    assert.equal(result.stdout, "");
+    assert.match(result.stderr, /阶段：补装预检/);
+    assert.match(result.stderr, /已完成：无/);
+    assert.ok(result.stderr.includes("目标：" + f.app));
+    assert.match(
+      result.stderr,
+      conflict === "manifest" ? /基础样式应用 package.json 无效/ : /babylon-smoke\.html/,
+    );
+    assert.ok(!result.stderr.includes("do-not-echo"));
+    assert.deepEqual(await snapshot(f.root), before);
+  }
+});
+
 test("Ant Design Vue 构建策略冲突在补装预检拒绝，根与应用文件不写入", async (t) => {
   const cli = fileURLToPath(new URL("../bin/cli.mjs", import.meta.url));
   const env = Object.fromEntries(
