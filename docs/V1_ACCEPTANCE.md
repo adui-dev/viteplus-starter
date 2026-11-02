@@ -247,3 +247,12 @@ Chrome 两个开发首页 Count is 0→1；Vue 样式顺序为 normalize、Tailw
 - 最终 CLI 包包含 88 个运行时文件，路径为 dist/cli/pack-y9XDHa/viteplus-starter-create-0.0.0.tgz；最终归档包经 vp dlx 三引擎只读预览通过，最终计划 74 文件、entry 为 /、无默认验收页或旧插件路径，未创建目标。此前包路径不会自动更新。
 - 归档后的 vp run models:keygen 可执行；已有 KEY 返回拒绝覆盖，前后内容哈希保持。env 密钥未输出、未提交。
 - 最终源码回归 274/274、文档静态校验、根 vp check 199 格式/149 代码文件通过。截图保存在忽略目录 dist/verification；结构与边界见 [目录与接入](PROJECT_LAYOUT.md)。
+
+## 2026-11-02 @adui 本地包与补装实机验收
+
+- 本地包名已确定为 @adui/viteplus-starter，命令名 viteplus-starter，private/0.0.0 保持；产物 dist/cli/pack-Piyx2v/adui-viteplus-starter-0.0.0.tgz，89 个运行时文件。源码和包清单验收通过，未执行 npm/Release 发布。环境为 Windows、Node 22.18.0、Vite+ 1.4.0；官方项目使用 pnpm 11.22.0，仓库 frozen install 使用 pnpm 12.16.1，根锁文件与依赖版本未变。
+- 经该 tgz 的 vp dlx 入口创建官方 Vue TS 应用，在补装前写入带业务标记的 App、main 和自定义插件注册入口，并记录 SHA-256；通过同一入口补装大屏、Three、embedded 模型保护。三类业务文件前后哈希全部保持，新运行时/构建插件归档到统一目录，无默认 smoke 页，模型配置的三份原件备份保留。check 50 格式/36 代码文件通过；完整 vue-tsc 与首页构建 2/2 通过。使用原 Downloads DamagedHelmet 的只读副本，产物只有 .adui，无 GLB/GLTF。
+- 经同一 tgz 创建官方 Monorepo 根和 React JS 成员，先准备带业务标记的页面/挂载代码/注册入口，再执行大屏、Three+Babylon、external 的多引擎补装。只有父阶段统一整理，新建了两个引擎目录；三类业务文件哈希保持，默认无独立页，KEY 脚本指向 build/plugins/models。应用 check 63 格式/53 代码文件及完整构建通过；包入口的工作区结构检查返回 ok:true，根 vp run ready 6/6 成功（含 1 项缓存命中）。首页使用 Three 适配器，未声称同时渲染所有引擎。
+- 两项实际构建均有 Three 大分块提示；官方 utils 构建有 TypeScript 7 API 实验性提示，未更改官方版本或检查规则。本轮未执行新增浏览器验收、Cesium 实际补装或全部 UI 组合的真实构建；这些范围不由结构/单元回归替代。
+- 全量回归 282/282、文档校验、根 vp check 201 格式/151 代码文件通过。8 项新增回归覆盖旧/新大屏、三引擎代表 TS/JS、显式独立页、多引擎、已有构建引用不误改、KEY/业务/原件备份保持、占用/未知文件/junction/格式失败及真实 CLI 保护。
+- 本轮验收日志与摘要保存在忽略目录 dist/verification；新本地包路径与旧包不同，旧 tgz 不会自动更新。用户现有 test-starter 未被迁移，原 Downloads 模型未修改。
