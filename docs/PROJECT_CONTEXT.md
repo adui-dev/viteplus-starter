@@ -2,6 +2,8 @@
 
 更新日期：2026-11-02。最新进度见文末各轮记录。
 
+本地测试现场已按用户 2026-11-02 的要求清理；下文“现场/产物保留”描述各轮验收当时的状态，不表示这些目录当前仍存在。清理范围和结果见文末记录。
+
 ## 项目定位与约束
 
 - 仓库：`adui-dev/viteplus-starter`。Vite+ 官方 `vite:application` / `vite:monorepo` 是唯一基础工程来源，Vue/React Application 按语言选 `vue` / `vue-ts` / `react` / `react-ts`。
@@ -722,3 +724,12 @@
 - 浏览器验收后与上轮 30 项 Git 可见文件基线逐项比较，SHA256/mtime 保持。有效 UI 与首页截图保留在仓库外，临时标签关闭且 4399 服务已停止；没有修改应用、生成器运行代码或依赖，只同步 V1 证据与能力表。
 - 生成器串行全量回归 261/261、无跳过，文档校验和根 vp check（188 格式/141 代码文件）通过。
 - 下一步进入实际 Windows 项目使用反馈阶段，围绕具体创建、补装与恢复问题维护；本组正常编码的构建和浏览器验收已完成。
+
+## 2026-11-02：清理历次本地测试项目
+
+- 按用户明确要求清点 D:/Workspace/adui-studio，将历史验收记录与目录、清单及 Git remote 对照，确认 50 个测试项目（含 test-vue、早期 starter 项目及两份 GitHub 下载副本）和 2 个专项目录：three-build-verification-20261027、Windows 路径验收 20261030。adui-p4-validation-20261027 另核对官方 Monorepo 清单与结构，未发现远程仓库。
+- 清理前逐个解析绝对路径，确认均为父目录的直接子目录、顶层不是链接且不包含 viteplus-starter；执行范围使用固定清单。永久递归删除被工具策略拦截后改用 Windows 回收接口；单项 Shell 调用耗时较长，停止本次拥有的调用进程后，剩余 31 个目标通过显式回收、遇错即停的 IFileOperation 批量处理，系统返回成功且未报告中止。没有将清理脚本或原生接口代码加入生成器。
+- 完成后逐项确认 52 个目录均已不存在。回收站中找到 50 个对应目录；adui-clean-maintenance-vue-ts-20261102、adui-normalize-validation-20261030 未找到对应记录，不能保证恢复。未清空回收站。
+- 保留目录为 viteplus-starter、adui-forge、adui-skills、dango-star-travelers、dango-star-travelers-development-pack、lixinbu、minesphere、minigame-dev-document；名称和创建时间与清理前一致。原始 C:/Users/ADui/Downloads/DamagedHelmet.glb 仍在，父目录 26 张验收截图及测试配置文件保留。未对这些保留项目执行删除或移动。
+- 本轮仅清理仓库外测试现场并更新历史路径说明，没有新增功能、升级依赖或重新创建验收工程。生成器串行回归 261/261、无跳过，文档检查及根 vp check（188 格式/141 代码文件）通过。
+- 下一步沿用现有 GitHub 下载与 vp run create 入口使用生成器，围绕实际 Windows 创建、补装、恢复问题维护；需要复验时按具体问题创建隔离现场，不恢复整套历史测试项目或扩展验收矩阵。

@@ -4,6 +4,8 @@
 
 当前交付验收平台为 Windows（用户于 2026-10-30 明确）；Linux/macOS 不在本阶段要求内，也未验证，不作为 Windows 交付的阻塞条件。
 
+本文中的本地项目路径和“现场/产物保留”描述记录各轮验收当时的状态，不要求测试工程永久保留。用户于 2026-11-02 要求清理之前创建的测试项目，后续目录清理情况见 [项目状态](PROJECT_CONTEXT.md)；清理不表示重新执行或扩大此前的验收范围。
+
 ## 正常编码应用补装与构建复验（2026-11-02）
 
 新建隔离 D:/Workspace/adui-studio/adui-clean-maintenance-vue-ts-20261102，由当前 CLI 委托官方 vite:application 的 vue-ts 模板生成；Node 22.18.0、pnpm 12.16.1、Vite+ 1.4.0。应用清单为无 BOM UTF-8，原 test-vue、BOM 对照副本及其他实际工程未改动。
