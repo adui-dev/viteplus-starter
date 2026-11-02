@@ -14,6 +14,8 @@
 
 ## 默认静态基础样式
 
+cli.mjs 的官方创建后基础样式预检复用 createStageRunner，报告“基础样式预检”及已完成步骤；recovery.test.mjs 在真实 CLI 的受控官方成功边界验证入口缺失/输出冲突、UI 安装前停止和模板现场保持。
+
 - packages/create/src/base-styles.mjs：四种入口的计划、预检、默认复制、优先导入、已有快照校验与无覆盖写入。
 - packages/create/assets/normalize.css、normalize.LICENSE.txt、normalize.SOURCE.md：固定 8.0.1 CSS、MIT 许可和来源记录。
 - packages/create/test/base-styles.test.mjs：TS/JS 两框架、样式顺序、原文件保留、重复调用、同名/部分文件与链接保护。

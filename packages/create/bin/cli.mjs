@@ -358,7 +358,7 @@ async function main() {
       normalizeNewWorkspaceApplication(workspace, undefined, options),
     );
   if (result.status === 0 && options.type === "application")
-    await preflightBaseStyles(target, options);
+    await stage("基础样式预检", () => preflightBaseStyles(target, options));
   if (
     result.status === 0 &&
     (integrations.dependencies.length || integrations.devDependencies.length)
