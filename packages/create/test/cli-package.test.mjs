@@ -21,6 +21,13 @@ test("CLI 本地包保留资源与官方提示依赖，不带测试或生命周�
   const manifest = await stageCliPackage(directory);
   assert.equal(manifest.name, "@adui/viteplus-starter");
   assert.equal(manifest.private, true);
+  assert.deepEqual(manifest.publishConfig, {
+    access: "public",
+    registry: "https://registry.npmjs.org/",
+  });
+  assert.equal(manifest.license, "MIT");
+  assert.equal(manifest.repository.url, "git+https://github.com/adui-dev/viteplus-starter.git");
+  assert.equal(manifest.bugs.url, "https://github.com/adui-dev/viteplus-starter/issues");
   assert.equal(manifest.bin["viteplus-starter"], "packages/create/bin/cli.mjs");
   assert.deepEqual(manifest.dependencies, { "@voidzero-dev/vite-plus-prompts": "1.4.0" });
   assert.equal(manifest.scripts, undefined);
@@ -33,6 +40,7 @@ test("CLI 本地包保留资源与官方提示依赖，不带测试或生命周�
     );
   const repository = fileURLToPath(new URL("../../../", import.meta.url));
   for (const path of [
+    "LICENSE",
     "packages/create/bin/cli.mjs",
     "packages/create/assets/normalize.css",
     "packages/create/assets/normalize.LICENSE.txt",

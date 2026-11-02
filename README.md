@@ -2,6 +2,8 @@
 
 项目定位、需求完成度和计划/构建/浏览器验收的区别见 [生成器能力与验收范围](docs/GENERATOR_STATUS.md)。
 
+CLI 包 @adui/viteplus-starter 当前准备 0.1.0 本地候选版，未发布；包内容清单、MIT 许可、隔离安装与人工发布条件见 [npm 首发准备](docs/NPM_RELEASE.md)。
+
 当前交付验收平台为 **Windows**，处于本地候选阶段，尚未发布。常用命令按执行目录整理在 [Windows V1 操作指南](docs/WINDOWS_GUIDE.md)，实际证据与限制见 [V1 清单](docs/V1_ACCEPTANCE.md)。
 
 Vue/React 的 TS/JS 应用默认包含本地 normalize.css 8.0.1，入口优先导入 `./styles/normalize.css`；不安装 normalize.css npm 包。CSS 选择 none 时也会加入。已有应用可用 --apply-existing 单独补齐，静态快照及许可来源见 [说明](packages/create/assets/normalize.SOURCE.md)。

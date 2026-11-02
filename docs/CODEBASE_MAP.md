@@ -249,3 +249,11 @@ engine-prompts.test.mjs：多选解析、摘要/取消、Three 保护提示；ve
 - workspace-inspect.mjs：区分首页管理标记与已归档预设，支持一个应用中新旧预设路径混合。
 - packages/create/test/existing-output.test.mjs：三引擎代表 TS/JS、旧/新大屏、显式独立页、多引擎、已有构建引用、业务文件/KEY/备份保持、占用/未知文件/junction/格式失败、真实 CLI 前置拒绝与工作区检查。
 - packages/create/package.json：分发包名 @adui/viteplus-starter；cli-package.test 检查最终打包清单名称。
+
+## 首发候选打包审查（2026-11-03）
+
+- scripts/cli-package.mjs：CLI 源元信息/private 显式状态继承及根 MIT LICENSE 复制。
+- scripts/cli-pack-report.mjs：实际 npm 文件清单的候选身份、路径/类型、资源/许可与重复项检查，构建只读报告对象。
+- scripts/pack-cli.mjs：tarball SHA-512 核验与 pack-contents.json 侧车文件，stdout 新增 contents 路径。
+- packages/create/test/cli-pack-report.test.mjs、cli-package.test.mjs：有效/异常候选、敏感或越界文件、缺失许可/资源及元信息、隔离包资源与公开元信息回归。
+- docs/NPM_RELEASE.md：候选版本、本地审查/安装、账户条件与明确发布边界，不提供自动发布入口。

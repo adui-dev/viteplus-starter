@@ -1,6 +1,8 @@
 # ADui Vite+ Starter CLI
 
-包名：`@adui/viteplus-starter`；命令名：`viteplus-starter`。当前仍为 0.0.0/private 本地验收包，尚未发布。
+包名：`@adui/viteplus-starter`；命令名：`viteplus-starter`。当前为 0.1.0/private 本地候选包，尚未发布。
+
+采用 MIT 许可，随包携带 LICENSE 及 normalize.css 的原许可。源码和问题反馈：[GitHub](https://github.com/adui-dev/viteplus-starter)。正式发布后可使用 `vp dlx @adui/viteplus-starter`；当前请使用下面的本地 tgz 命令。
 
 新建应用默认将所选 UI、大屏和引擎接入正式 main/App，运行时插件位于 src/plugins，Node 构建插件位于 build/plugins。默认不保留独立 smoke 页面与创建中间备份；新建时添加 --smoke-pages 可保留独立验收页，批量 JSON 对应应用的 smokePages: true。已有工程不会自动迁移或替换首页。
 
@@ -23,9 +25,9 @@ viteplus-starter --name my-vue-app --type application --framework vue --ui eleme
 尚未发布到 npm。仓库开发者在生成器根目录运行 `npm --silent run cli:pack`，获得包含 `tarball` 绝对路径的 JSON；使用本地包启动：
 
 ```powershell
-vp dlx -- 'C:\path\to\adui-viteplus-starter-0.0.0.tgz'
+vp dlx -- 'C:\path\to\adui-viteplus-starter-0.1.0.tgz'
 # 或
-npm exec --yes --package 'C:\path\to\adui-viteplus-starter-0.0.0.tgz' -- viteplus-starter
+npm exec --yes --package 'C:\path\to\adui-viteplus-starter-0.1.0.tgz' -- viteplus-starter
 ```
 
 该包包含所需生成器和预设源码，不需要先下载整个工具仓库。GitHub 模板下载方式仍须进入下载根目录执行 `vp run create`；它与此 CLI 包入口是两条使用路径。

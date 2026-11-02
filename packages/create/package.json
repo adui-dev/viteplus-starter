@@ -1,11 +1,25 @@
 {
   "name": "@adui/viteplus-starter",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
+  "description": "ADui Vite+ 交互式项目生成器",
+  "homepage": "https://github.com/adui-dev/viteplus-starter#readme",
+  "bugs": {
+    "url": "https://github.com/adui-dev/viteplus-starter/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adui-dev/viteplus-starter.git"
+  },
   "bin": {
     "viteplus-starter": "./bin/cli.mjs"
   },
   "type": "module",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "test": "node --test"
   },

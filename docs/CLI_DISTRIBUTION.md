@@ -2,7 +2,9 @@
 
 GitHub 来源的 `vp create github:adui-dev/viteplus-starter` 下载工具仓库，再由 `vp run create` 启动向导。要直接进入 UI/CSS、大屏和引擎选择，使用本地 CLI 安装包入口。
 
-当前包为 `@adui/viteplus-starter@0.0.0`，命令名 `viteplus-starter`，仍为 private，尚未发布到 npm/Release。无需为分发入口新建仓库或重写生成器。运行环境为 Windows、已安装的 `vp` 和受支持 Node；基础工程仍委托 Vite+ 官方模板。
+当前包为 `@adui/viteplus-starter@0.1.0`，命令名 `viteplus-starter`，仍为 private，尚未发布到 npm/Release。无需为分发入口新建仓库或重写生成器。运行环境为 Windows、已安装的 `vp` 和受支持 Node；基础工程仍委托 Vite+ 官方模板。
+
+0.1.0 为当前本地候选版本；首发条件与账户检查见 [npm 首发准备](NPM_RELEASE.md)。打包结果新增 contents 路径，对应实际文件清单 pack-contents.json，包含 MIT LICENSE、包元信息与 integrity，清单不进入 tarball。
 
 ## 构建本地包
 
@@ -14,7 +16,7 @@ if ($LASTEXITCODE -ne 0) { throw 'CLI 打包失败' }
 $bundle.tarball
 ```
 
-脚本将运行时暂存到独立临时目录，保留 `packages/create`、screen、three、cesium、babylon、model-security 的源码相对布局，使用 npm pack 生成 `dist/cli/pack-*/adui-viteplus-starter-0.0.0.tgz`。每次使用新产物目录，不覆盖旧包；暂存目录成功或失败均清理。JSON 包含绝对路径、文件数量和 npm integrity。
+脚本将运行时暂存到独立临时目录，保留 `packages/create`、screen、three、cesium、babylon、model-security 的源码相对布局，使用 npm pack 生成 `dist/cli/pack-*/adui-viteplus-starter-0.1.0.tgz`。每次使用新产物目录，不覆盖旧包；暂存目录成功或失败均清理。JSON 包含绝对路径、文件数量和 npm integrity。
 
 请使用 npm 运行打包脚本，由 npm 提供自身的 JS 入口；执行不经 shell 拼接、不运行包生命周期脚本、不安装依赖。生成包只有运行时源码、本地 normalize.css/MIT 许可和说明，没有仓库测试、node_modules、锁文件、环境密钥或测试模型，也没有安装生命周期脚本。
 
@@ -34,7 +36,7 @@ vp dlx -- $bundle.tarball
 若把 tgz 交给另一台已安装 Vite+ 的 Windows 电脑，也可以直接运行：
 
 ```powershell
-vp dlx -- 'C:\Downloads\adui-viteplus-starter-0.0.0.tgz'
+vp dlx -- 'C:\Downloads\adui-viteplus-starter-0.1.0.tgz'
 ```
 
 不需要先下载生成器仓库。无参数进入向导，选择项目类型、Vue/React、TS/JS、UI、CSS、大屏、引擎和模型保护。与 Vite+ 使用同款方向键选项和回车确认，3D 引擎用空格勾选，可多选，空列表表示不启用；名称直接输入。最终选择 No 或任意步骤 Ctrl+C 均取消，不创建项目。目标位置依据调用目录，和 dlx 缓存或包安装目录无关。

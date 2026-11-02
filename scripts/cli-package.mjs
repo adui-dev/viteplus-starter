@@ -53,11 +53,18 @@ export async function stageCliPackage(directory) {
   const sourceManifest = JSON.parse(
     (await readSource("packages/create/package.json")).toString("utf8"),
   );
+  if (typeof sourceManifest.private !== "boolean")
+    throw new Error("CLI 清单必须显式声明 private 状态");
   const manifest = {
     name: sourceManifest.name,
     version: sourceManifest.version,
-    private: true,
-    description: "ADui Vite+ 交互式项目生成器（本地验收包）",
+    private: sourceManifest.private,
+    publishConfig: sourceManifest.publishConfig,
+    description: sourceManifest.description,
+    license: sourceManifest.license,
+    repository: sourceManifest.repository,
+    homepage: sourceManifest.homepage,
+    bugs: sourceManifest.bugs,
     type: "module",
     bin: { "viteplus-starter": "packages/create/bin/cli.mjs" },
     files: ["packages/"],
@@ -70,5 +77,6 @@ export async function stageCliPackage(directory) {
   await writeFile(join(directory, "README.md"), await readSource("packages/create/README.md"), {
     flag: "wx",
   });
+  await writeFile(join(directory, "LICENSE"), await readSource("LICENSE"), { flag: "wx" });
   return manifest;
 }

@@ -1,10 +1,12 @@
 import { spawnSync } from "node:child_process";
-import { mkdtemp, mkdir, readFile, rm, stat } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { mkdtemp, mkdir, readFile, writeFile, rm, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { basename, dirname, isAbsolute, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { inspectPath } from "../packages/create/src/safe-paths.mjs";
 import { stageCliPackage } from "./cli-package.mjs";
+import { createCliPackReport } from "./cli-pack-report.mjs";
 
 async function pack() {
   const npm = process.env.npm_execpath;
@@ -37,7 +39,13 @@ async function pack() {
     if (!metadata?.filename || basename(metadata.filename) !== metadata.filename)
       throw new Error("npm pack 未返回有效产物文件名");
     const tarball = join(output, metadata.filename);
-    await readFile(tarball);
+    const archive = await readFile(tarball);
+    const report = createCliPackReport(manifest, metadata);
+    if ("sha512-" + createHash("sha512").update(archive).digest("base64") !== report.integrity)
+      throw new Error("CLI tarball 与 npm pack 的完整性信息不一致");
+    report.integrityVerified = true;
+    const contents = join(output, "pack-contents.json");
+    await writeFile(contents, JSON.stringify(report, null, 2) + "\n", { flag: "wx" });
     console.log(
       JSON.stringify({
         name: manifest.name,
@@ -46,6 +54,7 @@ async function pack() {
         tarball,
         fileCount: metadata.files.length,
         integrity: metadata.integrity,
+        contents,
       }),
     );
   } finally {

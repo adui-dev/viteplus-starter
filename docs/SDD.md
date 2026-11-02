@@ -343,3 +343,11 @@ existing-output 复用 application-output 导出的暂存文件计划及 UI 组�
 workspace-inspect 将“生成器管理的首页”与“预设目录已归档”分开：只有前者要求首页/注册入口，预设允许逐文件识别新旧实际路径；归档预设默认无需独立页或创建备份。旧项目检查分支继续兼容历史输出，不读取 env 内容。
 
 分发包直接使用 packages/create/package.json 的 @adui/viteplus-starter 名称，打包逻辑、版本、private 与 bin 不变；运行时不依赖 npm 包名定位源码。CLI 本地包回归检查最终清单名称，文档示例同步 adui-viteplus-starter-0.0.0.tgz。
+
+## 首发候选的包元信息与实际文件审查
+
+cli-package 从 CLI 源清单读取版本、显式 private 布尔值、描述、MIT、仓库/主页/反馈及 publishConfig；默认 private:true 保持，root LICENSE 原字节复制到暂存根。root 工作区不会作为 CLI 包发布。候选版本先用 0.1.0，最终首发版本尚需确认。
+
+cli-pack-report 只接收 npm pack 的元信息，核对包名/版本/标准 scoped 文件名和实际 files。允许固定顶层文件、normalize 静态资源、既有六个运行时源码树的已知类型；拒绝隐藏/越界路径、测试/依赖目录、模型、未知类型、重复项和缺少许可/入口的候选。pack-cli 在写侧车报告前计算实际 tarball SHA-512 并与 npm integrity 比较，成功后标记 integrityVerified；报告包含逐文件路径/字节数/模式及打包大小，位于产物目录，不进入 tarball。
+
+打包流程仍仅执行 npm pack --offline --ignore-scripts，不执行 publish/stage/login，不提供任何自动发布任务。目标目录独立、写入无覆盖、临时暂存清理保持原有保护。JSON 原有字段保留，新增 contents 路径供核对；审查报告的 publicationPerformed 固定为 false，不能代替账户/版本/内容的最终人工确认。
