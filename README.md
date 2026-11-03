@@ -32,7 +32,44 @@
 - 已安装 Vite+，可运行 `vp`，并具有可用的 pnpm 环境。
 - 创建项目时需要网络或完整的模板、依赖缓存。
 
-### 安装 npm 包并使用
+### 使用 vp dlx / pnpm dlx
+
+以下按包名运行的命令适用于正式发布后；当前未发布时使用 GitHub 或本地 tgz 入口。在希望存放新项目的父目录执行，任选一种即可直接进入向导：
+
+```powershell
+vp dlx -- @adui/viteplus-starter
+# 或
+pnpm dlx @adui/viteplus-starter
+```
+
+无需全局安装，也不将生成器添加到项目依赖。参数跟在包名后；例如查看帮助、预览 Vue 应用配置：
+
+```powershell
+vp dlx -- @adui/viteplus-starter --help
+vp dlx -- @adui/viteplus-starter --name my-vue-app --type application --framework vue --ui element-plus --css tailwindcss --dry-run
+pnpm dlx @adui/viteplus-starter --name my-vue-app --type application --framework vue --ui element-plus --css tailwindcss --dry-run
+```
+
+去掉 `--dry-run` 即实际创建项目；输出位于当前调用目录，创建完成后进入 `./my-vue-app` 运行 `vp check`、`vp run build` 和 `vp dev`。
+
+### 使用 pnpm 安装
+
+正式发布后，可以全局安装并启动向导：
+
+```powershell
+pnpm add --global @adui/viteplus-starter
+viteplus-starter
+```
+
+或安装为当前项目的开发依赖，再调用本地命令：
+
+```powershell
+pnpm add --save-dev @adui/viteplus-starter
+pnpm exec viteplus-starter
+pnpm exec viteplus-starter --help
+```
+
+### 使用 npm 安装
 
 以下 npm 包名命令适用于正式发布后；当前未发布时，使用下文的 GitHub 或本地 tgz 入口。
 
@@ -54,8 +91,6 @@ npm exec -- viteplus-starter
 
 ```powershell
 npm exec --yes --package @adui/viteplus-starter -- viteplus-starter
-# 已使用 Vite+ 时也可运行
-vp dlx @adui/viteplus-starter
 ```
 
 全局安装后可直接传参数创建应用，或先用 `--dry-run` 查看计划：
@@ -116,6 +151,12 @@ vp dlx -- $bundle.tarball
 ```
 
 得到的 tgz 包包含生成器及所需预设源码，可交给其他已安装 Vite+ 的 Windows 环境使用。包路径后的参数会传入 CLI，详见 [CLI 分发说明](docs/CLI_DISTRIBUTION.md)。
+
+本地 tgz 也可通过 pnpm 运行；在项目父目录执行，路径替换为实际包路径：
+
+```powershell
+pnpm dlx 'C:\Downloads\adui-viteplus-starter-0.1.0.tgz'
+```
 
 ## 常用操作
 

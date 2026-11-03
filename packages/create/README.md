@@ -5,7 +5,7 @@
 包名：`@adui/viteplus-starter` · 命令：`viteplus-starter` · [源码与文档](https://github.com/adui-dev/viteplus-starter) · [问题反馈](https://github.com/adui-dev/viteplus-starter/issues)
 
 > [!NOTE]
-> 首发版本为 `0.1.0`，当前仍为 private 本地候选包，尚未发布到 npm。下文按包名安装的命令适用于正式发布后；当前请使用本地 tgz。
+> 首发版本为 `0.1.0`，当前仍为 private 本地候选包，尚未发布到 npm。下文按包名运行的命令适用于正式发布后；当前请使用本地 tgz。
 
 ## 环境要求
 
@@ -13,7 +13,42 @@ Windows、可运行的 Vite+ `vp` 命令，以及 Node.js `^22.18.0 || ^24.11.0 
 
 ## 快速开始
 
-### 安装 npm 包
+### 使用 vp dlx / pnpm dlx
+
+正式发布后，在希望存放新项目的父目录任选一种命令进入向导，无需全局安装或添加项目依赖：
+
+```powershell
+vp dlx -- @adui/viteplus-starter
+# 或
+pnpm dlx @adui/viteplus-starter
+```
+
+参数直接跟在包名后，`vp dlx --` 中的分隔符确保帮助等选项传给生成器：
+
+```powershell
+vp dlx -- @adui/viteplus-starter --help
+vp dlx -- @adui/viteplus-starter --name my-vue-app --type application --framework vue --ui element-plus --css tailwindcss --dry-run
+pnpm dlx @adui/viteplus-starter --name my-vue-app --type application --framework vue --ui element-plus --css tailwindcss --dry-run
+```
+
+### 使用 pnpm 安装
+
+正式发布后可全局安装，或作为当前项目的开发依赖安装，任选一种方式：
+
+```powershell
+# 全局安装
+pnpm add --global @adui/viteplus-starter
+viteplus-starter
+```
+
+```powershell
+# 项目内安装
+pnpm add --save-dev @adui/viteplus-starter
+pnpm exec viteplus-starter
+pnpm exec viteplus-starter --help
+```
+
+### 使用 npm 安装
 
 全局安装后，在希望存放新项目的父目录启动配置向导：
 
@@ -33,8 +68,6 @@ npm exec -- viteplus-starter
 
 ```powershell
 npm exec --yes --package @adui/viteplus-starter -- viteplus-starter
-# 或使用 Vite+
-vp dlx @adui/viteplus-starter
 ```
 
 包名为 `@adui/viteplus-starter`，命令名为 `viteplus-starter`。这是项目生成工具，无需在 Vue/React 业务代码中 import。
@@ -51,6 +84,12 @@ vp dlx -- 'C:\Downloads\adui-viteplus-starter-0.1.0.tgz'
 
 ```powershell
 npm exec --yes --package 'C:\Downloads\adui-viteplus-starter-0.1.0.tgz' -- viteplus-starter
+```
+
+或使用 pnpm：
+
+```powershell
+pnpm dlx 'C:\Downloads\adui-viteplus-starter-0.1.0.tgz'
 ```
 
 无参数进入向导：选择项目形态、Vue/React、TS/JS、UI、CSS、大屏、3D 引擎与模型保护。方向键移动，回车确认；引擎用空格多选，Ctrl+C 取消。项目生成在当前调用目录下，不使用 CLI 安装目录。

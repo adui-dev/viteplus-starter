@@ -26,6 +26,15 @@ $bundle.tarball
 
 ## 一条命令进入向导
 
+正式发布后，在项目父目录可按包名运行，任选一种方式，无需全局安装或添加项目依赖：
+
+```powershell
+vp dlx -- @adui/viteplus-starter
+pnpm dlx @adui/viteplus-starter
+```
+
+`vp dlx -- @adui/viteplus-starter --help` 将帮助参数交给生成器；pnpm 对应 `pnpm dlx @adui/viteplus-starter --help`。其他 CLI 参数同样追加到包名后，输出按当前调用目录计算。当前包尚未发布，先使用以下本地 tgz 入口。
+
 切换到希望存放新项目的父目录，再使用包路径运行：
 
 ```powershell
@@ -54,13 +63,21 @@ vp dlx -- $bundle.tarball --name demo-vue --type application --framework vue --u
 npm exec --yes --package $bundle.tarball -- viteplus-starter
 ```
 
+pnpm 也可直接运行本地包：
+
+```powershell
+pnpm dlx $bundle.tarball
+```
+
+安装后长期使用的 pnpm/npm 全局及项目内命令见 [README](../README.md#快速开始)。包名调用需要包已发布；本地 tgz 调用不依赖发布状态，首次仍需取得提示组件依赖。
+
 参数模式和 GitHub 下载后的 CLI 使用同一套校验、官方模板与集成流程；创建时仍需取得官方模板及所选依赖。dry-run、取消向导和安装 CLI 本身不代表项目构建或组件渲染已通过。
 
 ## 本地验收
 
 自动回归覆盖暂存资源、隔离包的 Vue/React 多引擎与 JSON 批量预览、中文空格及元字符目录、调用目录计算、已有输出/junction 拒绝、打包调用上下文错误。真实 tgz 安装、vp dlx、TTY 选择/取消和代表创建结果见 [项目状态](PROJECT_CONTEXT.md)。
 
-包名已按用户要求确定为 @adui/viteplus-starter，版本及首次发布仍需单独确定；本入口不会自动发布或创建流水线。
+包名已按用户要求确定为 @adui/viteplus-starter，首发版本已确认为 0.1.0，尚未发布；本入口不会自动发布或创建流水线。
 
 ## 2026-11-02 本地包实测
 

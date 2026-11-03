@@ -831,3 +831,11 @@
 按用户反馈，根与包内 README 补充正式发布后的 npm 全局/项目内安装、viteplus-starter 命令、npm exec / vp dlx 免全局安装、帮助/预览/创建和进入生成应用后 check/build/dev 的完整流程。明确 npm 入口以当前调用目录为输出基准，包名与命令名不同，生成器无需在业务代码中 import。npm 尚未发布的说明保持；当前仍可使用 GitHub 或本地 tgz，不执行 registry 安装或发布。下一步重新打包含最终 README 的候选，再核对实际 npm 首发条件。
 
 本轮 285/285 测试、文档校验、四份改动文档的格式检查及全仓 153 文件 lint 通过。完整 vp check 仍仅因已安装 create-readme Skill 的既有格式问题未通过，安装原文及锁文件未修改、未暂存。npm 命令语法已核对官方 npm install / npm exec 文档，bin 名称与包清单一致；不将此说明补充称为 registry 安装成功。日志见忽略目录 dist/verification/npm-readme-tests.log。
+
+## 2026-11-03 补齐 pnpm 与 vp dlx 文档
+
+根与包内 README 增加 pnpm 全局/项目内安装、pnpm exec、pnpm dlx 和 vp dlx 的独立说明，包含向导、帮助、参数预览及本地 tgz 入口；CLI 分发说明同步两种 dlx。包名入口标明正式发布后可用，本地 tgz 不依赖发布；不改变生成器、依赖或发布状态。pnpm 语法参考官方 add/exec/dlx 文档，Vite+ 转发规则核对本地帮助。下一步重新打包包含最终说明的候选，核实 npm 首发条件。
+
+使用现有 0.1.0 本地候选包 pack-CTTmQw 实测 pnpm dlx 与 vp dlx 的帮助和参数预览：分别使用 Vue/Element Plus/Tailwind 和 React JS/Ant Design/UnoCSS，cwd/target 均指向实际调用目录，未创建目标。该包用于验证命令调用，尚未包含本轮 README 更新；未运行 registry 包名安装、全局安装或创建新应用，dlx 缓存沿用包管理器默认管理。
+
+本轮 285/285 测试、文档校验、五份改动文档的格式检查、153 文件 lint 和 git diff --check 通过。完整 vp check 仍仅因用户已安装 create-readme Skill 的原文格式未通过，未改动其文件和 skills-lock.json。测试及四份 dlx 帮助/预览日志位于忽略目录 dist/verification，不将本轮验证扩展为新建应用构建或正式发布。
