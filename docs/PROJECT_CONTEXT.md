@@ -889,3 +889,11 @@ npm whoami 已核实为 adui，对应个人作用域 @adui；目标包查询为 
 本轮准备 0.1.1 候选及对应包内 README，本地元信息修复不改变 CLI 运行逻辑、依赖或生成输出。公开 npm latest 仍为0.1.0，先前授权仅针对0.1.0首发，不据此上传新版本；检查、产物与最终状态另记。用户原有 Skill 安装改动保持。
 
 本轮291/291测试、文档校验及155文件lint通过；完整vp check仍仅因已安装create-readme Skill原文格式未通过，未改变检查规则。产物为dist/cli/pack-vn2jGH/adui-viteplus-starter-0.1.1.tgz，92文件，实际tarball清单及侧车报告均保留20个关键词，完整性审查通过。逐文件与公开0.1.0归档对比，仅package.json和README不同，其余90文件字节完全一致。vp dlx本地候选帮助与React JS/Ant Design/UnoCSS预览通过，未创建目标；npm publish --dry-run --ignore-scripts --access public --tag latest 对此候选预演退出0。日志与对比证据保留在dist/verification/keywords-*。尚未上传0.1.1，npm页面关键词未更新；下一步在明确授权后发布此修正候选并核对registry关键词。
+
+用户随后明确授权公开发布0.1.1并更新latest，已在npm官方页面完成本次浏览器身份验证。对上述已验收tarball的发布命令已成功退出，npm提示仍在处理；公开版本、关键词与下载完整性结果另记，不重复上传、不据CLI成功输出提前宣称页面已更新。
+
+### 0.1.1 发布核验完成
+
+registry处理后已公开提供0.1.1，latest指向0.1.1。版本清单keywords与包级keywords均与源码中的20项完全一致；公开tarball下载101415字节，SHA-512与候选完全一致：sha512-e4SimgM9NtNZLtKmwBxxxG3d2xsLbgmI0tt6RUHP93kkosqw5sJReSJ1gOW0VruXlJZLYVz6XDXhNspcE2ulLw==。真实vp dlx / pnpm dlx的显式0.1.1包名帮助均成功，未创建工程；只有验收进程指定缓存pnpm12.16.1，没有改全局配置。
+
+发布核验见dist/verification/keywords-publish-evidence.json及keywords-published-*；本轮沿用已验收产物，不重打包或重跑无变化的全量组合。npm网站抓取工具未返回页面，故只报告registry关键词已生效，不声称已进行网页视觉验收。0.1.0保留，未创建Release或CI/CD，也未修改用户Skill安装改动。下一步用公开CLI创建实际项目，依据具体反馈修复生成器。

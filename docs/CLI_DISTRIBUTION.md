@@ -2,9 +2,9 @@
 
 GitHub 来源的 `vp create github:adui-dev/viteplus-starter` 下载工具仓库，再由 `vp run create` 启动向导。要直接进入 UI/CSS、大屏和引擎选择，使用本地 CLI 安装包入口。
 
-当前公开包为 `@adui/viteplus-starter@0.1.0`，命令名 `viteplus-starter`，latest 指向 0.1.0。CLI 清单 private:false，发布及包名验收结果见 [发布记录](NPM_RELEASE.md)。无需为分发入口新建仓库或重写生成器。运行环境为 Windows、已安装的 `vp` 和受支持 Node；基础工程仍委托 Vite+ 官方模板。
+当前公开包为 `@adui/viteplus-starter@0.1.1`，命令名 `viteplus-starter`，latest 指向 0.1.1。CLI 清单 private:false，发布及包名验收结果见 [发布记录](NPM_RELEASE.md)。无需为分发入口新建仓库或重写生成器。运行环境为 Windows、已安装的 `vp` 和受支持 Node；基础工程仍委托 Vite+ 官方模板。
 
-0.1.0 为当前首发版本，也可继续本地打包。打包结果提供 contents 路径，对应实际文件清单 pack-contents.json，包含 MIT LICENSE、包元信息与 integrity，清单不进入 tarball。
+0.1.1 为当前公开版本，修正 npm Keywords；也可继续本地打包。打包结果提供 contents 路径，对应实际文件清单 pack-contents.json，包含 MIT LICENSE、关键词、包元信息与 integrity，清单不进入 tarball。
 
 ## 构建本地包
 
@@ -16,7 +16,7 @@ if ($LASTEXITCODE -ne 0) { throw 'CLI 打包失败' }
 $bundle.tarball
 ```
 
-脚本将运行时暂存到独立临时目录，保留 `packages/create`、screen、three、cesium、babylon、model-security 的源码相对布局，使用 npm pack 生成 `dist/cli/pack-*/adui-viteplus-starter-0.1.0.tgz`。每次使用新产物目录，不覆盖旧包；暂存目录成功或失败均清理。JSON 包含绝对路径、文件数量和 npm integrity。
+脚本将运行时暂存到独立临时目录，保留 `packages/create`、screen、three、cesium、babylon、model-security 的源码相对布局，使用 npm pack 生成 `dist/cli/pack-*/adui-viteplus-starter-0.1.1.tgz`。每次使用新产物目录，不覆盖旧包；暂存目录成功或失败均清理。JSON 包含绝对路径、文件数量和 npm integrity。
 
 请使用 npm 运行打包脚本，由 npm 提供自身的 JS 入口；执行不经 shell 拼接、不运行包生命周期脚本、不安装依赖。生成包只有运行时源码、本地 normalize.css/MIT 许可和说明，没有仓库测试、node_modules、锁文件、环境密钥或测试模型，也没有安装生命周期脚本。
 
@@ -47,7 +47,7 @@ vp dlx -- $bundle.tarball
 若把 tgz 交给另一台已安装 Vite+ 的 Windows 电脑，也可以直接运行：
 
 ```powershell
-vp dlx -- 'C:\Downloads\adui-viteplus-starter-0.1.0.tgz'
+vp dlx -- 'C:\Downloads\adui-viteplus-starter-0.1.1.tgz'
 ```
 
 不需要先下载生成器仓库。无参数进入向导，选择项目类型、Vue/React、TS/JS、UI、CSS、大屏、引擎和模型保护。与 Vite+ 使用同款方向键选项和回车确认，3D 引擎用空格勾选，可多选，空列表表示不启用；名称直接输入。最终选择 No 或任意步骤 Ctrl+C 均取消，不创建项目。目标位置依据调用目录，和 dlx 缓存或包安装目录无关。
@@ -79,7 +79,7 @@ pnpm dlx $bundle.tarball
 
 自动回归覆盖暂存资源、隔离包的 Vue/React 多引擎与 JSON 批量预览、中文空格及元字符目录、调用目录计算、已有输出/junction 拒绝、打包调用上下文错误。真实 tgz 安装、vp dlx、TTY 选择/取消和代表创建结果见 [项目状态](PROJECT_CONTEXT.md)。
 
-包名已按用户要求确定为 @adui/viteplus-starter，0.1.0 已公开发布；本地打包入口不会自动发布或创建流水线。
+包名已按用户要求确定为 @adui/viteplus-starter，当前0.1.1已公开发布并包含Keywords；本地打包入口不会自动发布或创建流水线。
 
 ## 2026-11-02 本地包实测
 
