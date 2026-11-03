@@ -1,6 +1,6 @@
 # npm 首发准备
 
-包名为 `@adui/viteplus-starter`，命令名为 `viteplus-starter`。用户已确认首发版本为 **0.1.0**，当前对应的本地候选包仍设置 `private: true`，尚未发布；仓库根作为开发工作区继续保留 0.0.0/private。
+包名为 `@adui/viteplus-starter`，命令名为 `viteplus-starter`。用户已明确授权 **0.1.0 / public / latest** 首发，CLI 发布清单已设置 `private: false`，当前正在重新打包与发布验收；仓库根作为开发工作区继续保留 0.0.0/private。实际上传结果见本文件后续记录与项目状态。
 
 ## 本轮候选包
 
@@ -41,6 +41,6 @@ if ($LASTEXITCODE -ne 0) { throw '候选包安装失败' }
 3. **只有用户明确授权发布后**，才同步版本/README 状态并调整 CLI 源清单的 private 状态，重新打包、核对新 integrity 并复验；工作区根继续 private。打包器读取源 private 布尔值，不另藏一个相互冲突的固定值。
 4. 最终发布必须指向已复验的 CLI tarball，不能在仓库根误发整个开发工作区。不添加流水线、安装钩子发布或其他自动发布入口。
 
-截至 2026-11-03 的只读检查：npm whoami 返回 ENEEDAUTH；公开 registry 对 @adui/viteplus-starter 返回 E404，作用域权限未核实。没有登录或创建 token，未直接读取或记录任何凭据内容，也没有上传候选包。
+2026-11-03 最新只读检查：npm whoami 返回 adui，符合个人作用域 @adui；目标包公开查询为 E404，权限列表尚无目标包。此前 ENEEDAUTH 为用户登录前的历史状态。个人作用域规则见 [npm scopes](https://docs.npmjs.com/about-scopes/)。未直接读取或记录任何凭据内容，授权后的上传结果单独记录。
 
 `private: true` 会让 npm 拒绝发布；publishConfig 只声明将来发布时的目标设置，不会自行执行发布。依据：[npm package.json](https://docs.npmjs.com/cli/v11/configuring-npm/package-json/#private)。scoped 公共包的可见性与身份要求以 [npm 官方发布说明](https://docs.npmjs.com/creating-and-publishing-scoped-public-packages/) 为准；本项目当前只做本地准备。

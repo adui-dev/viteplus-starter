@@ -20,7 +20,11 @@ test("CLI 本地包保留资源与官方提示依赖，不带测试或生命周�
   const directory = join(root, "package");
   const manifest = await stageCliPackage(directory);
   assert.equal(manifest.name, "@adui/viteplus-starter");
-  assert.equal(manifest.private, true);
+  assert.equal(manifest.private, false);
+  assert.equal(
+    JSON.parse(await readFile(new URL("../../../package.json", import.meta.url), "utf8")).private,
+    true,
+  );
   assert.deepEqual(manifest.publishConfig, {
     access: "public",
     registry: "https://registry.npmjs.org/",

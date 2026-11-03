@@ -90,4 +90,4 @@ multi-engine.mjs 编排逐应用多个独立引擎预设，不新增框架模板
 
 ## CLI 首发准备
 
-首发准备只增强本地 CLI 打包层：补齐元信息和许可，审核 npm 的实际文件列表与 tarball 完整性，输出独立可审阅清单。CLI 源清单保留 private:true，publishConfig 只描述未来发布的配置，不主动上传；根继续 private。手动发布条件与只读账户检查见 [首发准备](NPM_RELEASE.md)。
+首发准备只增强本地 CLI 打包层：补齐元信息和许可，审核 npm 的实际文件列表与 tarball 完整性，输出独立可审阅清单。用户明确授权 0.1.0 公开发布后，CLI 源清单改为 private:false，根继续 private；打包器仍不主动上传。手动发布和账户检查见 [npm 分发](NPM_RELEASE.md)。

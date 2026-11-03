@@ -12,13 +12,13 @@
 </p>
 
 > [!NOTE]
-> 首发版本 `0.1.0`，当前仍为 private 本地候选包，尚未发布到 npm。现在使用本地 tgz；下文按包名运行或安装的命令适用于正式发布后。
+> **Windows CLI · v0.1.0**。通过 Vite+、pnpm 或 npm 启动配置向导，按需生成官方 Vue、React 与 Monorepo 工程。
 
 ## 快速开始
 
 **环境**：Windows，Node.js `^22.18.0 || ^24.11.0 || >=26.0.0`，可运行的 Vite+ `vp` 与 pnpm。首次启动和创建需要网络或完整依赖缓存。
 
-### 本地包：当前可用
+### 使用本地 tgz
 
 从希望存放新项目的父目录任选一种命令，替换为实际 tgz 路径：
 
@@ -37,7 +37,7 @@ npm exec --yes --package 'C:\Downloads\adui-viteplus-starter-0.1.0.tgz' -- vitep
 
 </details>
 
-### 包名入口：正式发布后可用
+### 通过包名直接运行
 
 以下方式无需全局安装，也不将生成器添加到项目依赖：
 
@@ -66,7 +66,7 @@ Monorepo 在工作区根运行 `vp run ready`。
 
 ## 安装后使用
 
-包名 **`@adui/viteplus-starter`**，命令名 **`viteplus-starter`**。正式发布后，可任选一种方式安装：
+包名 **`@adui/viteplus-starter`**，命令名 **`viteplus-starter`**。可任选一种方式安装：
 
 | 方式             | pnpm                                         | npm                                             |
 | ---------------- | -------------------------------------------- | ----------------------------------------------- |

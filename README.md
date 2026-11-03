@@ -19,7 +19,7 @@
 </p>
 
 > [!NOTE]
-> 当前为 **Windows 本地候选版**，CLI 包名 `@adui/viteplus-starter`，首发版本 `0.1.0`，尚未发布到 npm。现在可通过 GitHub 或本地 tgz 使用；下文按包名安装、运行的命令适用于正式发布后。
+> **Windows CLI · v0.1.0**。包名 `@adui/viteplus-starter`，命令名 `viteplus-starter`；支持 Vite+、pnpm、npm、GitHub 和本地 tgz 入口。
 
 ## 功能
 
@@ -42,7 +42,7 @@
 
 ### 1. 启动配置向导
 
-**当前可用：从 GitHub 下载。** 在项目父目录执行，工具目录 `viteplus-starter` 须不存在：
+**从 GitHub 下载。** 在项目父目录执行，工具目录 `viteplus-starter` 须不存在：
 
 ```powershell
 vp create github:adui-dev/viteplus-starter
@@ -69,7 +69,7 @@ npm exec --yes --package 'C:\Downloads\adui-viteplus-starter-0.1.0.tgz' -- vitep
 
 </details>
 
-**正式发布后：按包名直接运行。** 以下三种方式任选一种，无需全局安装或添加项目依赖：
+**按包名直接运行。** 以下三种方式任选一种，无需全局安装或添加项目依赖：
 
 ```powershell
 vp dlx -- @adui/viteplus-starter
@@ -108,7 +108,7 @@ Monorepo 在工作区根运行 `vp run ready`。完整步骤见 [Windows 操作�
 
 ## 安装后使用
 
-正式发布后，也可以安装 CLI 长期使用。包名是 **`@adui/viteplus-starter`**，命令名是 **`viteplus-starter`**。
+也可以安装 CLI 长期使用。包名是 **`@adui/viteplus-starter`**，命令名是 **`viteplus-starter`**。
 
 | 方式             | pnpm                                         | npm                                             |
 | ---------------- | -------------------------------------------- | ----------------------------------------------- |

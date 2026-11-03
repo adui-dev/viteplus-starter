@@ -286,7 +286,7 @@ ui-smoke 内部预设表统一维护框架/UI 对应包、展示名、Vue 标签
 
 stageCliPackage 在新暂存目录中复制固定的 create/src、bin、normalize 静态资源与五个预设 src；只接受普通源码文件，拒绝隐藏文件、未知类型、链接和已有输出。保持 packages/<模块>/src 布局，使资源读取、模型安装器反向引用 create 及批量子进程入口无需重写。生成清单保留包名/版本/引擎约束、private、bin、文件白名单及运行时 dependencies，不携带开发依赖或生命周期脚本。
 
-pack-cli 由 npm run cli:pack 启动，使用 npm_execpath 和当前 Node 通过 argv 调用 npm pack --offline --ignore-scripts，不经 shell。产物位于每次新建的 dist/cli/pack-*；独立临时暂存目录创建后校验归属，并在 finally 清理。没有自动发布步骤，源包与产物均保持 private/0.0.0。
+pack-cli 由 npm run cli:pack 启动，使用 npm_execpath 和当前 Node 通过 argv 调用 npm pack --offline --ignore-scripts，不经 shell。产物位于每次新建的 dist/cli/pack-*；独立临时暂存目录创建后校验归属，并在 finally 清理。没有自动发布步骤；版本与 private 由 CLI 源清单明确提供，根工作区继续私有。
 
 安装包的 bin 直接运行原 CLI，采用调用 cwd；它不使用 GitHub 启动器的工具父目录策略，也不会在安装时生成应用。help 使用实际命令名 viteplus-starter，生成器源码入口继续可用。包声明官方提示组件的运行时依赖，由 dlx/安装器解析；生成应用仍要求可用的 vp，并由官方模板及应用包管理器安装所选依赖。
 
@@ -356,7 +356,7 @@ workspace-inspect 将“生成器管理的首页”与“预设目录已归档�
 
 ## 首发候选的包元信息与实际文件审查
 
-cli-package 从 CLI 源清单读取版本、显式 private 布尔值、描述、MIT、仓库/主页/反馈及 publishConfig；默认 private:true 保持，root LICENSE 原字节复制到暂存根。root 工作区不会作为 CLI 包发布。用户已确认首发版本为 0.1.0，当前候选版本与之相同。
+cli-package 从 CLI 源清单读取版本、显式 private 布尔值、描述、MIT、仓库/主页/反馈及 publishConfig；root LICENSE 原字节复制到暂存根。用户明确授权 0.1.0 公开发布后，CLI 源 private 改为 false，root 工作区继续 private，不作为 CLI 包发布。产物继承源清单状态，不在暂存目录隐藏覆盖。
 
 cli-pack-report 只接收 npm pack 的元信息，核对包名/版本/标准 scoped 文件名和实际 files。允许固定顶层文件、normalize 静态资源、既有六个运行时源码树的已知类型；拒绝隐藏/越界路径、测试/依赖目录、模型、未知类型、重复项和缺少许可/入口的候选。pack-cli 在写侧车报告前计算实际 tarball SHA-512 并与 npm integrity 比较，成功后标记 integrityVerified；报告包含逐文件路径/字节数/模式及打包大小，位于产物目录，不进入 tarball。
 

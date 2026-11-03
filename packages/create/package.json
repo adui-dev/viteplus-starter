@@ -1,7 +1,7 @@
 {
   "name": "@adui/viteplus-starter",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "description": "ADui Vite+ 交互式项目生成器",
   "homepage": "https://github.com/adui-dev/viteplus-starter#readme",
   "bugs": {

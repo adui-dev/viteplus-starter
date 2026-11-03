@@ -1,6 +1,6 @@
 # 生成器能力与验收范围
 
-2026-11-03 CLI 已准备 0.1.0/private 本地候选包，补齐 MIT LICENSE、公开元信息与实际文件清单/完整性审查，90文件的隔离安装、Windows shim、两框架预览与TTY取消通过。未发布；npm尚未登录，首发版本0.1.0已获用户确认，作用域权限仍待核实。详情见 [首发准备](NPM_RELEASE.md) 与项目状态文末。
+2026-11-03 用户已授权 @adui/viteplus-starter@0.1.0 以 public/latest 首发，npm 登录账号已核实为 adui。CLI 清单 private:false，根工作区仍 private；当前进行重新打包、隔离验收与实际发布，结果以 [发布记录](NPM_RELEASE.md) 和项目状态文末为准。此前私有候选与未登录描述属于历史状态。
 
 2026-11-02 补装新增插件已统一 src/plugins / build/plugins，保留已有业务入口、历史插件与配置原件备份，支持混合目录的结构检查。包名确定为 @adui/viteplus-starter，保持 private/0.0.0、未发布；本地包已完成 Vue 单应用及 React Monorepo 成员补装的代表检查/完整构建，工作区 ready 6/6，边界见项目状态文末。
 

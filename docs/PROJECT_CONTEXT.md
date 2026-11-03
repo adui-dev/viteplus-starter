@@ -865,3 +865,9 @@
 - 最新本地候选为 dist/cli/pack-D3wixQ/adui-viteplus-starter-0.1.0.tgz，共 92 文件，包含原 Logo 及 branding 模块，实际完整性审查通过、private 保持。vp dlx 初次请求 pnpm/latest 遇 429；仅在验收进程指定已缓存 pnpm 12.16.1 后成功完成该包的 React JS 预览，cwd/target 正确，未生成目标。未更改全局包管理器、依赖声明或发布。
 
 三个预览服务与本轮独立 Chrome 均已停止；临时应用、官方工作区及浏览器配置按自有路径核验后清理，保留候选包、日志与截图。下一步核实 npm 登录和 @adui 权限，进入 0.1.0 首发准备；不继续扩展业务展示功能。
+
+## 2026-11-03 用户授权 npm 首发
+
+npm whoami 已核实为 adui，对应个人作用域 @adui；目标包查询为 E404，权限列表尚无该目标包。用户随后明确授权以 public/latest 发布 @adui/viteplus-starter@0.1.0。当前进入实际发布流程：CLI private 改为 false、根仍为 true，同步 README 安装说明，重新打包/审查/隔离验收后上传；成功与否及 registry 结果另行记录，不将准备或 dry-run 作为已发布。
+
+发布前验证：291/291 测试、文档校验、155 文件 lint 与改动文件格式通过。全仓 vp check 仍仅受用户已安装 create-readme Skill 的既有格式影响，原文和锁文件未修改。发布候选 dist/cli/pack-M7ZfKt/adui-viteplus-starter-0.1.0.tgz，92 文件，private:false，实际 SHA-512 核验通过；隔离安装9个包，Windows shim 帮助、Vue TS/Element Plus/Tailwind/大屏和 React JS/Ant Design/UnoCSS/三引擎预览通过，无目标生成；安装后 Logo 原件 SHA-256、无生命周期脚本及清单状态一致。npm publish --dry-run --ignore-scripts --access public --tag latest 对该具体 tarball 预演退出0，尚未上传。

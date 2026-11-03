@@ -2,7 +2,7 @@
 
 GitHub 来源的 `vp create github:adui-dev/viteplus-starter` 下载工具仓库，再由 `vp run create` 启动向导。要直接进入 UI/CSS、大屏和引擎选择，使用本地 CLI 安装包入口。
 
-当前包为 `@adui/viteplus-starter@0.1.0`，命令名 `viteplus-starter`，仍为 private，尚未发布到 npm/Release。无需为分发入口新建仓库或重写生成器。运行环境为 Windows、已安装的 `vp` 和受支持 Node；基础工程仍委托 Vite+ 官方模板。
+当前包为 `@adui/viteplus-starter@0.1.0`，命令名 `viteplus-starter`。用户已授权 npm 公开首发，CLI 清单 private:false，当前正在发布验收；实际 registry 状态见 [发布记录](NPM_RELEASE.md)。无需为分发入口新建仓库或重写生成器。运行环境为 Windows、已安装的 `vp` 和受支持 Node；基础工程仍委托 Vite+ 官方模板。
 
 0.1.0 为当前本地候选版本；首发条件与账户检查见 [npm 首发准备](NPM_RELEASE.md)。打包结果新增 contents 路径，对应实际文件清单 pack-contents.json，包含 MIT LICENSE、包元信息与 integrity，清单不进入 tarball。
 

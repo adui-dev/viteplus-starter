@@ -235,3 +235,7 @@ FR-014 / NFR-001：CLI 首发版本经用户确认采用 0.1.0，保持 private:
 - 正式 HTML 入口与 App 必须通过新建快照检查；Logo 目标占用、入口变化或链接路径在写入前拒绝，不自动覆盖已有业务项目或迁移其自定义品牌。
 - UI、大屏、三引擎、模型独立验收页使用同一 SVG 的 favicon；独立页可内置 SVG 以避免改写业务入口或依赖新增资源文件。新建应用的 HTML 和首页引用由 Vite 处理资源路径。
 - README 横幅使用同一 Logo 的路径与渐变。自包含 CLI 包必须携带原 SVG，并纳入必要文件清单审查。预览列出品牌相关目标，不安装新依赖、不触发发布。
+
+## 2026-11-03 首次公开发布授权
+
+用户已明确确认将 @adui/viteplus-starter@0.1.0 以 public/latest 发布到 npm。CLI 源清单 private 改为 false，工作区根保持 true；重新打包并验证实际 tarball、隔离安装与发布预演后，人工上传该具体产物。发布成功须以 registry 返回的版本、tag 与 integrity 为准，并验证 vp dlx / pnpm dlx。此授权不包含 GitHub Release、CI/CD 或自动发布配置。
