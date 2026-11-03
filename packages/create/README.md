@@ -118,6 +118,8 @@ Monorepo 根不指定框架、语言或插件，各应用独立配置。全部�
 
 ## 生成结果
 
+新建 Vue/React 应用（含无插件应用）、工作区默认网站、验收页图标与 README 统一使用 ADui Studio Logo。首页与 favicon 共用 src/assets/adui-studio-logo.svg，由 Vite 处理生产资源路径；已有业务项目的自定义标识不自动覆盖。
+
 | 内容             | 默认行为                                                                   |
 | ---------------- | -------------------------------------------------------------------------- |
 | 基础工程         | 委托 Vite+ 官方 `vite:application` / `vite:monorepo`                       |

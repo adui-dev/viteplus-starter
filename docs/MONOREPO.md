@@ -2,6 +2,8 @@
 
 根工作区使用 Vite+ 官方 `vite:monorepo`；每个新增应用仍使用官方 `vite:application`。保留默认 `apps/website` 和 `packages/utils`，没有 CI/CD 配置。
 
+新建工作区的 website 首页展示和 favicon 使用统一 ADui Studio Logo，保留官方计数器、链接、目录及工具配置。新增 Vue/React 应用也使用相同标识；向已有工作区添加应用不会自动改写已有 website 或业务品牌。
+
 需要一次新建多个应用时，使用 [JSON 批量配置](BATCH_CONFIG.md)；下面的 `--workspace` 继续用于向已有工作区逐个添加应用。
 
 ## 创建

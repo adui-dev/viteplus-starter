@@ -22,6 +22,8 @@ $bundle.tarball
 
 当前包清单声明 @voidzero-dev/vite-plus-prompts 1.4.0 运行时依赖，由 dlx/安装器取得组件及传递依赖。首次启动需要可用的依赖缓存或网络；打包命令本身仍不安装依赖。
 
+包内还包含用户指定的原始 adui-studio-logo.svg，用于新建应用首页、favicon 和工作区默认网站；图标是打包审查的必要资源。旧 tgz 不会获得该更新，须重新打包并使用新路径。
+
 更新源码后重新打包并使用新的 tarball 路径，旧 tgz 不会自动替换交互界面。直接从源码运行 vp run create 时，先在工具根执行 vp install --frozen-lockfile，安装新增的提示依赖。
 
 ## 一条命令进入向导

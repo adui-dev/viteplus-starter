@@ -4,6 +4,7 @@
 
 ```text
 src/
+  assets/adui-studio-logo.svg # 首页与 favicon 的共享原始 Logo
   plugins/
     index.ts             # JS 项目为 index.js
     ui/index.ts          # 只导出所选库的 UiButton
@@ -25,6 +26,8 @@ build/plugins/
 ```
 
 只生成所选功能需要的目录。Vite、UnoCSS、TypeScript 等工具约定的配置文件继续位于官方支持的位置；Tailwind 样式沿用 src/starter.tailwind.css。浏览器运行时与 Node 构建代码分开。
+
+新建应用默认带 src/assets/adui-studio-logo.svg，首页与 index.html favicon 共用用户指定的原始标识；Vite 负责生产资源与 base 路径。无预设时也显示品牌首页，不生成空 plugins 入口。新建工作区的默认 website 同样统一品牌，保留其官方页面功能及配置。已有业务应用补装不替换 App/index 或自定义 Logo；独立验收页使用同源 SVG 图标。
 
 Vue 的 main 使用 `createApp(App).use(plugins).mount('#app')` 注册所选 UI 按钮和 AdScreen；App.vue 显式导入并使用组件，保留类型检查。UI 的自动导入解析器继续位于 Vite 配置，不通过全量安装组件库替代按需导入。
 

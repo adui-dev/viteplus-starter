@@ -34,6 +34,8 @@
 
 基础工程始终委托 Vite+ 官方 `vite:application` / `vite:monorepo`。各应用独立选择语言和插件，默认 TypeScript；UI、CSS 和引擎均可不启用。所有 Vue/React 应用默认导入本地静态 normalize.css，不安装 normalize.css npm 包。
 
+新建应用、工作区默认网站、README 和 favicon 统一使用 [ADui Studio Logo](packages/create/assets/adui-studio-logo.svg)。应用首页与浏览器图标共用同一资源，生产构建由 Vite 处理路径。
+
 ## 快速开始
 
 **环境**：Windows / PowerShell，Node.js `^22.18.0 || ^24.11.0 || >=26.0.0`，可运行的 Vite+ `vp` 与 pnpm。首次创建需要网络或完整的模板、依赖缓存。
@@ -191,6 +193,7 @@ vp run create --name existing-vue --type application --framework vue --ui elemen
 
 ```text
 src/
+├─ assets/         ADui Studio Logo 与应用资源
 ├─ plugins/        UI、大屏与所选引擎运行时
 ├─ components/     页面组件与按需场景入口
 ├─ styles/         本地 normalize.css、许可及首页样式

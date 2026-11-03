@@ -6,10 +6,6 @@
       <stop stop-color="#111827"/>
       <stop offset="1" stop-color="#172554"/>
     </linearGradient>
-    <linearGradient id="accent" x1="52" y1="62" x2="112" y2="122" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#67E8F9"/>
-      <stop offset="1" stop-color="#A78BFA"/>
-    </linearGradient>
     <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
       <path d="M32 0H0V32" stroke="#93C5FD" stroke-opacity=".065"/>
     </pattern>
@@ -18,10 +14,24 @@
   <rect width="1280" height="320" rx="20" fill="url(#grid)"/>
   <circle cx="1156" cy="70" r="184" fill="#6366F1" fill-opacity=".08"/>
   <circle cx="1000" cy="316" r="210" fill="#22D3EE" fill-opacity=".045"/>
-  <rect x="52" y="52" width="52" height="52" rx="15" fill="url(#accent)"/>
-  <path d="M65 84L78 65L91 84M69 79H87M78 84V92" stroke="#111827" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <svg x="52" y="20" width="112" height="112" viewBox="0 0 1024 1024">
+  <!-- Generator: Adobe Illustrator 29.6.0, SVG Export Plug-In . SVG Version: 2.1.1 Build 207)  -->
+  <defs>
+    <style>
+      .st0 {
+        fill: url(#_未命名的渐变);
+      }
+    </style>
+    <linearGradient id="_未命名的渐变" data-name="未命名的渐变" x1="431.2" y1="593.6" x2="432.6" y2="592.2" gradientTransform="translate(-338410.1 254469.4) scale(784.6 -428.3)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5b2b82"/>
+      <stop offset=".5" stop-color="#5b2b82"/>
+      <stop offset="1" stop-color="#6cff00"/>
+    </linearGradient>
+  </defs>
+  <path class="st0" d="M336.7,680.2l-50.5,120.8H11.5L318,214h188.2l191.4,459.3s22,.7,34.7.7,151.8-4.9,151.8-166.5-155-163-163.3-163-78.2-.8-78.2-.8l-59.3-129.7h174.9c96.2,0,257.4,81.5,257.4,293.5s-141.1,293.5-228.3,293.5h-186.8l-191-452.1-179.9,329.8,107.2,1.5Z"/>
+</svg>
   <g font-family="Segoe UI, Arial, sans-serif">
-    <text x="122" y="85" fill="#A5B4FC" font-size="18" font-weight="600" letter-spacing="3">ADUI / DEVELOPER TOOLS</text>
+    <text x="184" y="85" fill="#A5B4FC" font-size="18" font-weight="600" letter-spacing="3">ADUI / DEVELOPER TOOLS</text>
     <text x="52" y="164" fill="#F8FAFC" font-size="48" font-weight="700" letter-spacing="-1.5">Vite+ Starter</text>
     <text x="54" y="204" fill="#A9BAD4" font-size="19">Official templates. Your stack.</text>
     <g font-size="13" font-weight="600">

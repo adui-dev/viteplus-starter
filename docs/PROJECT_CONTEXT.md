@@ -849,3 +849,19 @@
 本轮 285/285 测试、文档校验、四份改动 Markdown 的格式检查、153 文件 lint 与 git diff --check 通过。SVG XML 解析、导航标题与折叠标签核对完成；使用 PowerShell Markdown 转换及本地 Chrome 生成并查看排版预览，预览与日志位于忽略目录 dist/verification。该预览用于本地视觉检查，不等同 GitHub/npm 页面实测。完整 vp check 仍仅因已安装 create-readme Skill 的既有格式问题未通过；不修改第三方原文或检查配置。本轮未重打 CLI 包、创建应用或执行发布。
 
 浏览器已退出；自动审批以 blocked by policy 拒绝清理本轮自有 Chrome 临时配置目录，未提供更具体原因，未绕过该限制。临时目录 adui-readme-preview-45e11a1a930e41e59829604da693d887 保留在系统 Temp 中，具体路径记录于忽略目录 dist/verification/readme-preview-profile.txt。
+
+## 2026-11-03 用户指定统一 Logo
+
+用户提供 Pictures/adui-studio-logo.svg，明确所有项目品牌展示及搭建后 favicon 使用该文件。原字节副本纳入 packages/create/assets/adui-studio-logo.svg，SHA-256 与原件一致；README 横幅替换自绘标识为该 SVG 的相同路径与渐变。新建 Vue/React TS/JS（含无插件应用）、新建工作区默认 website、保留/单独生成的验收页和本地 CLI 包接入统一标识，基础工程仍由官方模板生成。旧工程业务 App/index 和自定义品牌不自动覆盖。
+
+本轮扩展新建最终整理的 HTML 快照与资源占用保护，空预设也显示品牌首页但不生成空插件目录。工作区默认网站保留原计数器、文档链接及工具配置；仅替换已知官方品牌结构，未知结构保留现场。实际验证另行记录，未发布 npm 或 Release。
+
+### 本轮实际验证
+
+- 291/291 Node 测试通过，无跳过；新增四种无插件框架/语言、六类独立页、Logo/HTML/junction 冲突和工作区网站保护用例。两项旧退出码用例补齐新的官方 HTML/website 夹具，继续验证真实 CLI 的非零退出与停止行为；不跳过测试。根 155 个代码文件 lint 通过，完整 vp check 仍仅因用户已安装 create-readme Skill 的既有格式未通过。
+- 原始 SVG、仓库副本、Vue/React/website 生产 favicon 的 SHA-256 均为 AEB0CB115AAC9BD96475F69D26A75CC9B2AEA72B82250D7579AE2E9E0293303C；.gitattributes 仅对此原件禁用换行转换，用户 Pictures 文件未修改。
+- Node 22.18.0、Vite+ 1.4.0、官方选择 pnpm 11.22.0：官方 Monorepo 根创建后执行品牌整理，再由当前 CLI 添加 Vue TS/TDesign/UnoCSS/AdScreen 应用并保留 smoke 页；工作区 ready 无缓存 7/7，通过 48 文件格式、23 文件 lint/类型、utils 1 项测试及完整构建。官方 utils 保留 TypeScript 7 API 实验性提示。独立 React JS 无插件应用由 CLI 创建，12 文件格式/3 文件检查及完整 build 通过，不生成空插件目录；额外 /brand-check/ base 构建验证品牌资源路径。
+- Chrome 实测 Vue、React 及默认 website 生产页：Logo 成功加载、favicon HTTP 200、原件字节一致、点击均由 0 到 1，无捕获到的运行时异常。React 在 /brand-check/ 下验收；截图及结构化结果位于 dist/verification/logo-*-browser。未将此代表验收扩展为全部插件组合或三引擎页面专项构建。
+- 最新本地候选为 dist/cli/pack-D3wixQ/adui-viteplus-starter-0.1.0.tgz，共 92 文件，包含原 Logo 及 branding 模块，实际完整性审查通过、private 保持。vp dlx 初次请求 pnpm/latest 遇 429；仅在验收进程指定已缓存 pnpm 12.16.1 后成功完成该包的 React JS 预览，cwd/target 正确，未生成目标。未更改全局包管理器、依赖声明或发布。
+
+三个预览服务与本轮独立 Chrome 均已停止；临时应用、官方工作区及浏览器配置按自有路径核验后清理，保留候选包、日志与截图。下一步核实 npm 登录和 @adui 权限，进入 0.1.0 首发准备；不继续扩展业务展示功能。
