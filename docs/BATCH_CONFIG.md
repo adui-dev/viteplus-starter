@@ -46,6 +46,15 @@ uiSmoke 的 Vue UI 为 Element Plus、Ant Design Vue、TDesign，React UI 为 An
 
 ## 预览与执行
 
+使用 npm 公开包时，将上面的 JSON 保存为项目父目录中的 `monorepo.batch.json`，在该目录执行：
+
+```powershell
+vp dlx -- @adui/viteplus-starter --config ./monorepo.batch.json --dry-run
+vp dlx -- @adui/viteplus-starter --config ./monorepo.batch.json
+```
+
+也可用 `pnpm dlx @adui/viteplus-starter` 替换上述入口，保留后面的参数。预览不会创建工作区；第二条命令才实际生成。需要复现特定版本时，在包名后追加版本，例如 `@adui/viteplus-starter@0.1.1`。
+
 在仓库上级目录执行，输出为**当前目录下的配置 name**，与配置文件所在目录无关；目标必须不存在，不能在已有 workspace 内嵌套创建。
 
 目标预检也会检查当前目录及各级祖先的 package.json：存在时须为不超过 1 MiB 的普通 JSON 对象文件，接受 UTF-8 BOM；目录、符号链接、悬空链接、超限或损坏清单均拒绝。错误给出对应路径，不显示清单内容；先人工核对该文件，不删除未知祖先文件来重试。普通非工作区清单可继续规划，workspace 标记仍禁止嵌套；预览后再执行也会重新检查。
@@ -88,6 +97,10 @@ root 的 ready 会调用检查、默认库测试和所有包的完整 build 脚�
 不要删除未知文件后盲目重跑；先检查现场。修好已有工作区后可用逐应用 `--workspace` 命令显式处理未完成应用；再次执行相同 batch 会因根目录已存在而拒绝。不要同时向同一工作区运行多个生成命令。
 
 ## 验证状态
+
+2026-11-03，实际通过公开包 `@adui/viteplus-starter@0.1.1` 的 `vp dlx` 创建混合工作区：Vue TS/Element Plus/Tailwind 与 React JS/Ant Design/UnoCSS，均启用 AdScreen 和显式 UI Smoke。根 `vp run ready` 无缓存 8/8 成功，构建后 `vp check` 通过（71 文件格式、38 代码文件检查）。Chrome 验证两正式生产首页在 1280×800、1920×1080、800×600 下的指针点击与计数；两开发模式 UI Smoke 的点击和 CSS 生效。默认 website 的计数器、三个生产页的 Logo/favicon 也通过。结构只读检查通过，重复创建退出1，115份源文件及配置哈希未变。
+
+本轮依赖安装提示 Volar 2.4.30 要求 TypeScript <7，而官方工作区 catalog 为 TypeScript 7.0.2；`pnpm peers check` 因此退出1，完整类型检查和构建均通过。保留官方依赖选择，不将该警告描述为已修复。详细范围见 [项目状态](PROJECT_CONTEXT.md)，不代表其他组合已验证。
 
 2026-10-27，使用仓库样例 JSON 完整创建 `D:\Workspace\adui-studio\adui-batch-demo`，5 个生成阶段全部完成。根 `vp run ready` 的 8 项任务全部成功，构建后 `vp check` 再次通过（47 文件格式正确、20 文件无警告或 lint/type 错误）；官方 utils 构建有 TypeScript 7 API 实验性提示。
 

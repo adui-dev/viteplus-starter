@@ -79,6 +79,8 @@ pnpm dlx $bundle.tarball
 
 自动回归覆盖暂存资源、隔离包的 Vue/React 多引擎与 JSON 批量预览、中文空格及元字符目录、调用目录计算、已有输出/junction 拒绝、打包调用上下文错误。真实 tgz 安装、vp dlx、TTY 选择/取消和代表创建结果见 [项目状态](PROJECT_CONTEXT.md)。
 
+公开 0.1.1 已通过 `vp dlx` 实际创建 Vue TS/Element Plus/Tailwind 与 React JS/Ant Design/UnoCSS 混合工作区，均接入正式首页和 AdScreen；根 ready 8/8、构建后检查及五张代表页面的浏览器验收通过。只读结构检查和重复创建保护通过；依赖存在官方 TypeScript 7 与 Volar 的 peer 范围警告，详见 [批量验收记录](BATCH_CONFIG.md#验证状态)。这些结果来自公开包的实际创建，与此前的帮助和 dry-run 验证分开记录。
+
 包名已按用户要求确定为 @adui/viteplus-starter，当前0.1.1已公开发布并包含Keywords；本地打包入口不会自动发布或创建流水线。
 
 ## 2026-11-02 本地包实测

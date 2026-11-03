@@ -8,7 +8,7 @@
 
 - 仓库：`adui-dev/viteplus-starter`。Vite+ 官方 `vite:application` / `vite:monorepo` 是唯一基础工程来源，Vue/React Application 按语言选 `vue` / `vue-ts` / `react` / `react-ts`。
 - 已实现：基础 CLI 交互与参数模式、Application UI/CSS 集成、旧项目补装及 `--repair-existing`、UI Smoke、通过 `--workspace` 逐个添加及通过 JSON 批量新建 Monorepo 应用、本地单元测试与文档检查。
-- 当前阶段：Windows V1 CLI 分发入口与实际使用问题修复。用户 2026-11-02 明确希望一条命令进入配置向导，本地自包含 CLI 包已实现，正式包名已确定为 @adui/viteplus-starter，尚未发布。现有恢复、三引擎及代表大屏专项范围见文末及 GENERATOR_STATUS；自定义布局、其他操作系统与覆盖式恢复不在本阶段范围。
+- 当前阶段：Windows V1 CLI 公开分发后的实际使用验收与问题修复。@adui/viteplus-starter@0.1.1 已公开发布，latest、20 个关键词及下载完整性已核验；继续使用公开包验证真实创建、正式首页和混合工作区。现有恢复、三引擎及代表大屏专项范围见文末及 GENERATOR_STATUS；自定义布局、其他操作系统与覆盖式恢复不在本阶段范围。
 - 严格要求：**不得添加任何 CI/CD、自动发布或部署工作流**；仅人工本地测试。
 
 ## 用户 Windows 实机验收（已确认）
@@ -35,7 +35,7 @@
 
 ## 下一步
 
-1. 按用户新要求优先完成 CLI 分发体验：本地 tgz 可通过 vp dlx 直接进入向导，0.1.0 候选已完成本地分发验证；下一步确认版本、npm 登录和作用域权限后准备首发；任何 npm/Release 发布仍需明确授权。继续维护 Windows 创建、补装及输入校验的具体问题，不重复扩张组合或新增业务演示。
+1. 使用已发布的 0.1.1 CLI 验证 Windows 真实项目创建、正式首页和混合工作区；依据具体反馈修复创建、补装及输入校验问题，不重复扩张组合或新增业务演示。任何后续 npm/Release 发布仍需明确授权。
 2. 默认本地 normalize.css、独立应用与 Monorepo 的 UI/CSS 联用已完成代表验收；官方模板和文件保护边界继续保留。
 3. 新需求明确后再调整范围；不能将代表组合通过视为完整矩阵通过，不推进其他系统或发布流程。
 
@@ -897,3 +897,17 @@ npm whoami 已核实为 adui，对应个人作用域 @adui；目标包查询为 
 registry处理后已公开提供0.1.1，latest指向0.1.1。版本清单keywords与包级keywords均与源码中的20项完全一致；公开tarball下载101415字节，SHA-512与候选完全一致：sha512-e4SimgM9NtNZLtKmwBxxxG3d2xsLbgmI0tt6RUHP93kkosqw5sJReSJ1gOW0VruXlJZLYVz6XDXhNspcE2ulLw==。真实vp dlx / pnpm dlx的显式0.1.1包名帮助均成功，未创建工程；只有验收进程指定缓存pnpm12.16.1，没有改全局配置。
 
 发布核验见dist/verification/keywords-publish-evidence.json及keywords-published-*；本轮沿用已验收产物，不重打包或重跑无变化的全量组合。npm网站抓取工具未返回页面，故只报告registry关键词已生效，不声称已进行网页视觉验收。0.1.0保留，未创建Release或CI/CD，也未修改用户Skill安装改动。下一步用公开CLI创建实际项目，依据具体反馈修复生成器。
+
+## 2026-11-03 公开 CLI 混合工作区实际验收
+
+从系统临时目录经 `vp dlx -- @adui/viteplus-starter@0.1.1 --config <JSON>` 实际创建官方 Monorepo 与两个应用，5个阶段全部成功，不使用源码 CLI 替代公开包。环境为 Windows、Node 22.18.0、Vite+ 1.4.0；官方流程实际选择 pnpm 11.22.0。Vue 默认 TS，选择 Element Plus/Tailwind；React 选择 JS/Ant Design/UnoCSS，二者均启用 AdScreen、显式生成 UI Smoke。
+
+- 正式 main/App 已接入 `src/plugins/ui`、`src/plugins/screen`；normalize 静态 CSS 为正式入口第一条导入，不安装 normalize.css 包。未留下大屏/引擎/模型的旧暂存目录或中间备份，显式 UI Smoke 保留。官方 website/utils 保留，根无 Vue/React、UI/CSS 直接依赖。
+- 根 `vp run ready` 无缓存8/8通过，包含完整类型检查、utils的1项测试与所有包构建；构建后 `vp check` 再次通过，71份格式文件、38份代码文件无警告、lint或类型错误。官方 utils 的 TypeScript 7 API 实验性提示保留。
+- Chrome 验证 Vue/React 正式生产首页：1280×800、1920×1080、800×600 均能通过真实指针坐标点击，计数依次0→1→2→3。默认 website 生产页0→1；三页 Logo 成功加载，favicon HTTP200且 SHA-256 与用户 SVG 原件完全相同。两开发模式 UI Smoke 页面均0→1，浅绿色背景、16px内边距及8px圆角有效。五页均无捕获到的运行时异常或控制台 warning/error；截图及结构化结果在 `dist/verification/public-cli-*.png/.json`。
+- 公开包 `--inspect-workspace` 对照同一JSON为 ok:true，两个应用 present且无问题；重复创建同一配置退出1并拒绝覆盖。前后115份源文件及配置哈希完全一致，比较排除 node_modules、Git内部文件和构建产物。
+- 安装 peer 警告已定位：Volar 2.4.30 要求 TypeScript <7，官方根 catalog 为7.0.2；`pnpm peers check` 退出1。完整检查、构建与代表页面交互通过，但不宣称依赖声明范围完全兼容；未擅自升级、降级或改写官方 catalog。
+
+生成器291/291测试通过；155份代码文件lint通过。仓库完整 `vp check` 仍仅因用户已安装 create-readme Skill 的原有格式退出1，保持 Skill 及锁文件原样。发布包运行逻辑未修改，不准备或发布新版本。公开包创建、ready、只读/重复创建与依赖记录见忽略目录 `dist/verification/public-cli-*`。下一步验证公开包对已有应用的补装及业务入口保护，按具体问题修复生成器。
+
+本轮5个预览/开发服务及独立 Chrome 已停止；临时根经系统临时目录、自有名称、非链接和真实路径核验后删除，应用、工作区与浏览器配置均已清理。保留日志、截图、配置和 `public-cli-evidence.json`，用户已有项目与 Skill 安装改动未触碰。
