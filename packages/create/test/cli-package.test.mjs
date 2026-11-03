@@ -24,6 +24,9 @@ test("CLI 本地包保留资源与官方提示依赖，不带测试或生命周�
     await readFile(new URL("../package.json", import.meta.url), "utf8"),
   );
   const packedManifest = JSON.parse(await readFile(join(directory, "package.json"), "utf8"));
+  assert.equal(packedManifest.author, "ADui");
+  for (const field of ["author", "description", "license", "homepage", "bugs", "repository"])
+    assert.deepEqual(packedManifest[field], sourceManifest[field]);
   assert.deepEqual(packedManifest.keywords, sourceManifest.keywords);
   assert.ok(Array.isArray(packedManifest.keywords) && packedManifest.keywords.length > 0);
   assert.ok(
@@ -35,10 +38,11 @@ test("CLI 本地包保留资源与官方提示依赖，不带测试或生命周�
   for (const keyword of ["adui", "vite-plus", "cli", "vue", "react", "monorepo"])
     assert.ok(packedManifest.keywords.includes(keyword));
   assert.equal(manifest.private, false);
-  assert.equal(
-    JSON.parse(await readFile(new URL("../../../package.json", import.meta.url), "utf8")).private,
-    true,
+  const rootManifest = JSON.parse(
+    await readFile(new URL("../../../package.json", import.meta.url), "utf8"),
   );
+  assert.equal(rootManifest.private, true);
+  assert.equal(rootManifest.author, "ADui");
   assert.deepEqual(manifest.publishConfig, {
     access: "public",
     registry: "https://registry.npmjs.org/",

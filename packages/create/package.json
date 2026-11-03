@@ -30,6 +30,7 @@
     "url": "https://github.com/adui-dev/viteplus-starter/issues"
   },
   "license": "MIT",
+  "author": "ADui",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/adui-dev/viteplus-starter.git"

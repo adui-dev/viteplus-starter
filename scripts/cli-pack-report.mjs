@@ -66,6 +66,7 @@ export function createCliPackReport(manifest, metadata) {
     version: manifest.version,
     private: manifest.private === true,
     license: manifest.license,
+    author: manifest.author,
     keywords: manifest.keywords,
     repository: manifest.repository,
     publishConfig: manifest.publishConfig,

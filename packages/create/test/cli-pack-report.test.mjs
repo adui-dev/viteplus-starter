@@ -7,6 +7,7 @@ const manifest = {
   version: "0.1.0",
   private: true,
   license: "MIT",
+  author: "ADui",
   keywords: ["vite-plus", "vue", "react"],
   repository: { type: "git", url: "git+https://github.com/adui-dev/viteplus-starter.git" },
 };
@@ -39,6 +40,7 @@ test("候选包清单保留实际 npm 文件信息与私有状态，不将本地
   assert.equal(result.name, manifest.name);
   assert.equal(result.version, "0.1.0");
   assert.equal(result.private, true);
+  assert.equal(result.author, manifest.author);
   assert.deepEqual(result.keywords, manifest.keywords);
   assert.equal(result.publicationPerformed, false);
   assert.equal(result.fileCount, input.files.length);
