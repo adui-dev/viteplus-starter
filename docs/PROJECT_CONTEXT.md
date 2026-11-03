@@ -871,3 +871,13 @@
 npm whoami 已核实为 adui，对应个人作用域 @adui；目标包查询为 E404，权限列表尚无该目标包。用户随后明确授权以 public/latest 发布 @adui/viteplus-starter@0.1.0。当前进入实际发布流程：CLI private 改为 false、根仍为 true，同步 README 安装说明，重新打包/审查/隔离验收后上传；成功与否及 registry 结果另行记录，不将准备或 dry-run 作为已发布。
 
 发布前验证：291/291 测试、文档校验、155 文件 lint 与改动文件格式通过。全仓 vp check 仍仅受用户已安装 create-readme Skill 的既有格式影响，原文和锁文件未修改。发布候选 dist/cli/pack-M7ZfKt/adui-viteplus-starter-0.1.0.tgz，92 文件，private:false，实际 SHA-512 核验通过；隔离安装9个包，Windows shim 帮助、Vue TS/Element Plus/Tailwind/大屏和 React JS/Ant Design/UnoCSS/三引擎预览通过，无目标生成；安装后 Logo 原件 SHA-256、无生命周期脚本及清单状态一致。npm publish --dry-run --ignore-scripts --access public --tag latest 对该具体 tarball 预演退出0，尚未上传。
+
+### 0.1.0 公开首发完成
+
+用户已完成 npm 官方浏览器身份验证。实际发布使用当前 Node 配套 npm CLI、argv 传参及已复验的 pack-M7ZfKt tarball，--access public、--tag latest，命令退出0。第一次 Windows TTY 命令因 registry URL 参数拆分而在客户端报 EUSAGE，未发起上传；改用直接 argv 调用后完成。registry 处理期间曾短暂显示 0.0.0-stage，随后确认 0.1.0 公开可用且 latest 正确；没有单独执行 npm stage、重复上传或改动其他版本。
+
+从公开 registry 实际下载 101318 字节 tarball，SHA-512 与本地候选完全一致：sha512-f6j8l2ZGlk5f8sip73q2liIkkirkOJnrXVgAgtHRyTab7dLfI0/qzI/J1diX1KhWpTxkx1OawxJVlPQMuY3xPg==。发布准备提交为 89b39ce，版本、tag、tarball URL、校验与包名调用日志位于忽略目录 dist/verification/npm-*。
+
+真实 registry 包名调用 vp dlx -- @adui/viteplus-starter 与 pnpm dlx @adui/viteplus-starter 的帮助均成功；前者 Vue TS/Element Plus/Tailwind/大屏、后者 React JS/Ant Design/UnoCSS/三引擎预览通过。调用目录含中文、空格、& 和单引号，cwd/target 正确，未创建工程。仅验收进程使用已缓存 pnpm 12.16.1，未改变全局配置；CLI 包名解析与公开下载已核实。未将帮助/预览称为新的应用创建或浏览器验收。
+
+首发已完成，不创建 GitHub Release 或 CI/CD。下一步通过已发布包进行真实项目使用，按具体创建/补装反馈修复生成器，不扩展业务查看器或重复完整组合矩阵。

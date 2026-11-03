@@ -2,9 +2,9 @@
 
 GitHub 来源的 `vp create github:adui-dev/viteplus-starter` 下载工具仓库，再由 `vp run create` 启动向导。要直接进入 UI/CSS、大屏和引擎选择，使用本地 CLI 安装包入口。
 
-当前包为 `@adui/viteplus-starter@0.1.0`，命令名 `viteplus-starter`。用户已授权 npm 公开首发，CLI 清单 private:false，当前正在发布验收；实际 registry 状态见 [发布记录](NPM_RELEASE.md)。无需为分发入口新建仓库或重写生成器。运行环境为 Windows、已安装的 `vp` 和受支持 Node；基础工程仍委托 Vite+ 官方模板。
+当前公开包为 `@adui/viteplus-starter@0.1.0`，命令名 `viteplus-starter`，latest 指向 0.1.0。CLI 清单 private:false，发布及包名验收结果见 [发布记录](NPM_RELEASE.md)。无需为分发入口新建仓库或重写生成器。运行环境为 Windows、已安装的 `vp` 和受支持 Node；基础工程仍委托 Vite+ 官方模板。
 
-0.1.0 为当前本地候选版本；首发条件与账户检查见 [npm 首发准备](NPM_RELEASE.md)。打包结果新增 contents 路径，对应实际文件清单 pack-contents.json，包含 MIT LICENSE、包元信息与 integrity，清单不进入 tarball。
+0.1.0 为当前首发版本，也可继续本地打包。打包结果提供 contents 路径，对应实际文件清单 pack-contents.json，包含 MIT LICENSE、包元信息与 integrity，清单不进入 tarball。
 
 ## 构建本地包
 
@@ -28,14 +28,14 @@ $bundle.tarball
 
 ## 一条命令进入向导
 
-正式发布后，在项目父目录可按包名运行，任选一种方式，无需全局安装或添加项目依赖：
+在项目父目录可按包名运行，任选一种方式，无需全局安装或添加项目依赖：
 
 ```powershell
 vp dlx -- @adui/viteplus-starter
 pnpm dlx @adui/viteplus-starter
 ```
 
-`vp dlx -- @adui/viteplus-starter --help` 将帮助参数交给生成器；pnpm 对应 `pnpm dlx @adui/viteplus-starter --help`。其他 CLI 参数同样追加到包名后，输出按当前调用目录计算。当前包尚未发布，先使用以下本地 tgz 入口。
+`vp dlx -- @adui/viteplus-starter --help` 将帮助参数交给生成器；pnpm 对应 `pnpm dlx @adui/viteplus-starter --help`。其他 CLI 参数同样追加到包名后，输出按当前调用目录计算。以下本地 tgz 入口同样可用。
 
 切换到希望存放新项目的父目录，再使用包路径运行：
 
@@ -79,7 +79,7 @@ pnpm dlx $bundle.tarball
 
 自动回归覆盖暂存资源、隔离包的 Vue/React 多引擎与 JSON 批量预览、中文空格及元字符目录、调用目录计算、已有输出/junction 拒绝、打包调用上下文错误。真实 tgz 安装、vp dlx、TTY 选择/取消和代表创建结果见 [项目状态](PROJECT_CONTEXT.md)。
 
-包名已按用户要求确定为 @adui/viteplus-starter，首发版本已确认为 0.1.0，尚未发布；本入口不会自动发布或创建流水线。
+包名已按用户要求确定为 @adui/viteplus-starter，0.1.0 已公开发布；本地打包入口不会自动发布或创建流水线。
 
 ## 2026-11-02 本地包实测
 

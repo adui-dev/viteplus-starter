@@ -1,6 +1,6 @@
 # 生成器能力与验收范围
 
-2026-11-03 用户已授权 @adui/viteplus-starter@0.1.0 以 public/latest 首发，npm 登录账号已核实为 adui。CLI 清单 private:false，根工作区仍 private；当前进行重新打包、隔离验收与实际发布，结果以 [发布记录](NPM_RELEASE.md) 和项目状态文末为准。此前私有候选与未登录描述属于历史状态。
+2026-11-03 @adui/viteplus-starter@0.1.0 已以 public/latest 首发。registry 版本、tag 及公开下载 integrity 与验收产物一致，vp dlx / pnpm dlx 包名帮助与两框架预览通过。CLI 清单 private:false，根工作区仍 private；详情见 [发布记录](NPM_RELEASE.md) 和项目状态文末。此前私有候选与未登录描述属于历史状态。
 
 2026-11-02 补装新增插件已统一 src/plugins / build/plugins，保留已有业务入口、历史插件与配置原件备份，支持混合目录的结构检查。包名确定为 @adui/viteplus-starter，保持 private/0.0.0、未发布；本地包已完成 Vue 单应用及 React Monorepo 成员补装的代表检查/完整构建，工作区 ready 6/6，边界见项目状态文末。
 
@@ -10,7 +10,7 @@
 
 本阶段只验收 Windows，按用户 2026-10-30 的明确要求不再推进 Linux/macOS；其他系统未验证，也不作为本阶段阻塞项。
 
-Windows V1 本地候选的操作说明与集中交付核对已整理：[Windows 指南](WINDOWS_GUIDE.md) 提供按执行目录组织的命令，[V1 清单](V1_ACCEPTANCE.md) 区分历史实测、本地检查和未覆盖范围。仓库仍为 0.0.0/private，未发布；后续按实际 Windows 项目试用反馈修复生成器，不自动扩大功能。
+Windows 操作说明与集中交付核对已整理：[Windows 指南](WINDOWS_GUIDE.md) 提供按执行目录组织的命令，[V1 清单](V1_ACCEPTANCE.md) 区分历史实测、本地检查和未覆盖范围。开发工作区仍为 0.0.0/private，不作为包发布；CLI 已发布 0.1.0，后续按实际 Windows 项目试用反馈修复生成器，不自动扩大功能。
 
 按 2026-11-02 的用户新要求，主线增加 [可分发 CLI 本地入口](CLI_DISTRIBUTION.md)：构建自包含 tgz，通过 vp dlx 直接进入已有选项向导。它解决分发体验，不增加预设；正式 npm 发布仍需单独确定。
 
@@ -47,7 +47,7 @@ GitHub 远程入口已完成两种来源的 Windows 实际下载与启动；简�
 | FR-011 本地 GLB    | 贴图、相机适配、替换/清除/卸载，用户模型已实测                              | 仅自包含 GLB，非业务查看器路线                                       |
 | FR-012 基础样式    | Vue/React TS/JS 默认本地 normalize.css 8.0.1，无 npm 包；已有应用可单独补齐 | 仅正式应用入口；旧独立验收页及旧成员不自动改写，未知同名文件拒绝覆盖 |
 | FR-013 GitHub 入口 | 两种 GitHub 来源；代表单应用与 JSON Monorepo 创建、检查和完整构建通过       | 下载后显式 vp run create；仅代表组合，未穷举全部预设                 |
-| FR-014 CLI 分发    | 本地自包含 tgz、vp dlx 直接启动原向导、调用目录定位及隔离包回归             | private/0.0.0；未发布 npm/Release，代表实测见项目状态                |
+| FR-014 CLI 分发    | 自包含 tgz、npm 公开包、vp dlx/pnpm dlx 启动、调用目录定位及隔离包回归      | 0.1.0/public/latest 已发布并验收；未创建 GitHub Release              |
 | NFR-001 可靠性     | 名称/选项校验、路径保护、重复输出拒绝、安装后复查                           | 失败保留依赖安装和现场；不承诺事务性或抵御恶意并发文件系统替换       |
 | NFR-002 本地验证   | 单元测试、文档检查、Vite+ 检查及代表项目构建                                | 全部手动本地执行，无流水线或发布                                     |
 | NFR-003 维护       | 需求、设计、索引、ADR 与实施记录                                            | 每次新增预设同步更新覆盖范围                                         |
