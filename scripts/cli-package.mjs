@@ -48,7 +48,12 @@ export async function stageCliPackage(directory) {
   }
   for (const tree of runtimeTrees) await copyTree(join("packages", tree));
   await copy("packages/create/bin/cli.mjs");
-  for (const name of ["normalize.css", "normalize.LICENSE.txt", "normalize.SOURCE.md"])
+  for (const name of [
+    "normalize.css",
+    "normalize.LICENSE.txt",
+    "normalize.SOURCE.md",
+    "adui-studio-logo.svg",
+  ])
     await copy("packages/create/assets/" + name);
   const sourceManifest = JSON.parse(
     (await readSource("packages/create/package.json")).toString("utf8"),

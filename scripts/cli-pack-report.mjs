@@ -5,6 +5,7 @@ const required = [
   "packages/create/bin/cli.mjs",
   "packages/create/assets/normalize.css",
   "packages/create/assets/normalize.LICENSE.txt",
+  "packages/create/assets/adui-studio-logo.svg",
 ];
 
 function publicFile(path) {

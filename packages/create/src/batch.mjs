@@ -6,6 +6,7 @@ import { spawnSync } from "node:child_process";
 import { buildVpCommand, validateProjectName, validateProjectOptions } from "./options.mjs";
 import { planIntegrations } from "./integrations.mjs";
 import { planBaseStyles } from "./base-styles.mjs";
+import { brandWorkspaceWebsite, workspaceBrandingPlan } from "./branding.mjs";
 import { planUiSmoke } from "./ui-smoke.mjs";
 import { planScreenPreset } from "./screen.mjs";
 import { planEngine } from "./engine.mjs";
@@ -138,6 +139,7 @@ export async function createBatchPlan(input, cwd = process.cwd()) {
       target: workspaceRoot,
       ...rootCommand,
       args: [...rootCommand.args, "--no-interactive"],
+      branding: workspaceBrandingPlan(),
     },
   ];
   for (const app of config.apps) {
@@ -209,8 +211,12 @@ export async function loadBatchPlan(filename, cwd = process.cwd()) {
   return { ...(await createBatchPlan(config, cwd)), configFile };
 }
 
-function runStep(step) {
-  if (step.kind === "workspace") return runWorkspaceVp(step.cwd, step.args);
+async function runStep(step) {
+  if (step.kind === "workspace") {
+    await runWorkspaceVp(step.cwd, step.args);
+    await brandWorkspaceWebsite(step.target);
+    return;
+  }
   // Use argv rather than a shell for paths/config values, including spaces and metacharacters.
   const result = spawnSync(process.execPath, step.args, { cwd: step.cwd, stdio: "inherit" });
   if (result.error) throw result.error;

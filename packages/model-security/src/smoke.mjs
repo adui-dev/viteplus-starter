@@ -1,3 +1,5 @@
+import { brandHtml } from "../../create/src/branding.mjs";
+
 export function modelSmoke(framework, language, keyMode, engine = "three") {
   if (!["three", "babylon", "cesium"].includes(engine)) throw new Error("不支持的模型引擎");
   const ts = language === "ts",
@@ -117,5 +119,6 @@ export function modelSmoke(framework, language, keyMode, engine = "three") {
   if (engine === "babylon")
     files["src/model-smoke/style.css"] +=
       ".babylon-canvas{display:block;width:100%;height:100%;touch-action:none}";
+  files["model-smoke.html"] = brandHtml(files["model-smoke.html"]);
   return files;
 }

@@ -1,5 +1,15 @@
 # 详细设计
 
+## 统一品牌资源
+
+branding.mjs 从 packages/create/assets/adui-studio-logo.svg 读取用户提供的原始 SVG。brandHtml 保留 HTML 正文、元信息和注释，仅在唯一 head 内统一 favicon；独立生成页使用编码后的内置 SVG，新建完整应用使用 src/assets/adui-studio-logo.svg，由 Vite 重写生产资源路径。
+
+.gitattributes 对这一份原始 SVG 禁用换行转换，避免 Windows checkout 改变原件字节；不修改其他资源的 Git 或格式规则。
+
+captureApplication 同时捕获 App 和 index.html、预检 Logo 路径。最终整理在所有输出及快照检查通过后写入共享 Logo、HTML 与带品牌图片的首页。无 UI/大屏/引擎时也整理品牌首页，但不生成空 plugins/index；已有业务应用补装不调用该替换流程。保留的本次 smoke HTML 也引用同一资源。原模板无展示引用的旧资源不递归删除。
+
+新建 Monorepo 的 brandWorkspaceWebsite 仅识别官方 website 的已知 main.ts 导入和 hero 结构，统一标识引用及 favicon，保留原计数器、链接与配置。单次根创建和批量默认 runner 均调用；不用于已有工作区。未知结构、冲突 Logo、链接和并发快照变化拒绝写入，失败保留现场。CLI 打包复制同一个 SVG 并将其列为必要文件；不增加浏览器依赖。
+
 ## 本地质量基线
 
 根 Vite+ fmt 统一自有源码、测试与文档格式；仅排除原样保存的第三方 `.agents/skills/git-commit/**`、`.agents/skills/gitmoji/**`，保留其上游指令与安装哈希。没有关闭源码检查、lint 规则或 Git hooks。

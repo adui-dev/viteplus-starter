@@ -24,6 +24,7 @@ function metadata() {
       "packages/create/bin/cli.mjs",
       "packages/create/assets/normalize.css",
       "packages/create/assets/normalize.LICENSE.txt",
+      "packages/create/assets/adui-studio-logo.svg",
       "packages/create/src/options.mjs",
       "packages/three/src/lazy.d.mts",
     ].map((path) => ({ path, size: 25, mode: 420 })),
@@ -78,6 +79,7 @@ test("缺少许可、错误元信息、缺失资源或重复文件会阻止候�
     "LICENSE",
     "packages/create/bin/cli.mjs",
     "packages/create/assets/normalize.LICENSE.txt",
+    "packages/create/assets/adui-studio-logo.svg",
   ]) {
     const input = metadata();
     input.files = input.files.filter((file) => file.path !== path);

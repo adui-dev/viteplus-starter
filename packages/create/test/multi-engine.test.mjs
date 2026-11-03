@@ -189,6 +189,7 @@ childProcess.spawnSync = (command, args) => {
     writeFileSync(${JSON.stringify(join(cwd, "failure-app/completed-stage.txt"))}, "preserve completed stage");
     mkdirSync(${JSON.stringify(join(cwd, "failure-app/src"))});
     writeFileSync(${JSON.stringify(join(cwd, "failure-app/src/App.vue"))}, "preserve official App fixture");
+    writeFileSync(${JSON.stringify(join(cwd, "failure-app/index.html"))}, "<html><head></head><body></body></html>");
     return {status: 0};
   }
   if (scenario.launchError) return {error: new Error("controlled launch failure")};

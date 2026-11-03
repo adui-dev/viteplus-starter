@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { executeWorkspaceRecovery } from "../src/workspace-recovery-execute.mjs";
 import { addBaseStyles, planBaseStyles, preflightBaseStyles } from "../src/base-styles.mjs";
+import { brandWorkspaceWebsite, workspaceBrandingPlan } from "../src/branding.mjs";
 import { planWorkspaceRecovery } from "../src/workspace-recovery.mjs";
 import { inspectWorkspace } from "../src/workspace-inspect.mjs";
 import { createStageRunner } from "../src/recovery.mjs";
@@ -320,7 +321,7 @@ async function main() {
           integrations,
           ...(options.type === "application"
             ? { output: await planApplicationOutput(options) }
-            : {}),
+            : { branding: workspaceBrandingPlan() }),
           ...(planBaseStyles(options) ? { baseStyles: planBaseStyles(options) } : {}),
           ...(planModelProtection(options)
             ? { modelProtection: applicationPresetPlan(planModelProtection(options), options) }
@@ -390,8 +391,7 @@ async function main() {
   const homeSnapshot =
     result.status === 0 &&
     options.type === "application" &&
-    !process.env.ADUI_DEFER_APPLICATION_OUTPUT &&
-    (options.screen || options.engine || (options.ui && options.ui !== "none"))
+    !process.env.ADUI_DEFER_APPLICATION_OUTPUT
       ? await stage("首页接入预检", () => captureApplication(target, options))
       : null;
   if (
@@ -404,6 +404,8 @@ async function main() {
   }
   if (result.status === 0 && options.type === "application")
     await stage("基础样式集成", () => addBaseStyles(target, options));
+  if (result.status === 0 && options.type === "monorepo")
+    await stage("工作区网站标识", () => brandWorkspaceWebsite(target));
   if (result.status === 0) await finishWorkspaceIntegration();
   if (result.status === 0 && options.screen) {
     await stage("大屏集成", () => addScreenPreset(target, options));
@@ -424,7 +426,9 @@ async function main() {
   }
   if (homeSnapshot) {
     await stage("插件目录与首页接入", () => finalizeApplication(target, options, homeSnapshot));
-    console.log("运行时插件：src/plugins；构建插件：build/plugins；所选功能已接入首页。");
+    console.log("ADui Studio Logo 与 favicon 已接入首页。");
+    if (options.screen || options.engine || (options.ui && options.ui !== "none"))
+      console.log("运行时插件：src/plugins；构建插件：build/plugins；所选功能已接入首页。");
   }
   if (result.signal) {
     process.exitCode = 1;

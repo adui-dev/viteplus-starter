@@ -1,0 +1,2 @@
+# Preserve the user-provided brand asset byte-for-byte on every checkout.
+packages/create/assets/adui-studio-logo.svg -text

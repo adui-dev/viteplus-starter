@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 import { validateProjectOptions } from "./options.mjs";
 import { inspectPath } from "./safe-paths.mjs";
+import { brandHtml } from "./branding.mjs";
 
 const presets = {
   vue: {
@@ -126,7 +127,7 @@ export function planUiSmoke(input) {
   const extension =
     framework === "vue" ? (language === "js" ? "js" : "ts") : language === "js" ? "jsx" : "tsx";
   const mainFile = "main." + extension;
-  const files = { "ui-smoke.html": htmlPage(mainFile) };
+  const files = { "ui-smoke.html": brandHtml(htmlPage(mainFile)) };
   if (framework === "vue") {
     const imports = ["import { createApp } from 'vue'", "import SmokeApp from './SmokeApp.vue'"];
     if (preset.style) imports.push(`import '${preset.style}'`);

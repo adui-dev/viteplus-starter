@@ -1,5 +1,14 @@
 # 代码索引
 
+## 统一 Logo 与 favicon
+
+- packages/create/assets/adui-studio-logo.svg：用户提供的原始品牌资源，随 CLI 分发。
+- packages/create/src/branding.mjs：共享 HTML favicon、工作区网站品牌整理及文件计划。
+- application-home/application-output：品牌首页、共享资源、HTML/App 快照保护及最终整理；空预设不生成空插件入口。
+- screen/ui-smoke/three-smoke/cesium/babylon 与 model-security/src/smoke：独立验收页使用同源 SVG 图标。
+- packages/create/test/branding.test.mjs：四种无插件应用、独立页、HTML/资源冲突和工作区网站保护。
+- scripts/cli-package.mjs、cli-pack-report.mjs：原 SVG 暂存和必要资源审查；docs/assets/readme-banner.svg：使用相同路径/渐变的文档横幅。
+
 ## 2026-10-26 P3 结构更新
 
 - `packages/create/src/format-config.mjs`：向 Vite+ 根 `fmt.ignorePatterns` 安全合并 Vue 自动生成的 `src/components.d.ts`。

@@ -67,6 +67,7 @@ test(
 import { mkdirSync, writeFileSync, appendFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 const args=process.argv.slice(2),kind=args[1];
+if(args[0]==="fmt") process.exit(0);
 appendFileSync(${JSON.stringify(log)},kind+"\\n");
 const target=resolve(args[args.indexOf("--directory")+1]);
 mkdirSync(target,{recursive:true});
@@ -74,6 +75,9 @@ writeFileSync(join(target,"partial.txt"),"keep partial");
 if(kind==="vite:monorepo") {
   if(${JSON.stringify(mode)}==="root") process.exit(7);
   mkdirSync(join(target,"apps"));
+  mkdirSync(join(target,"apps/website/src"),{recursive:true});
+  writeFileSync(join(target,"apps/website/index.html"),"<html><head></head><body></body></html>");
+  writeFileSync(join(target,"apps/website/src/main.ts"),${JSON.stringify("import heroImg from './assets/hero.png'\nimport typescriptLogo from './assets/typescript.svg'\nimport viteLogo from './assets/vite.svg'\ndocument.body.innerHTML = `<div class=\"hero\"></div>`\n")});
   writeFileSync(join(target,"package.json"),JSON.stringify({name:"batch-exit-review",private:true,devDependencies:{"vite-plus":"1.4.0"}}));
   writeFileSync(join(target,"pnpm-workspace.yaml"),"packages:\\n  - apps/*\\n  - packages/*\\n");
   writeFileSync(join(target,"vite.config.ts"),"export default defineConfig({fmt:{}})\\n");

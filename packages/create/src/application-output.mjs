@@ -12,6 +12,7 @@ import {
 } from "./plugin-paths.mjs";
 import { inspectPath } from "./safe-paths.mjs";
 import { runWorkspaceVp } from "./workspace.mjs";
+import { brandHtml, logoPath, logoSource } from "./branding.mjs";
 
 export function applicationEntry(options) {
   const ts = (options.language ?? "ts") === "ts",
@@ -27,7 +28,12 @@ export async function captureApplication(directory, options) {
   const { app } = applicationEntry(options);
   if (!(await inspectPath(join(directory, app)))?.isFile())
     throw new Error("官方应用缺少首页：" + app);
-  return { app, source: await readFile(join(directory, app), "utf8") };
+  if (!(await inspectPath(join(directory, "index.html")))?.isFile())
+    throw new Error("官方应用缺少 HTML 入口");
+  if (await inspectPath(join(directory, logoPath))) throw new Error("Logo 目标已存在，拒绝覆盖");
+  const html = await readFile(join(directory, "index.html"), "utf8");
+  brandHtml(html, "/" + logoPath);
+  return { app, source: await readFile(join(directory, app), "utf8"), html };
 }
 
 export async function planApplicationOutput(options) {
@@ -35,6 +41,8 @@ export async function planApplicationOutput(options) {
   return {
     files: [
       ...new Set([
+        "index.html",
+        logoPath,
         ...applicationFiles(files, options.smokePages),
         ...Object.keys(homeFiles(options)),
       ]),
@@ -78,6 +86,10 @@ export async function finalizeApplication(
   }
   if ((await remember(app)) !== snapshot.source)
     throw new Error("首页在创建期间已变更，拒绝替换：" + app);
+  if ((await remember("index.html")) !== snapshot.html)
+    throw new Error("HTML 入口在创建期间已变更，拒绝替换");
+  writes.set("index.html", brandHtml(snapshot.html, "/" + logoPath));
+  writes.set(logoPath, logoSource);
   for (const path of stagedFiles) {
     // Never read project credentials, and tolerate the optional original .gitignore backup.
     if (path === ".env.local") continue;
@@ -89,7 +101,10 @@ export async function finalizeApplication(
       target = applicationPath(path);
     if (path.includes(".before-adui-") || (!options.smokePages && isSmokeFile(path)))
       removals.add(path);
-    else if (target !== path || isSmokeFile(path)) writes.set(target, rewritePluginPaths(source));
+    else if (target !== path || isSmokeFile(path)) {
+      const content = rewritePluginPaths(source);
+      writes.set(target, target.endsWith(".html") ? brandHtml(content, "/" + logoPath) : content);
+    }
     if (target !== path) removals.add(path);
   }
   for (const ext of ["ts", "js", "mts", "mjs"]) {
@@ -123,13 +138,13 @@ export async function finalizeApplication(
   }
   let entry = await remember(main);
   const ext = (options.language ?? "ts") === "ts" ? "ts" : "js";
-  if (options.framework === "vue") {
+  if (options.framework === "vue" && home[`src/plugins/index.${ext}`]) {
     const mount = /createApp\(App\)\.mount\((['"])#app\1\)/g;
     if ([...entry.matchAll(mount)].length !== 1) throw new Error("无法唯一识别官方 Vue 挂载入口");
     entry =
       entry.replace(mount, "createApp(App).use(plugins).mount('#app')") +
       `\nimport plugins from './plugins/index.${ext}'\n`;
-  } else entry += `\nimport './plugins/index.${ext}'\n`;
+  } else if (home[`src/plugins/index.${ext}`]) entry += `\nimport './plugins/index.${ext}'\n`;
   // Replace only the official starter stylesheet import; retain UI/CSS/normalize imports.
   entry = entry.replace(/^import\s+['"]\.\/(?:style|index)\.css['"];?\s*$/gm, "");
   entry += "\nimport './styles/application.css'\n";

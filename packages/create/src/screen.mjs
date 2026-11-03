@@ -1,5 +1,6 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { inspectPath } from "./safe-paths.mjs";
+import { brandHtml } from "./branding.mjs";
 import { rejectGroupedPreset } from "./plugin-paths.mjs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -52,6 +53,7 @@ export async function planScreenPreset(input) {
       ext +
       "'\nconst root=document.getElementById('screen-root')\nif(root)createRoot(root).render(<ScreenDemo/>)\n";
   }
+  files["screen-smoke.html"] = brandHtml(files["screen-smoke.html"]);
   return { files, previewPath: "/screen-smoke.html", options: options.screen };
 }
 

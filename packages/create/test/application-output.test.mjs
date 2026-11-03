@@ -44,7 +44,11 @@ async function fixture(t, selection) {
       ? "import {createApp} from 'vue'\nimport App from './App.vue'\nimport './styles/normalize.css'\nimport './style.css'\ncreateApp(App).mount('#app')\n"
       : "import {createRoot} from 'react-dom/client'\nimport App from './App.jsx'\nimport './styles/normalize.css'\nimport './index.css'\ncreateRoot(document.getElementById('root')).render(<App />)\n",
   );
-  await put(directory, "index.html", "<!doctype html>\n");
+  await put(
+    directory,
+    "index.html",
+    '<!doctype html><html><head><link rel="icon" href="/vite.svg" /></head><body></body></html>\n',
+  );
   await put(
     directory,
     "vite.config.ts",
@@ -183,7 +187,7 @@ test("路径占用、首页变更、未知暂存文件和 junction 在接入写�
   }
 });
 
-test("格式失败保留暂存文件和备份，空预设保留官方首页", async (t) => {
+test("格式失败保留暂存文件和备份，空预设也接入品牌首页且不生成空插件目录", async (t) => {
   const active = await fixture(t, { engine: "three" });
   await assert.rejects(
     finalizeApplication(active.directory, active.options, active.snapshot, () => {
@@ -195,10 +199,11 @@ test("格式失败保留暂存文件和备份，空预设保留官方首页", as
   await readFile(join(active.directory, "package.json.before-adui-models"));
   const plain = await fixture(t, { screen: undefined });
   await finalizeApplication(plain.directory, plain.options, plain.snapshot, noop);
-  assert.equal(
+  assert.match(
     await readFile(join(plain.directory, plain.snapshot.app), "utf8"),
-    plain.snapshot.source,
+    /adui-studio-logo.svg/,
   );
+  await assert.rejects(readFile(join(plain.directory, "src/plugins/index.ts")), { code: "ENOENT" });
 });
 
 test("验收页为布尔开关，批量和恢复调用传递开关", () => {

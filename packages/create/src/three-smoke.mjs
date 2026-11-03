@@ -1,3 +1,4 @@
+import { brandHtml } from "./branding.mjs";
 import {
   installedPresetPath,
   rejectGroupedPreset,
@@ -160,6 +161,7 @@ export async function planThreeSmoke(input) {
     '<!doctype html><html lang="zh-CN"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>ADui Three Smoke</title></head><body><div id="three-root"></div><script type="module" src="/src/three-smoke/main.' +
     ext +
     '"></script></body></html>';
+  files["three-smoke.html"] = brandHtml(files["three-smoke.html"]);
   return { files, previewPath: "/three-smoke.html" };
 }
 async function inspect(path) {

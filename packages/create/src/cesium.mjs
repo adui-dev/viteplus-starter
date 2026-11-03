@@ -1,3 +1,4 @@
+import { brandHtml } from "./branding.mjs";
 import {
   installedPresetPath,
   rejectGroupedPreset,
@@ -97,6 +98,7 @@ export default function GlobeView(){const host=useRef${ts ? "<HTMLDivElement|nul
   files["cesium-smoke.html"] =
     `<!doctype html><html lang="zh-CN"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>ADui Cesium</title></head><body><div id="cesium-root"></div><script type="module" src="/src/cesium-smoke/main.${ext}"></script></body></html>`;
   files["src/cesium-smoke/demo.css"] += engineScreenStyles;
+  files["cesium-smoke.html"] = brandHtml(files["cesium-smoke.html"]);
   return { files, previewPath: "/cesium-smoke.html" };
 }
 export async function preflightCesium(directory, input, requireScreen = true) {

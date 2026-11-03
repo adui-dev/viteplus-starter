@@ -44,6 +44,7 @@ test("CLI 本地包保留资源与官方提示依赖，不带测试或生命周�
     "packages/create/bin/cli.mjs",
     "packages/create/assets/normalize.css",
     "packages/create/assets/normalize.LICENSE.txt",
+    "packages/create/assets/adui-studio-logo.svg",
     "packages/model-security/src/project-key.mjs",
     "packages/model-security/src/setup.mjs",
     "packages/screen/src/vue.d.mts",

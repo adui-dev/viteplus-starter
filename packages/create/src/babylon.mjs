@@ -1,3 +1,4 @@
+import { brandHtml } from "./branding.mjs";
 import {
   installedPresetPath,
   rejectGroupedPreset,
@@ -92,6 +93,7 @@ export default function BabylonView(){const host=useRef${ts ? "<HTMLDivElement|n
   files["babylon-smoke.html"] =
     `<!doctype html><html lang="zh-CN"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>ADui Babylon</title></head><body><div id="babylon-root"></div><script type="module" src="/src/babylon-smoke/main.${ext}"></script></body></html>`;
   files["src/babylon-smoke/demo.css"] += engineScreenStyles;
+  files["babylon-smoke.html"] = brandHtml(files["babylon-smoke.html"]);
   return { files, previewPath: "/babylon-smoke.html" };
 }
 export async function preflightBabylon(directory, input, requireScreen = true) {
