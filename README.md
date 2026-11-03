@@ -1,116 +1,46 @@
-# ADui Vite+ Starter
+<p align="center">
+  <img src="docs/assets/readme-banner.svg" alt="ADui Vite+ Starter：Vue、React 与 Monorepo 官方模板及插件预设" width="1280" />
+</p>
 
-基于 Vite+ 官方模板的交互式项目生成器，为 Vue、React 和 Monorepo 按需集成 UI、CSS、大屏适配、3D 引擎与模型保护。
+<h1 align="center">ADui Vite+ Starter</h1>
 
-[快速开始](#快速开始) · [常用操作](#常用操作) · [项目结构](#项目结构) · [文档](#文档) · [MIT](LICENSE)
+<p align="center">
+  基于 Vite+ 官方模板，按需组合你的前端技术栈。<br />
+  Vue · React · TypeScript · JavaScript · Monorepo
+</p>
+
+<p align="center">
+  <a href="#快速开始">快速开始</a> ·
+  <a href="#安装后使用">安装与使用</a> ·
+  <a href="#常用操作">常用操作</a> ·
+  <a href="#项目结构">项目结构</a> ·
+  <a href="#文档">文档</a> ·
+  <a href="LICENSE">MIT</a>
+</p>
 
 > [!NOTE]
-> 当前面向 Windows，CLI 包名为 `@adui/viteplus-starter`，首发版本为 `0.1.0`，尚未发布到 npm。现在可通过 GitHub 下载或本地 CLI 包使用。
+> 当前为 **Windows 本地候选版**，CLI 包名 `@adui/viteplus-starter`，首发版本 `0.1.0`，尚未发布到 npm。现在可通过 GitHub 或本地 tgz 使用；下文按包名安装、运行的命令适用于正式发布后。
 
 ## 功能
 
-| 能力       | 支持范围                                                       |
-| ---------- | -------------------------------------------------------------- |
-| 项目形态   | 独立 Application、Monorepo、工作区逐应用添加、JSON 批量创建    |
-| 框架与语言 | Vue 3 / React，TypeScript / JavaScript，默认 TypeScript        |
-| Vue UI     | Element Plus、Ant Design Vue、TDesign，或不启用                |
-| React UI   | Ant Design、TDesign，或不启用                                  |
-| 样式       | UnoCSS、Tailwind CSS，或不启用；默认导入本地静态 normalize.css |
-| 大屏适配   | AdScreen，支持 contain / cover / stretch / none 布局           |
-| 3D 引擎    | Three.js、CesiumJS、Babylon.js，可按应用多选、按需加载         |
-| 模型保护   | 自包含 GLB 自动加密为 `.adui`，支持内置或外置密钥模式          |
-| 已有项目   | 增量补装、独立验收页、工作区检查与缺失应用恢复                 |
+| 方向       | 支持能力                                                                                           |
+| ---------- | -------------------------------------------------------------------------------------------------- |
+| 官方工程   | Application / Monorepo；Vue 3 / React；TypeScript / JavaScript                                     |
+| UI 与样式  | Vue：Element Plus、Ant Design Vue、TDesign；React：Ant Design、TDesign；CSS：UnoCSS / Tailwind CSS |
+| 大屏与 3D  | AdScreen 大屏适配；Three.js / CesiumJS / Babylon.js，可多选、按需加载                              |
+| 模型保护   | 自包含 GLB 自动加密为 `.adui`，内置或外置密钥模式，KEY 生成与轮换                                  |
+| 工作区管理 | 逐应用添加、JSON 批量创建、只读检查与缺失应用恢复                                                  |
+| 增量集成   | 已有应用补装、配置保护、可选独立验收页                                                             |
 
-基础工程始终由 Vite+ 官方 `vite:application` / `vite:monorepo` 创建。UI、CSS 和引擎配置按应用独立管理，保留官方工具链与配置结构。
+基础工程始终委托 Vite+ 官方 `vite:application` / `vite:monorepo`。各应用独立选择语言和插件，默认 TypeScript；UI、CSS 和引擎均可不启用。所有 Vue/React 应用默认导入本地静态 normalize.css，不安装 normalize.css npm 包。
 
 ## 快速开始
 
-### 环境要求
+**环境**：Windows / PowerShell，Node.js `^22.18.0 || ^24.11.0 || >=26.0.0`，可运行的 Vite+ `vp` 与 pnpm。首次创建需要网络或完整的模板、依赖缓存。
 
-- Windows 和 PowerShell。
-- Node.js `^22.18.0 || ^24.11.0 || >=26.0.0`。
-- 已安装 Vite+，可运行 `vp`，并具有可用的 pnpm 环境。
-- 创建项目时需要网络或完整的模板、依赖缓存。
+### 1. 启动配置向导
 
-### 使用 vp dlx / pnpm dlx
-
-以下按包名运行的命令适用于正式发布后；当前未发布时使用 GitHub 或本地 tgz 入口。在希望存放新项目的父目录执行，任选一种即可直接进入向导：
-
-```powershell
-vp dlx -- @adui/viteplus-starter
-# 或
-pnpm dlx @adui/viteplus-starter
-```
-
-无需全局安装，也不将生成器添加到项目依赖。参数跟在包名后；例如查看帮助、预览 Vue 应用配置：
-
-```powershell
-vp dlx -- @adui/viteplus-starter --help
-vp dlx -- @adui/viteplus-starter --name my-vue-app --type application --framework vue --ui element-plus --css tailwindcss --dry-run
-pnpm dlx @adui/viteplus-starter --name my-vue-app --type application --framework vue --ui element-plus --css tailwindcss --dry-run
-```
-
-去掉 `--dry-run` 即实际创建项目；输出位于当前调用目录，创建完成后进入 `./my-vue-app` 运行 `vp check`、`vp run build` 和 `vp dev`。
-
-### 使用 pnpm 安装
-
-正式发布后，可以全局安装并启动向导：
-
-```powershell
-pnpm add --global @adui/viteplus-starter
-viteplus-starter
-```
-
-或安装为当前项目的开发依赖，再调用本地命令：
-
-```powershell
-pnpm add --save-dev @adui/viteplus-starter
-pnpm exec viteplus-starter
-pnpm exec viteplus-starter --help
-```
-
-### 使用 npm 安装
-
-以下 npm 包名命令适用于正式发布后；当前未发布时，使用下文的 GitHub 或本地 tgz 入口。
-
-全局安装后，在希望存放新项目的父目录运行命令，即可进入配置向导：
-
-```powershell
-npm install --global @adui/viteplus-starter
-viteplus-starter
-```
-
-如果选择安装到当前项目的开发依赖，则通过 npm exec 调用本地命令：
-
-```powershell
-npm install --save-dev @adui/viteplus-starter
-npm exec -- viteplus-starter
-```
-
-也可以免全局安装，直接运行：
-
-```powershell
-npm exec --yes --package @adui/viteplus-starter -- viteplus-starter
-```
-
-全局安装后可直接传参数创建应用，或先用 `--dry-run` 查看计划：
-
-```powershell
-viteplus-starter --help
-viteplus-starter --name my-vue-app --type application --framework vue --ui element-plus --css tailwindcss --dry-run
-# 确认计划后去掉 --dry-run 创建
-viteplus-starter --name my-vue-app --type application --framework vue --ui element-plus --css tailwindcss
-Set-Location -LiteralPath .\my-vue-app
-vp check
-vp run build
-vp dev
-```
-
-npm 包命令将项目生成在**当前调用目录**下。包名是 `@adui/viteplus-starter`，安装后的命令名是 `viteplus-starter`；它是项目生成工具，不需要在业务代码中 import。生成应用的日常开发继续使用 `vp`。
-
-### 从 GitHub 下载并启动向导
-
-在希望存放项目的父目录执行，目标 `viteplus-starter` 目录须不存在：
+**当前可用：从 GitHub 下载。** 在项目父目录执行，工具目录 `viteplus-starter` 须不存在：
 
 ```powershell
 vp create github:adui-dev/viteplus-starter
@@ -118,51 +48,93 @@ Set-Location -LiteralPath viteplus-starter
 vp run create
 ```
 
-也可将第一条命令替换为：
+也支持 `vp create https://github.com/adui-dev/viteplus-starter`。GitHub 命令下载生成器仓库，`vp run create` 才会启动配置向导，新应用与工具仓库并列生成。
+
+**已有本地 tgz：直接运行。** 在项目父目录任选一种，替换为实际包路径：
 
 ```powershell
-vp create https://github.com/adui-dev/viteplus-starter
+vp dlx -- 'C:\Downloads\adui-viteplus-starter-0.1.0.tgz'
+# 或
+pnpm dlx 'C:\Downloads\adui-viteplus-starter-0.1.0.tgz'
 ```
 
-`vp create github:...` 下载的是生成器仓库；进入工具目录运行 `vp run create` 才会启动配置向导。新项目生成在工具仓库的父目录，与工具目录并列。
-
-向导依次选择名称、项目形态、框架、语言、UI、CSS、大屏、引擎及模型保护。方向键移动，回车确认；引擎使用空格多选，Ctrl+C 取消。
-
-创建完成后，进入实际应用目录：
+<details>
+<summary>使用 npm 运行本地 tgz</summary>
 
 ```powershell
-Set-Location -LiteralPath ..\my-app  # 替换为向导中填写的项目名
+npm exec --yes --package 'C:\Downloads\adui-viteplus-starter-0.1.0.tgz' -- viteplus-starter
+```
+
+</details>
+
+**正式发布后：按包名直接运行。** 以下三种方式任选一种，无需全局安装或添加项目依赖：
+
+```powershell
+vp dlx -- @adui/viteplus-starter
+# 或
+pnpm dlx @adui/viteplus-starter
+# 或
+npm exec --yes --package @adui/viteplus-starter -- viteplus-starter
+```
+
+### 2. 选择项目配置
+
+向导依次选择名称、Application / Monorepo、框架、语言、UI、CSS、大屏、引擎及模型保护。
+
+| 操作            | 按键                          |
+| --------------- | ----------------------------- |
+| 移动选项 / 确认 | 方向键 / Enter                |
+| 多选 3D 引擎    | Space 勾选，Enter 确认        |
+| 取消创建        | Ctrl+C，或在最终确认时选择 No |
+
+### 3. 检查并启动应用
+
+假设项目名为 `my-app`，根据入口进入对应目录：
+
+| 创建入口                   | 项目位置         | 进入应用                              |
+| -------------------------- | ---------------- | ------------------------------------- |
+| 工具仓库内 `vp run create` | 工具仓库的父目录 | `Set-Location -LiteralPath ..\my-app` |
+| dlx / 已安装的 CLI         | 当前调用目录     | `Set-Location -LiteralPath .\my-app`  |
+
+```powershell
 vp check
 vp run build
 vp dev
 ```
 
-Monorepo 在工作区根运行 `vp run ready`；应用启动方式和入口详见 [Windows 操作指南](docs/WINDOWS_GUIDE.md)。
+Monorepo 在工作区根运行 `vp run ready`。完整步骤见 [Windows 操作指南](docs/WINDOWS_GUIDE.md)。
 
-### 使用本地 CLI 包
+## 安装后使用
 
-已有源码与依赖时，在生成器仓库根目录打包，再切换到项目父目录启动：
+正式发布后，也可以安装 CLI 长期使用。包名是 **`@adui/viteplus-starter`**，命令名是 **`viteplus-starter`**。
+
+| 方式             | pnpm                                         | npm                                             |
+| ---------------- | -------------------------------------------- | ----------------------------------------------- |
+| 全局安装         | `pnpm add --global @adui/viteplus-starter`   | `npm install --global @adui/viteplus-starter`   |
+| 全局安装后启动   | `viteplus-starter`                           | `viteplus-starter`                              |
+| 项目内安装       | `pnpm add --save-dev @adui/viteplus-starter` | `npm install --save-dev @adui/viteplus-starter` |
+| 项目内安装后启动 | `pnpm exec viteplus-starter`                 | `npm exec -- viteplus-starter`                  |
+
+无参数启动向导，`--help` 查看帮助，`--dry-run` 只输出计划。CLI 是项目生成工具，无需在业务代码中 import；生成应用的日常开发继续使用 `vp`。
+
+<details>
+<summary>通过 vp dlx / pnpm dlx 传入帮助与预览参数</summary>
 
 ```powershell
-$bundle = npm --silent run cli:pack | ConvertFrom-Json
-if ($LASTEXITCODE -ne 0) { throw 'CLI 打包失败' }
-Set-Location ..
-vp dlx -- $bundle.tarball
+vp dlx -- @adui/viteplus-starter --help
+vp dlx -- @adui/viteplus-starter --name my-vue-app --type application --framework vue --ui element-plus --css tailwindcss --dry-run
+pnpm dlx @adui/viteplus-starter --name my-vue-app --type application --framework vue --ui element-plus --css tailwindcss --dry-run
 ```
 
-得到的 tgz 包包含生成器及所需预设源码，可交给其他已安装 Vite+ 的 Windows 环境使用。包路径后的参数会传入 CLI，详见 [CLI 分发说明](docs/CLI_DISTRIBUTION.md)。
+本地 tgz 使用同样的参数，只需将包名替换为 tgz 路径。`vp dlx --` 的分隔符让帮助等参数传给生成器。
 
-本地 tgz 也可通过 pnpm 运行；在项目父目录执行，路径替换为实际包路径：
-
-```powershell
-pnpm dlx 'C:\Downloads\adui-viteplus-starter-0.1.0.tgz'
-```
+</details>
 
 ## 常用操作
 
-以下命令在生成器根目录执行；`vp run create` 将目标解析到工具父目录。项目名使用小写字母、数字和中划线，以字母开头；新建目标目录须不存在，补装使用已有应用目录。
+以下示例在**生成器仓库根目录**运行，目标按工具父目录解析。项目名以小写字母开头，只使用小写字母、数字和中划线；新建目标须不存在。
 
-### 按参数创建应用
+### 创建 Vue / React 应用
 
 ```powershell
 # Vue + TypeScript + Element Plus + Tailwind CSS
@@ -171,13 +143,14 @@ vp run create --name my-vue-app --type application --framework vue --ui element-
 # React + JavaScript + Ant Design + UnoCSS
 vp run create --name my-react-app --type application --framework react --language js --ui antd --css unocss
 
-# 大屏 + Three.js，默认启用模型自动加密加载
+# Vue 大屏 + Three.js，默认启用模型自动加密加载
 vp run create --name my-screen --type application --framework vue --screen --engine three
 ```
 
-添加 `--dry-run` 可只查看计划，`--help` 查看全部参数。新建应用直接从正式 main/App 接入所选插件；默认不生成额外验收页，需要时添加 `--smoke-pages`。
+添加 `--dry-run` 先预览；新建应用直接从正式 main/App 接入所选插件。默认不保留独立预设验收页，需要时添加 `--smoke-pages`。
 
-### 创建 Monorepo 并添加应用
+<details>
+<summary>创建 Monorepo，并添加独立配置的应用</summary>
 
 ```powershell
 vp run create --name my-workspace --type monorepo
@@ -185,59 +158,68 @@ vp run create --workspace ./my-workspace --name admin --type application --frame
 vp run create --workspace ./my-workspace --name portal --type application --framework react --language js --ui antd --css tailwindcss
 ```
 
-保留官方 `apps/website` 和 `packages/utils`，新增应用位于 `apps/<name>`。每个应用独立选择语言与插件，根不指定统一框架或语言。详见 [Monorepo 指南](docs/MONOREPO.md)。
+保留官方 `apps/website` 和 `packages/utils`，新应用位于 `apps/<name>`。根不指定统一框架或语言。详见 [Monorepo 指南](docs/MONOREPO.md)。
 
-### JSON 批量创建
+</details>
+
+<details>
+<summary>使用 JSON 批量创建混合工作区</summary>
 
 ```powershell
 vp run create --config ./viteplus-starter/examples/monorepo.batch.json --dry-run
 vp run create --config ./viteplus-starter/examples/monorepo.batch.json
 ```
 
-此处配置路径相对于工具父目录，假设工具目录名为 `viteplus-starter`；重命名后须同步调整，也可传配置的绝对路径。示例创建 Vue TS 与 React JS 混合工作区。配置格式见 [批量配置](docs/BATCH_CONFIG.md) 和 [示例索引](examples/README.md)。
+配置路径相对于工具父目录；工具目录重命名后须同步调整路径，或使用绝对路径。配置格式见 [批量配置](docs/BATCH_CONFIG.md)，更多组合见 [示例索引](examples/README.md)。
 
-### 为已有应用补装
+</details>
+
+<details>
+<summary>为已有 Vue 应用补装 UI / CSS</summary>
 
 ```powershell
 vp run create --name existing-vue --type application --framework vue --ui element-plus --css tailwindcss --apply-existing
 ```
 
-示例目标是工具父目录下的 `existing-vue`，须与已有应用的实际框架、语言一致。补装归档本次新增插件，保留业务 App、挂载逻辑和配置原件备份；UI/CSS 与基础样式按已知规则增量导入。已有插件不自动迁移，冲突时停止并保留现场。接入方式见 [项目结构说明](docs/PROJECT_LAYOUT.md)。
+目标为工具父目录下的已有 `existing-vue`，框架和语言须匹配。本次新增插件统一归档；业务 App、挂载逻辑、自定义注册入口与配置原件备份保留，样式按已知规则增量导入。历史插件不自动迁移，冲突时停止并保留现场。详见 [补装接入说明](docs/PROJECT_LAYOUT.md)。
+
+</details>
 
 ## 项目结构
 
-新建应用按所选功能生成对应目录，下面以 Vue TypeScript 应用为例：
+只生成所选功能需要的目录。以 Vue TypeScript 应用为例：
 
 ```text
 src/
-  plugins/          # UI、大屏和所选引擎运行时
-  components/       # 页面组件与按需场景入口
-  styles/           # 本地 normalize.css、许可与首页样式
-  models/           # 启用模型保护时存放自包含 GLB
-  App.vue           # 使用所选插件的正式首页
-  main.ts           # 应用挂载、插件注册与样式入口
+├─ plugins/        UI、大屏与所选引擎运行时
+├─ components/     页面组件与按需场景入口
+├─ styles/         本地 normalize.css、许可及首页样式
+├─ models/         自包含 GLB，按模型保护配置生成
+├─ App.vue         使用所选插件的正式首页
+└─ main.ts         挂载、插件注册与样式入口
 build/
-  plugins/          # 模型加密、Cesium 资源等构建增强
+└─ plugins/        模型加密、Cesium 静态资源等构建增强
 ```
 
-React 使用对应的 `App.tsx` / `main.tsx`，JavaScript 项目使用 JS / JSX 入口。Vue 从 main 注册插件、在 App 使用组件；React 保留 createRoot，在 App 组合组件。引擎点击后才加载，多引擎安装不会同时启动多个渲染器。
+Vue 在 main 注册插件、App 使用组件；React 保留 createRoot，在 App 组合组件。JS / React 使用对应的 JS / JSX / TSX 入口。引擎点击后加载，多引擎安装不会同时启动多个渲染器。详见 [目录与入口设计](docs/PROJECT_LAYOUT.md)。
 
-normalize.css 使用随生成器携带的静态文件，不安装 npm 包，也不在运行时依赖远程 CSS。模型保护默认在构建时将 GLB 转为 `.adui`，生成项目提供 `models:keygen` / `models:keyrotate`；客户端内置密钥用于提高直接复用门槛，不保证无法逆向提取。详见 [模型构建指南](docs/MODEL_BUILD.md)。
+模型保护默认将自包含 GLB 加密为 `.adui`，提供 `models:keygen` / `models:keyrotate`。客户端内置密钥用于提高直接复用门槛，不保证无法逆向提取，边界见 [模型构建指南](docs/MODEL_BUILD.md)。
 
 ## 文档
 
-| 主题           | 入口                                                                                                                                              |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 使用与配置     | [Windows 操作](docs/WINDOWS_GUIDE.md)、[项目结构](docs/PROJECT_LAYOUT.md)、[CLI 分发](docs/CLI_DISTRIBUTION.md)                                   |
-| 工作区         | [Monorepo](docs/MONOREPO.md)、[JSON 批量配置](docs/BATCH_CONFIG.md)、[配置示例](examples/README.md)                                               |
-| 大屏与引擎     | [AdScreen](docs/SCREEN.md)、[Three.js](docs/THREE_SMOKE.md)、[Cesium](docs/CESIUM.md)、[Babylon](docs/BABYLON.md)、[多引擎](docs/MULTI_ENGINE.md) |
-| 模型与页面验收 | [模型构建](docs/MODEL_BUILD.md)、[模型加密](docs/MODEL_SECURITY.md)、[UI 验收](docs/UI_SMOKE.md)                                                  |
-| 能力与边界     | [当前能力](docs/GENERATOR_STATUS.md)、[验收范围](docs/V1_ACCEPTANCE.md)、[首发准备](docs/NPM_RELEASE.md)                                          |
-| 开发维护       | [协作规范](AGENTS.md)、[架构](docs/ARCHITECTURE.md)、[代码索引](docs/CODEBASE_MAP.md)、[本地验证](docs/HARNESS.md)                                |
+| 主题       | 指南                                                                                                                                                  |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 开始使用   | [Windows 操作](docs/WINDOWS_GUIDE.md) · [CLI 分发](docs/CLI_DISTRIBUTION.md) · [项目结构](docs/PROJECT_LAYOUT.md)                                     |
+| 工作区     | [Monorepo](docs/MONOREPO.md) · [批量配置](docs/BATCH_CONFIG.md) · [配置示例](examples/README.md)                                                      |
+| 大屏与引擎 | [AdScreen](docs/SCREEN.md) · [Three.js](docs/THREE_SMOKE.md) · [Cesium](docs/CESIUM.md) · [Babylon](docs/BABYLON.md) · [多引擎](docs/MULTI_ENGINE.md) |
+| 模型与验收 | [模型构建](docs/MODEL_BUILD.md) · [模型加密](docs/MODEL_SECURITY.md) · [UI 验收](docs/UI_SMOKE.md)                                                    |
+| 交付范围   | [当前能力](docs/GENERATOR_STATUS.md) · [验收范围](docs/V1_ACCEPTANCE.md) · [首发准备](docs/NPM_RELEASE.md)                                            |
+| 开发维护   | [协作规范](AGENTS.md) · [架构](docs/ARCHITECTURE.md) · [代码索引](docs/CODEBASE_MAP.md) · [本地验证](docs/HARNESS.md)                                 |
 
-当前验证覆盖 Windows 下的代表组合，完整构建、浏览器验收和未覆盖范围以验收文档为准。
+当前验证覆盖 Windows 下的代表组合；完整构建、浏览器验收和未覆盖范围以验收文档为准。
 
-## 本地开发
+<details>
+<summary>本地开发与 CLI 打包</summary>
 
 ```powershell
 git clone https://github.com/adui-dev/viteplus-starter.git
@@ -249,4 +231,15 @@ node scripts/validate-docs.mjs
 vp check
 ```
 
-直接运行 `node packages/create/bin/cli.mjs` 时，输出相对于当前调用目录；需要在仓库外创建应用时，使用前文的 `vp run create` 或切换目录后调用 CLI 绝对路径。
+在生成器根目录打包，再切换到项目父目录启动：
+
+```powershell
+$bundle = npm --silent run cli:pack | ConvertFrom-Json
+if ($LASTEXITCODE -ne 0) { throw 'CLI 打包失败' }
+Set-Location ..
+vp dlx -- $bundle.tarball
+```
+
+打包结果包含 tgz 及内容清单。源码或包内 README 更新后须重新打包，旧 tgz 不会自动更新。直接调用 CLI 源文件时输出相对于当前调用目录；`vp run create` 始终以工具父目录为基准。详见 [CLI 分发说明](docs/CLI_DISTRIBUTION.md)。
+
+</details>

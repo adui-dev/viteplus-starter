@@ -839,3 +839,13 @@
 使用现有 0.1.0 本地候选包 pack-CTTmQw 实测 pnpm dlx 与 vp dlx 的帮助和参数预览：分别使用 Vue/Element Plus/Tailwind 和 React JS/Ant Design/UnoCSS，cwd/target 均指向实际调用目录，未创建目标。该包用于验证命令调用，尚未包含本轮 README 更新；未运行 registry 包名安装、全局安装或创建新应用，dlx 缓存沿用包管理器默认管理。
 
 本轮 285/285 测试、文档校验、五份改动文档的格式检查、153 文件 lint 和 git diff --check 通过。完整 vp check 仍仅因用户已安装 create-readme Skill 的原文格式未通过，未改动其文件和 skills-lock.json。测试及四份 dlx 帮助/预览日志位于忽略目录 dist/verification，不将本轮验证扩展为新建应用构建或正式发布。
+
+## 2026-11-03 README 排版与视觉整理
+
+继续使用 create-readme Skill 整理根与 CLI README：增加共享静态 SVG 横幅、居中标题和导航，将重复安装步骤合并为 npm/pnpm 对照表，快速开始按启动、选择、验证组织，Monorepo/批量/补装/打包等细节使用折叠块。保留 vp dlx、pnpm dlx、npm、全局/项目内安装与本地 tgz 用法，明确工具父目录和 CLI 当前目录的区别。发布状态、模型保护边界及代表验收范围保持准确。
+
+新横幅位于 docs/assets/readme-banner.svg，仅服务文档，不修改打包器或生成应用。根 README 使用相对资源路径，CLI README 使用仓库 raw 绝对 URL，以适配独立包展示。用户安装的 Skill 与锁文件保持原样；本轮不发布。下一步重新打包含最终文档的候选包，继续核实首发条件。
+
+本轮 285/285 测试、文档校验、四份改动 Markdown 的格式检查、153 文件 lint 与 git diff --check 通过。SVG XML 解析、导航标题与折叠标签核对完成；使用 PowerShell Markdown 转换及本地 Chrome 生成并查看排版预览，预览与日志位于忽略目录 dist/verification。该预览用于本地视觉检查，不等同 GitHub/npm 页面实测。完整 vp check 仍仅因已安装 create-readme Skill 的既有格式问题未通过；不修改第三方原文或检查配置。本轮未重打 CLI 包、创建应用或执行发布。
+
+浏览器已退出；自动审批以 blocked by policy 拒绝清理本轮自有 Chrome 临时配置目录，未提供更具体原因，未绕过该限制。临时目录 adui-readme-preview-45e11a1a930e41e59829604da693d887 保留在系统 Temp 中，具体路径记录于忽略目录 dist/verification/readme-preview-profile.txt。
