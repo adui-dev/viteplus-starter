@@ -881,3 +881,11 @@ npm whoami 已核实为 adui，对应个人作用域 @adui；目标包查询为 
 真实 registry 包名调用 vp dlx -- @adui/viteplus-starter 与 pnpm dlx @adui/viteplus-starter 的帮助均成功；前者 Vue TS/Element Plus/Tailwind/大屏、后者 React JS/Ant Design/UnoCSS/三引擎预览通过。调用目录含中文、空格、& 和单引号，cwd/target 正确，未创建工程。仅验收进程使用已缓存 pnpm 12.16.1，未改变全局配置；CLI 包名解析与公开下载已核实。未将帮助/预览称为新的应用创建或浏览器验收。
 
 首发已完成，不创建 GitHub Release 或 CI/CD。下一步通过已发布包进行真实项目使用，按具体创建/补装反馈修复生成器，不扩展业务查看器或重复完整组合矩阵。
+
+## 2026-11-03 npm Keywords 修正
+
+用户反馈 npm 页面 Keywords 为 none。原因是 CLI 源清单没有 keywords，独立包构造器也未传递该字段。补齐 ADui、Vite+、CLI、Vue/React、语言、Monorepo、UI/CSS 与三引擎共20个准确关键词；打包器与报告同步保留，回归直接检查暂存 package.json，避免只改源清单仍在分发时丢失。
+
+本轮准备 0.1.1 候选及对应包内 README，本地元信息修复不改变 CLI 运行逻辑、依赖或生成输出。公开 npm latest 仍为0.1.0，先前授权仅针对0.1.0首发，不据此上传新版本；检查、产物与最终状态另记。用户原有 Skill 安装改动保持。
+
+本轮291/291测试、文档校验及155文件lint通过；完整vp check仍仅因已安装create-readme Skill原文格式未通过，未改变检查规则。产物为dist/cli/pack-vn2jGH/adui-viteplus-starter-0.1.1.tgz，92文件，实际tarball清单及侧车报告均保留20个关键词，完整性审查通过。逐文件与公开0.1.0归档对比，仅package.json和README不同，其余90文件字节完全一致。vp dlx本地候选帮助与React JS/Ant Design/UnoCSS预览通过，未创建目标；npm publish --dry-run --ignore-scripts --access public --tag latest 对此候选预演退出0。日志与对比证据保留在dist/verification/keywords-*。尚未上传0.1.1，npm页面关键词未更新；下一步在明确授权后发布此修正候选并核对registry关键词。

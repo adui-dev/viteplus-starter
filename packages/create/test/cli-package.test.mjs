@@ -20,6 +20,20 @@ test("CLI 本地包保留资源与官方提示依赖，不带测试或生命周�
   const directory = join(root, "package");
   const manifest = await stageCliPackage(directory);
   assert.equal(manifest.name, "@adui/viteplus-starter");
+  const sourceManifest = JSON.parse(
+    await readFile(new URL("../package.json", import.meta.url), "utf8"),
+  );
+  const packedManifest = JSON.parse(await readFile(join(directory, "package.json"), "utf8"));
+  assert.deepEqual(packedManifest.keywords, sourceManifest.keywords);
+  assert.ok(Array.isArray(packedManifest.keywords) && packedManifest.keywords.length > 0);
+  assert.ok(
+    packedManifest.keywords.every(
+      (keyword) => typeof keyword === "string" && keyword.trim() === keyword && keyword.length > 0,
+    ),
+  );
+  assert.equal(new Set(packedManifest.keywords).size, packedManifest.keywords.length);
+  for (const keyword of ["adui", "vite-plus", "cli", "vue", "react", "monorepo"])
+    assert.ok(packedManifest.keywords.includes(keyword));
   assert.equal(manifest.private, false);
   assert.equal(
     JSON.parse(await readFile(new URL("../../../package.json", import.meta.url), "utf8")).private,

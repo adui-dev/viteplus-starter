@@ -9,6 +9,12 @@
 - 291 项测试、隔离安装、Windows shim、Vue/React 预览与 publish dry-run 通过。真实 registry 包名调用 vp dlx / pnpm dlx 的帮助及 Vue/React 配置预览通过，未创建目标；registry 返回的 version/latest/integrity 均已核对。预览不等同新的应用构建，生成能力的代表实测见项目状态。
 - 本轮未添加自动发布配置、CI/CD 或 GitHub Release。原始 Logo 与用户已安装 Skill 保持；根完整 vp check 仍仅受该第三方 Skill 的既有格式问题影响，分发内容不包含该 Skill。
 
+## 0.1.1 Keywords 修正候选（未发布）
+
+0.1.0 未提供 keywords，npm 页面因此显示 none。CLI 源清单补齐 20 个与实际功能相关的关键词，并由 cli-package 显式传入独立包清单；pack-contents.json 同步展示关键词，回归直接核对暂存 package.json，防止只修改源码却在打包时遗漏。
+
+源码及包内 README 当前准备 0.1.1 候选；npm 公开 latest 仍为 0.1.0。已发布版本不可覆盖，更新页面需要发布新版本，参考 [npm 版本更新说明](https://docs.npmjs.com/updating-your-published-package-version-number/)。此前首发授权针对 0.1.0，本候选不自动上传。
+
 ## 本轮候选包
 
 在仓库根运行：

@@ -358,6 +358,8 @@ workspace-inspect 将“生成器管理的首页”与“预设目录已归档�
 
 cli-package 从 CLI 源清单读取版本、显式 private 布尔值、描述、MIT、仓库/主页/反馈及 publishConfig；root LICENSE 原字节复制到暂存根。用户明确授权 0.1.0 公开发布后，CLI 源 private 改为 false，root 工作区继续 private，不作为 CLI 包发布。产物继承源清单状态，不在暂存目录隐藏覆盖。
 
+keywords 同样从 CLI 源清单复制到真正打包的 package.json，并进入侧车内容报告。回归检查源数组、暂存清单和必需核心关键词，防止清单重建时静默丢失 npm 页面检索元信息。该修正不改变 CLI 运行逻辑、依赖和生成结果。
+
 cli-pack-report 只接收 npm pack 的元信息，核对包名/版本/标准 scoped 文件名和实际 files。允许固定顶层文件、normalize 静态资源、既有六个运行时源码树的已知类型；拒绝隐藏/越界路径、测试/依赖目录、模型、未知类型、重复项和缺少许可/入口的候选。pack-cli 在写侧车报告前计算实际 tarball SHA-512 并与 npm integrity 比较，成功后标记 integrityVerified；报告包含逐文件路径/字节数/模式及打包大小，位于产物目录，不进入 tarball。
 
 打包流程仍仅执行 npm pack --offline --ignore-scripts，不执行 publish/stage/login，不提供任何自动发布任务。目标目录独立、写入无覆盖、临时暂存清理保持原有保护。JSON 原有字段保留，新增 contents 路径供核对；审查报告的 publicationPerformed 固定为 false，不能代替账户/版本/内容的最终人工确认。

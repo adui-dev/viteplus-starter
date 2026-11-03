@@ -32,6 +32,8 @@ cli.mjs 的官方创建后基础样式预检复用 createStageRunner，报告“
 
 ## 核心入口
 
+- cli-package.mjs 将 CLI 源 keywords 保留到分发包清单，cli-pack-report.mjs 在侧车报告展示；cli-package/cli-pack-report 回归核对实际暂存 JSON 和报告，避免 npm 页面缺失 Keywords。
+
 - scripts/cli-package.mjs：固定源码与静态资源暂存、路径保护及独立包清单；scripts/pack-cli.mjs、根 cli:pack：npm 本地打包、唯一产物目录和暂存清理。
 - packages/create/test/cli-package.test.mjs：资源、隔离 CLI 多引擎/批量预览、特殊字符调用目录、输出冲突/junction 和打包上下文回归；docs/CLI_DISTRIBUTION.md、packages/create/README.md：本地 tgz 直接运行说明。
 - prompts.mjs 使用结构化 text/select/multiselect/confirm 适配器；CLI 仅在 TTY 向导分支动态加载官方提示组件。engine-prompts.test.mjs 验证具名选项、空引擎选择和逐步骤取消；fixtures/scripted-prompts.mjs 提供类型化测试回答，不依赖终端模拟数字输入。

@@ -66,6 +66,7 @@ export async function stageCliPackage(directory) {
     private: sourceManifest.private,
     publishConfig: sourceManifest.publishConfig,
     description: sourceManifest.description,
+    keywords: sourceManifest.keywords,
     license: sourceManifest.license,
     repository: sourceManifest.repository,
     homepage: sourceManifest.homepage,

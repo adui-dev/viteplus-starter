@@ -1,8 +1,30 @@
 {
   "name": "@adui/viteplus-starter",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "description": "ADui Vite+ 交互式项目生成器",
+  "keywords": [
+    "adui",
+    "ant-design",
+    "babylonjs",
+    "cesium",
+    "cli",
+    "element-plus",
+    "javascript",
+    "monorepo",
+    "react",
+    "scaffolding",
+    "starter",
+    "tailwindcss",
+    "tdesign",
+    "threejs",
+    "typescript",
+    "unocss",
+    "vite",
+    "vite-plus",
+    "viteplus",
+    "vue"
+  ],
   "homepage": "https://github.com/adui-dev/viteplus-starter#readme",
   "bugs": {
     "url": "https://github.com/adui-dev/viteplus-starter/issues"

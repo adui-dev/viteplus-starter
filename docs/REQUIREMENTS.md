@@ -241,3 +241,7 @@ FR-014 / NFR-001：CLI 首发版本经用户确认采用 0.1.0，保持 private:
 用户已明确确认将 @adui/viteplus-starter@0.1.0 以 public/latest 发布到 npm。CLI 源清单 private 改为 false，工作区根保持 true；重新打包并验证实际 tarball、隔离安装与发布预演后，人工上传该具体产物。发布成功须以 registry 返回的版本、tag 与 integrity 为准，并验证 vp dlx / pnpm dlx。此授权不包含 GitHub Release、CI/CD 或自动发布配置。
 
 首发验收已完成：registry 公开提供 0.1.0，latest 为 0.1.0，公开下载与发布候选完整性一致；两种包名入口的帮助和 Vue/React 参数预览通过。范围限于分发与调用验证，不扩展为新一轮所有组合构建通过。
+
+## 2026-11-03 npm Keywords 修正
+
+NFR-003：CLI 清单应包含与实际支持能力一致的 keywords，独立打包清单必须保留这些关键词，侧车报告供审阅；回归核对实际暂存 JSON，不能只添加 README 文本。本轮准备 0.1.1 元信息修正候选，公开 latest 仍为 0.1.0；未发布候选不能称 npm 页面已更新。

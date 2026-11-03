@@ -12,7 +12,7 @@
 </p>
 
 > [!NOTE]
-> **Windows CLI · v0.1.0**。通过 Vite+、pnpm 或 npm 启动配置向导，按需生成官方 Vue、React 与 Monorepo 工程。
+> **Windows CLI · v0.1.1**。通过 Vite+、pnpm 或 npm 启动配置向导，按需生成官方 Vue、React 与 Monorepo 工程。
 
 ## 快速开始
 
@@ -23,16 +23,16 @@
 从希望存放新项目的父目录任选一种命令，替换为实际 tgz 路径：
 
 ```powershell
-vp dlx -- 'C:\Downloads\adui-viteplus-starter-0.1.0.tgz'
+vp dlx -- 'C:\Downloads\adui-viteplus-starter-0.1.1.tgz'
 # 或
-pnpm dlx 'C:\Downloads\adui-viteplus-starter-0.1.0.tgz'
+pnpm dlx 'C:\Downloads\adui-viteplus-starter-0.1.1.tgz'
 ```
 
 <details>
 <summary>使用 npm 运行本地 tgz</summary>
 
 ```powershell
-npm exec --yes --package 'C:\Downloads\adui-viteplus-starter-0.1.0.tgz' -- viteplus-starter
+npm exec --yes --package 'C:\Downloads\adui-viteplus-starter-0.1.1.tgz' -- viteplus-starter
 ```
 
 </details>
